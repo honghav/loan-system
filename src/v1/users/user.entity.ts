@@ -1,14 +1,15 @@
-import { 
-  Entity, 
-  Column, 
-  PrimaryGeneratedColumn, 
-  CreateDateColumn, 
-  UpdateDateColumn, 
-  Index, 
-  OneToMany
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Customer } from '../customer/customer.enitity';
+import { LoanType } from '../loan_type/loan_type.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -25,7 +26,6 @@ export enum UserPosition {
   MANAGER = 'manager',
   DEVELOPER = 'developer',
 }
-
 
 export enum LoginType {
   PHONE_NUMBER = 'phone_number',
@@ -92,7 +92,7 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true })
   image?: string | null;
-  
+
   @Column({
     name: 'login_type',
     type: 'enum',
@@ -115,7 +115,6 @@ export class User {
   })
   position!: UserPosition;
 
-
   @Column({
     type: 'enum',
     enum: UserStatus,
@@ -124,6 +123,8 @@ export class User {
   status!: UserStatus;
   @OneToMany(() => Customer, (customer) => customer.user)
   customer?: Customer[];
+  @OneToMany(() => LoanType, (loan) => loan.user)
+  loanType?: LoanType[];
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

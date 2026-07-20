@@ -6,6 +6,7 @@ import { UsersModule } from './v1/users/users.module';
 import { TelegramModule } from './v1/telegram/telegram.module';
 import { CustomerModule } from './v1/customer/customer.module';
 import { AuthModule } from './v1/auth/auth.module';
+import { LoanTypeModule } from './v1/loan_type/loan_type.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { AuthModule } from './v1/auth/auth.module';
     // TelegramModule,
     CustomerModule,
     AuthModule,
+    LoanTypeModule,
   ],
 })
 export class AppModule {}
-
