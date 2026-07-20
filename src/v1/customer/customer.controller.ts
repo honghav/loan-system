@@ -19,7 +19,7 @@ import { CreateCustomerDto } from './dto/createCustomer.dto';
 import { UpdateCustomerDto } from './dto/updateCustomer.dto';
 
 @ApiTags('Customers') // Group endpoints together in Swagger UI
-@Controller('customers')
+@Controller('v1/customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
@@ -73,7 +73,8 @@ export class CustomerController {
   @ApiOperation({ summary: 'Delete a specific customer by ID' })
   @ApiParam({
     name: 'id',
-    description: 'The unique UUID or string identifier of the customer to delete',
+    description:
+      'The unique UUID or string identifier of the customer to delete',
     type: String,
   })
   @ApiResponse({ status: 200, description: 'Customer deleted successfully.' })
