@@ -6,10 +6,12 @@ import {
   UpdateDateColumn,
   Index,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Customer } from '../customer/customer.enitity';
 import { LoanType } from '../loan_type/loan_type.entity';
+import { LoanInformation } from '../loan_info/loan_infor.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -125,6 +127,8 @@ export class User {
   customer?: Customer[];
   @OneToMany(() => LoanType, (loan) => loan.user)
   loanType?: LoanType[];
+  @OneToMany(() => LoanInformation, (loanInfo) => loanInfo.user)
+  loanInformation?: LoanInformation[];
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

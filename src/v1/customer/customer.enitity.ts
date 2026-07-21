@@ -6,8 +6,10 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { LoanInformation } from '../loan_info/loan_infor.entity';
 
 @Entity('customers') // Changed to plural matching 'users' standard
 export class Customer {
@@ -44,6 +46,9 @@ export class Customer {
   // 2. This property purely gives you easy string access to the foreign key value
   @Column({ name: 'user_id', type: 'uuid', nullable: true })
   userId?: string;
+
+  @OneToMany(() => LoanInformation, (loanInfo) => loanInfo.customer)
+  loanInformation?: LoanInformation[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

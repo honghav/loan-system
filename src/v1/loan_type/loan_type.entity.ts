@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { LoanInformation } from '../loan_info/loan_infor.entity';
 
 @Entity('loan_type')
 export class LoanType {
@@ -29,6 +30,9 @@ export class LoanType {
 
   @Column({ name: 'user_id', type: 'uuid', nullable: true })
   userId?: string;
+
+  @OneToMany(() => LoanInformation, (loan) => loan.loanType)
+  loanInformation?: LoanInformation[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

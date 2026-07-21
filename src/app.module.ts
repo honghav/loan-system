@@ -7,6 +7,8 @@ import { TelegramModule } from './v1/telegram/telegram.module';
 import { CustomerModule } from './v1/customer/customer.module';
 import { AuthModule } from './v1/auth/auth.module';
 import { LoanTypeModule } from './v1/loan_type/loan_type.module';
+import { LoanInformationModule } from './v1/loan_info/loan_infor.module';
+import { PaymentTableModule } from './v1/payment_table/payment_table.module';
 
 @Module({
   imports: [
@@ -24,7 +26,9 @@ import { LoanTypeModule } from './v1/loan_type/loan_type.module';
     // TelegramModule,
     CustomerModule,
     AuthModule,
+    LoanInformationModule,
     LoanTypeModule,
+    PaymentTableModule,
   ],
 })
 export class AppModule {}
