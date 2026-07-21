@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -37,5 +37,22 @@ export class PaymentLoanController {
   })
   async getAll(@Query() query?: GetPaymenttable) {
     return await this.paymentTableService.getAll(query);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update the status of a payment table record' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully updated the status of the payment table record.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Payment table record not found.',
+  })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+  ) {
+    return await this.paymentTableService.updateStatus(id, status);
   }
 }

@@ -4,6 +4,7 @@ import { PaymentTable } from './payment_table.entity';
 import { Repository } from 'typeorm';
 import { CreatePaymenttable } from './dto/create_payment_table.dto';
 import { GetPaymenttable } from './dto/get_payment_table.dto';
+import { UpdatePaymenttable } from './dto/update_payment_table.dto';
 
 @Injectable()
 export class PaymentTableService {
@@ -37,4 +38,15 @@ export class PaymentTableService {
       throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
     }
   }
+
+  async updateStatus(id: string, status: string) {
+    const record = await this.paymentTableRepo.findOne({ where: { id } });
+    if (!record) {
+      throw new Error('Payment record not found');
+    }
+    record.status = status as UpdatePaymenttable['status']; // Cast to PaymentStatus enum
+    return await this.paymentTableRepo.save(record);
+  }
+
+
 }

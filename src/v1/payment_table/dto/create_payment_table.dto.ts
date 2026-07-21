@@ -16,13 +16,13 @@ export class CreatePaymenttable {
   @IsNotEmpty()
   paymentRequiredDate!: Date;
 
-  @ApiPropertyOptional({
-    description: 'Actual date when payment was made',
-    example: '2026-05-01',
-    nullable: true,
-  })
-  @IsOptional()
-  payDate?: Date | null;
+  // @ApiPropertyOptional({
+  //   description: 'Actual date when payment was made',
+  //   example: '2026-05-01',
+  //   nullable: true,
+  // })
+  // @IsOptional()
+  // payDate?: Date | null;
 
   @ApiPropertyOptional({
     description: 'Total payment amount required/paid for this period',

@@ -1,12 +1,14 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsEnum,
   IsInt,
   IsOptional,
   IsString,
   IsUUID,
   Min,
 } from 'class-validator';
+import { PaymentStatus } from '../payment_table.entity';
 
 export class GetPaymenttable {
   @ApiPropertyOptional({
@@ -55,4 +57,11 @@ export class GetPaymenttable {
   @IsOptional()
   @IsString()
   payDate?: string;
+
+    @IsOptional()
+    @IsEnum(PaymentStatus, {
+      message: 'Invalid Payment Status',
+    })
+    status!: PaymentStatus;
+  
 }
