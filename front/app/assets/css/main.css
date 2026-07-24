@@ -1,0 +1,283 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap");
+
+@import url("https://fonts.cdnfonts.com/css/sf-ui-display");
+@import "tailwindcss";
+@import "@nuxt/ui";
+@source "../../../content/**/*";
+
+/* ================================
+   THEME
+================================ */
+
+@theme static {
+  /* Font */
+  --font-sans: "Kantumruy Pro", sans-serif;
+
+  /* Green palette */
+  --color-green-50: #effdf5;
+  --color-green-100: #d9fbe8;
+  --color-green-200: #b3f5d1;
+  --color-green-300: #75edae;
+  --color-green-400: #00dc82;
+  --color-green-500: #00c16a;
+  --color-green-600: #00a155;
+  --color-green-700: #007f45;
+  --color-green-800: #016538;
+  --color-green-900: #0a5331;
+  --color-green-950: #052e16;
+
+  /* Project colors */
+  --color-primary: #0e6b3e;
+  --color-secondary: #1a1a1a;
+}
+
+/* ================================
+   DARK MODE
+================================ */
+
+.dark {
+  --ui-bg: var(--ui-color-white-950);
+  --ui-bg-muted: var(--ui-color-neutral-900);
+  --ui-bg-elevated: var(--ui-color-neutral-900);
+  --ui-bg-accented: var(--ui-color-neutral-800);
+}
+
+/* ================================
+   GLOBAL
+================================ */
+
+* {
+  --ui-color-primary: var(--color-primary);
+  --ui-color-secondary: var(--color-secondary);
+  font-family: "Kantumruy Pro", sans-serif;
+  font-optical-sizing: auto;
+  scrollbar-width: none;
+  /* font-weight: 300; */
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  background-color: #f6f8f7;
+  color-scheme: light;
+}
+.dark body {
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  background-color: #141f18;
+  color-scheme: dark;
+}
+
+body {
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  overflow-x: hidden;
+  color: #000;
+  /* background-color: #09220C; */
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* ================================
+   COLORS
+================================ */
+
+.bg-primary {
+  background: linear-gradient(45deg, #0e6b3e 0%, #2fa36b 100%);
+}
+
+.text-primary {
+  color: var(--color-primary) !important;
+}
+.dark .text-primary {
+  color: var(--color-primary) !important;
+}
+
+.bg-secondary {
+  background-color: white !important;
+}
+.dark .bg-secondary {
+  background-color: #020618 !important;
+}
+
+.text-secondary {
+  color: var(--color-secondary) !important;
+}
+.dark .text-secondary {
+  color: white !important;
+}
+
+/* .border-secondary {
+  border-color: #020618 !important;
+} */
+
+/* ================================
+   SCROLLBAR
+================================ */
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+.btn-primary {
+  background: linear-gradient(45deg, #0e6b3e 0%, #2fa36b 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  display: inline-block;
+}
+
+/* ================================
+   TYPOGRAPHY
+================================ */
+
+.inter-light {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+}
+
+h1 {
+  font-size: clamp(18px, 4vw, 24px);
+}
+
+h2 {
+  font-size: clamp(16px, 3vw, 20px);
+}
+
+h3 {
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-family: "Kantumruy Pro", "Inter", sans-serif !important;
+}
+
+h4 {
+  font-size: clamp(12px, 2.5vw, 16px);
+}
+
+p {
+  font-size: clamp(12px, 2vw, 14px);
+}
+.font-semibold {
+  font-weight: 500 !important;
+}
+
+/* ================================
+   Border
+================================ */
+.border-primary {
+  border-color: var(--color-primary) !important;
+}
+.dark .border-primary {
+  border-color: var(--color-primary) !important;
+}
+
+.border-secondary {
+  border-color: #e3e7e5 !important;
+}
+.dark .border-secondary {
+  border-color: var(--color-primary) !important;
+}
+/* ================================
+   CONTAINER
+================================ */
+
+.container {
+  max-width: 1280px;
+  @apply mx-auto px-4 xl:px-0;
+}
+
+/* ================================
+   ELEMENTS
+================================ */
+
+button {
+  cursor: pointer;
+  user-select: none;
+}
+
+ul li a {
+  @apply text-nowrap;
+}
+
+/* ================================
+   ANIMATION DARK MODE
+================================ */
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: clip-expand 0.5s ease-in forwards;
+  mix-blend-mode: normal;
+}
+
+@keyframes clip-expand {
+  from {
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
+  }
+}
+/* ================================
+   ANIMATION CARD
+================================ */
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 5s ease forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ================================
+   Loading animation
+================================ */
+.loader {
+  width: 75px;
+  height: 75px;
+  border: 2px solid #e5e7eb;
+  border-top: 6px solid #0e6b3e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

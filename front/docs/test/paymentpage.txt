@@ -1,0 +1,210 @@
+<template>
+    <article class="container">
+        <section class="h-4"></section>
+        <UBreadcrumb :items="[{ label: $t('home'), to: '/' }, { label: $t('cart'), to: '/cart' }]"
+            class="w-fit py-2.5 bg-secondary rounded-xl px-4 " />
+        <article class="w-full grid grid-cols-4 gap-5 my-10">
+            <!-- Payment Information -->
+            <section class="bg-white col-span-3 rounded-2xl p-7">
+                <h2 class="my-2">{{ $t('payment') }}</h2>
+                <div class="mt-4 flex items-center gap-2">
+                    <UIcon name="ri:id-card-fill" size="20" />
+                    <h3 class="">{{ $t('profile_info') }}</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-gray-600 my-3">
+                    <div class="w-full">
+                        <h4>{{ $t('first_name') }}</h4>
+                        <UInput v-model="user?.first_name" size="lg" :placeholder="$t('first_name')"
+                            :ui="{
+                                root: 'w-full ',
+                                base: 'w-full text-black h-10 rounded-lg ring ring-gray-200'
+                            }" />
+                    </div>
+                    <div class="w-full">
+                        <h4>{{ $t('last_name') }}</h4>
+                        <UInput v-model="user?.last_name" size="lg" :placeholder="$t('last_name')"
+                            :ui="{
+                                root: 'w-full ',
+                                base: 'w-full text-black h-10 rounded-lg ring ring-gray-200'
+                            }" />
+                    </div>
+                    <div class="w-full">
+                        <h4>{{ $t('phone') }}</h4>
+                        <!-- <UInput v-model="paymentData?.profile.phone" size="lg" :placeholder="$t('phone')" :ui="{
+                            root: 'w-full',
+                            base: 'w-full text-black h-10 rounded-lg ring ring-gray-200'
+                        }" /> -->
+                    </div>
+                    <div class="w-full">
+                        <h4>{{ $t('type_delivery') }}</h4>
+                        <!-- <UInput v-model="paymentData?.delivery_type" size="lg" :placeholder="$t('type_delivery')" :ui="{
+                            root: 'w-full',
+                            base: 'w-full text-black h-10 rounded-lg ring ring-gray-200'
+                        }" /> -->
+                    </div>
+                </div>
+                <!-- Address Fill -->
+                <div class="mt-4 flex items-center gap-2">
+                    <UIcon name="ri:map-pin-2-fill" size="20" />
+                    <h3 class="">{{ $t('address_info') }}</h3>
+                </div>
+                <div class="w-full col-span-3 my-3 ">
+                    <h4 class="text-gray-600">{{ $t('address_label') }}</h4>
+                    <!-- <UInputMenu v-model="addressdefult" :items="addressvalue" :ui="{
+                        root: 'w-full',
+                        base: 'w-full text-black h-10 rounded-lg ring ring-gray-200',
+                        content: ' py-2 bg-white hover:text-black text-black  rounded-lg shadow-lg mt-1',
+                        item: 'px-4 py-2 text-black  hover:bg-gray-100 cursor-pointer border-t-1 border-gray-200',
+                        itemLabel: 'text-black hover:text-black focus:text-primary',
+                    }" /> -->
+                </div>
+                <!-- Payment Methods -->
+                <div class="mt-4 flex items-center gap-2">
+                    <UIcon name="ri:bank-card-fill" size="20" />
+                    <h3 class="">{{ $t('payment_methods') }}</h3>
+                </div>
+                <div class="grid grid-cols-3 gap-4 my-3">
+                    <!-- <label v-for="payment in paymentData?.payment_method" :key="payment.id" class="cursor-pointer">
+                        <input v-model="selectedPayment" :value="payment.id" type="radio" class="hidden peer">
+                        <div
+                            class="flex items-center justify-between rounded-xl border-2 px-5 py-2 transition-all duration-200 border-gray-200 peer-checked:border-green-600 peer-checked:bg-green-50">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-md overflow-hidden flex items-center justify-center bg-white">
+                                    <NuxtImg :src="payment.image" :alt="payment.name"
+                                        class="w-full h-full object-contain" />
+                                </div>
+                                <span class="text-xl font-medium text-gray-800">
+                                    {{ payment.name }}
+                                </span>
+                            </div>
+                            <div
+                                class="w-3 h-3 rounded-full border-2 flex items-center justify-center border-gray-300 peer-checked:border-green-600">
+                                <div v-if="selectedPayment === payment.id"
+                                    class="w-2.5 h-2.5 rounded-full bg-green-600" />
+                            </div>
+                        </div>
+                    </label> -->
+                </div>
+                <!-- Note Fill -->
+                <div class="mt-4 flex items-center gap-2">
+                    <UIcon name="ri:booklet-fill" size="20" />
+                    <h3 class="">{{ $t('note') }}</h3>
+                </div>
+                <h4 class="mt-3 text-gray-600">{{ $t('note_placeholder') }}</h4>
+                <!-- <UInput v-model="paymentData?.note" size="lg" :placeholder="$t('note')" :ui="{
+                    root: 'w-full',
+                    base: 'w-full text-black h-10 rounded-lg ring ring-gray-200'
+                }" /> -->
+            </section>
+            <!-- Sumari part -->
+            <section class="col-span-1 rounded-2xl bg-white h-fit p-7">
+                <!-- <h3 class="font-semibold text-secondary ">{{ $t('sumari') }} • {{ paymentData?.order_items.total_item}} {{ $t('item')}}</h3> -->
+                <div class="py-5">
+                    <!-- <div
+                        class="grid grid-cols-2 border-t border-b border-gray-300 justify-between items-center mb-2 gap-4 py-5">
+                        <p class="text-gray-500">{{ $t('subtotal') }}</p>
+                        <p class="text-end">${{ paymentData?.order_items.original_price?.toFixed(2) }}</p>
+                        <p class="text-gray-500">{{ $t('delivery_fee') }}</p>
+                        <p class="text-end">$1</p>
+                        <p class="text-gray-500">{{ $t('saving') }}</p>
+                        <p class="text-end">$ {{ paymentData?.order_items.discount?.toFixed(2) }} </p>
+                    </div> -->
+                    <div class="grid grid-cols-2 mt-20 items-center gap-4">
+                        <h4 class="font-bold  mt-4">{{ $t('total') }}</h4>
+                        <!-- <h1 class="font-bold mt-4 text-red-500 text-end">${{
+                            paymentData?.order_items.total_price?.toFixed(2) }}</h1> -->
+                        <UButton 
+                            class="col-span-2 w-full bg-primary text-white rounded-2xl p-3 flex justify-center">
+                            {{ $t('checkout') }}
+                        </UButton>
+                        <!-- @click="handleCheckout" -->
+                    </div>
+                </div>
+            </section>
+            <!-- Cart Items -->
+            <section class="col-span-3 flex flex-col gap-5 p-10 rounded-2xl bg-white">
+                <h3 class="font-semibold text-secondary ">{{ $t('order_items') }}</h3>
+                <!-- <section class=" max-h-60 overflow-y-auto no-scrollbar"
+                    v-for="item in paymentData?.order_items.list_items" :key="item.id">
+                    <CartItemCard :id="item.id" :name="item.product?.name" :first_price="item.product?.first_price"
+                        :discount="item.discount" :final_price="item.total_price" :quantity="item.quantity"
+                        :image="item.product?.image" :status="true" />
+                </section> -->
+            </section>
+        </article>
+    </article>
+</template>
+
+<script lang="ts" setup>
+import swalModal from '~/composables/swalModal';
+import type { CartDTO, CartItemDTO } from '~/model_dto/cart.dto';
+import { orderProcessingResponse, type ProccessOrderFromDTO, type ProccessOrderPayloadDTO } from '~/model_dto/order.dto';
+import { userId, type ProfileDTO } from '~/model_dto/profile.dto';
+import { getProcessedOrdersFormService } from '~/services/ordersService';
+import {paymentMethodList} from '~/constants/controller/layout/footer';
+import { addressList } from '~/services/addressService';
+import { userProfile} from '~/services/profile'
+import { cartList } from '~/services/cartService';
+import { orderFromData } from '~/services/ordersService';
+ // const orderResponse: ProccessOrderFromDTO = orderProcessingResponse
+const selectedPayment = ref(1)
+// const user = userId;
+const methodPayment = paymentMethodList
+const address = addressList
+const user = userProfile?.value
+const cart = cartList
+const paymentData = 
+// const paymentData = orderFromData.value
+
+// const addressvalue = paymentData?.address
+//     .map((address, index) => ({
+//         label: address.address + ' (' + address.type + ')',
+//         value: index + 1,
+//     })) ?? []
+// const addressdefult = ref(addressvalue[0])
+// const state = ref<ProccessOrderPayloadDTO>({
+//     first_name: paymentData?.value?.profile.first_name || 'John',
+//     last_name: paymentData?.value?.profile.last_name || 'Doe',
+//     phone: paymentData?.value?.profile.phone || '',
+//     delivery_type: paymentData?.value?.delivery_type,
+//     delivery_fee: 1,
+//     payment_method: selectedPayment.value,
+//     note: '',
+//     created_at: new Date(),
+//     user_id: user,
+//     status: 0,
+//     payment_status: 0,
+//     order_items: paymentData?.value?.order_items,
+//     adressId: Number(addressdefult.value.value)
+// })
+// function handleCheckout() {
+//     const payload: ProccessOrderPayloadDTO = {
+//         first_name: state.value.first_name,
+//         last_name: state.value.last_name,
+//         phone: state.value.phone,
+//         delivery_type: state.value.delivery_type,
+//         delivery_fee: state.value.delivery_fee,
+//         payment_method: selectedPayment.value,
+//         note: state.value.note,
+//         created_at: new Date(),
+//         user_id: user,
+//         status: 0, // Assuming 0 is the initial status for a new order
+//         payment_status: 0, // Assuming 0 is the initial payment status for a new order
+//         order_items: state.value.order_items,
+//         // adressId: Number(addressdefult.value.value)
+//     }
+//     console.log("Checkout payload: ", payload)
+//     swalModal($t('payment_success'), $t('payment_success_message'), "success");
+// }
+onMounted(async() => {
+    await getProcessedOrdersFormService(methodPayment, cart.value, user as ProfileDTO, address.value)
+    // Fetch order processing data here if needed
+    // console.log("Payment data: ", paymentData)
+    // console.log("User:", user)
+    // console.log("User Name:", paymentData?.profile.first_name, paymentData?.profile.last_name)
+})
+</script>
+
+]
+

@@ -1,0 +1,100 @@
+<div class="space-y-4">
+  <!-- Username -->
+  <div>
+    <label class="text-secondary font-medium">
+      {{ $t('username') }}
+      <span class="text-red-500">*</span>
+    </label>
+
+    <UInput
+      v-model="state.name"
+      icon="i-lucide-user"
+      size="lg"
+      :placeholder="$t('username')"
+      :color="usernameError ? 'error' : 'neutral'"
+      :ui="{
+        base: 'h-14 rounded-lg text-secondary'
+      }"
+    />
+
+    <p
+      v-if="usernameError"
+      class="text-red-500 text-sm mt-1"
+    >
+      {{ usernameError }}
+    </p>
+  </div>
+
+  <!-- Password -->
+  <div>
+    <label class="text-secondary font-medium">
+      {{ $t('password') }}
+      <span class="text-red-500">*</span>
+    </label>
+
+    <UInput
+      v-model="state.password"
+      icon="i-lucide-lock-keyhole"
+      size="lg"
+      :type="show ? 'text' : 'password'"
+      :placeholder="$t('password')"
+      :color="passwordError ? 'error' : 'neutral'"
+      :ui="{
+        base: 'h-14 rounded-lg text-secondary'
+      }"
+    >
+      <template #trailing>
+        <UButton
+          color="neutral"
+          variant="link"
+          size="lg"
+          :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+          @click="show = !show"
+        />
+      </template>
+    </UInput>
+
+    <p
+      v-if="passwordError"
+      class="text-red-500 text-sm mt-1"
+    >
+      {{ passwordError }}
+    </p>
+  </div>
+
+  <!-- Forgot Password -->
+  <div class="flex justify-end">
+    <button
+      type="button"
+      class="text-sm text-primary hover:underline"
+      @click="openForgotPasswordModal"
+    >
+      {{ $t('forget') }} {{ $t('password') }}?
+    </button>
+  </div>
+
+  <!-- Login Button -->
+  <UButton
+    block
+    size="lg"
+    class="btn-primary text-white rounded-lg"
+    :loading="logoutLoading"
+    :disabled="!isLoginValid"
+    @click="loginUser"
+  >
+    {{ $t('login') }}
+  </UButton>
+
+  <!-- Register -->
+  <p class="text-center text-gray-500">
+    {{ $t('dont_have_account') }}
+
+    <button
+      type="button"
+      class="text-primary font-medium hover:underline ml-1"
+      @click="openRegisterModal"
+    >
+      {{ $t('register') }}
+    </button>
+  </p>
+</div>
