@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoanInformationService } from './loan_infor.service';
 import { CreateLoanInformation } from './dto/create_loan_info.dto';
@@ -33,4 +33,19 @@ export class LoanInformationController {
   async getAll() {
     return await this.loaniInfoService.getAll();
   }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a loan information record by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully fetched loan information record.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Loan information record not found.',
+  })
+  async getById(@Param('id') id: string) {
+    return await this.loaniInfoService.getById(id);
+  }
 }
+
+  

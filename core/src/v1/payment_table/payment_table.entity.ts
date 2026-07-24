@@ -11,6 +11,12 @@ import {
 } from 'typeorm';
 import { LoanInformation } from '../loan_info/loan_infor.entity';
 
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED',
+}
 @Entity('payment_table')
 export class PaymentTable {
   @PrimaryGeneratedColumn('uuid')
@@ -73,7 +79,14 @@ export class PaymentTable {
     nullable: true,
   })
   remainingBalance?: number | null;
-
+    @Column({
+      name: 'status',
+      type: 'enum',
+      enum: PaymentStatus,
+      default: PaymentStatus.PENDING,
+    })
+    status!: PaymentStatus;
+  
   @ManyToOne(() => LoanInformation, (loanInfo) => loanInfo.paymentTables, {
     nullable: true,
     onDelete: 'SET NULL',

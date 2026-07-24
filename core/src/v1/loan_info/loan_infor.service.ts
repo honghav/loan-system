@@ -13,10 +13,10 @@ export class LoanInformationService {
   constructor(
     @InjectRepository(LoanInformation)
     private loanInfoRepo: Repository<LoanInformation>,
-    // @InjectRepository(PaymentTableService)
-    // private readonly paymentTableService: PaymentTableService,
+    @InjectRepository(PaymentTable)
+    private paymentTableRepo: Repository<PaymentTable>,
   ) {}
-  //   constructor(private readonly paymentTableService: PaymentTableService) {}
+
   private getTotalMonths(
     startDate: Date | string,
     endDate?: Date | string | null,
@@ -37,12 +37,52 @@ export class LoanInformationService {
 
     return Math.max(years * 12 + months, 1);
   }
+
   async create(dto: CreateLoanInformation) {
     if (dto.customerId == null) {
       throw new Error('The Customer Id is required');
     }
-    const loanInfo = await this.loanInfoRepo.create({ ...dto });
-    return await this.loanInfoRepo.save(loanInfo);
+
+    // 1. Create and save the loan information in database
+    const newLoanInfo = this.loanInfoRepo.create({ ...dto });
+    const savedLoan = await this.loanInfoRepo.save(newLoanInfo);
+
+    // 2. Calculate total months for the loan
+    const totalMonth = this.getTotalMonths(
+      savedLoan.startDate,
+      savedLoan.endDate ?? null,
+    );
+
+    // 3. Generate payment schedule table
+    const tableMonth = generatePaymentSchedule({
+      amount: Number(savedLoan.amount),
+      durationMonths: totalMonth,
+      monthlyRate: Number(savedLoan.loanFee || 0),
+      startDate: savedLoan.startDate,
+    });
+
+    // 4. Persist payment schedule items to database
+    const paymentRecords = tableMonth.map((item) =>
+      this.paymentTableRepo.create({
+        paymentRequiredDate: new Date(item.paymentRequiredDate),
+        beginningBalance: item.beginningBalance,
+        totalPayment: item.totalPayment,
+        principal: item.principal,
+        interest: item.interest,
+        remainingBalance: item.remainingBalance,
+        loanInformationId: savedLoan.id,
+      }),
+    );
+    await this.paymentTableRepo.save(paymentRecords);
+
+    // 5. Return success payload
+    return {
+      success: true,
+      data: {
+        ...savedLoan,
+        tableMonth,
+      },
+    };
   }
 
   async getAll() {
@@ -72,6 +112,38 @@ export class LoanInformationService {
             monthlyRate: Number(loan.loanFee),
             startDate: loan.startDate,
           }),
+        };
+      });
+      return {
+        success: true,
+        total: result.length,
+        data: result,
+      };
+    } catch (error: any) {
+      // This sends the REAL database error back to Postman instead of "Internal server error"
+      throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
+    }
+  }
+  async getById(id: string) {
+    try {
+      const loanInfo = await this.loanInfoRepo.find({
+        relations: {
+          user: true,
+          customer: true,
+          loanType: true,
+          paymentTables: true,
+        },
+        where: { id },
+        order: { createdAt: 'DESC' },
+      });
+      const result = loanInfo.map((loan) => {
+        // const totalMonth = this.getTotalMonths(
+        //   loan.startDate,
+        //   loan.endDate ?? null,
+        // );
+
+        return {
+          ...loan,
         };
       });
       return {
