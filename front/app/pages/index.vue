@@ -6,29 +6,29 @@
 <script setup lang="ts">
 // SEO Meta
 useSeoMeta({
-  title: "Home - PAPA FOOD",
-  ogTitle: "PAPA FOOD - Quality Products at the Best Prices",
+  title: "Loan System",
+  ogTitle: "Loan System - Quality Products at the Best Prices",
   description:
-    "Shop quality products at PAPA FOOD. Discover great deals, browse our latest collections, and enjoy a smooth online shopping experience.",
+    "Shop quality products at Loan System. Discover great deals, browse our latest collections, and enjoy a smooth online shopping experience.",
   ogDescription:
-    "PAPA FOOD offers quality products, exclusive deals, and a secure online shopping experience.",
+    "Loan System offers quality products, exclusive deals, and a secure online shopping experience.",
 });
 useHead({
-  title: "PAPA FOOD - Quality Products at the Best Prices",
+  title: "Loan System - Quality Products at the Best Prices",
   meta: [
     {
       name: "description",
       content:
-        "PAPA FOOD offers high-quality products at affordable prices. Shop online, discover great deals, and enjoy a smooth shopping experience.",
+        "Loan System offers high-quality products at affordable prices. Shop online, discover great deals, and enjoy a smooth shopping experience.",
     },
     {
       property: "og:title",
-      content: "PAPA FOOD - Quality Products at the Best Prices",
+      content: "Loan System - Quality Products at the Best Prices",
     },
     {
       property: "og:description",
       content:
-        "Shop at PAPA FOOD for quality products, exclusive deals, and a secure online shopping experience.",
+        "Shop at Loan System for quality products, exclusive deals, and a secure online shopping experience.",
     },
     {
       property: "og:image",
@@ -48,12 +48,12 @@ useHead({
     },
     {
       name: "twitter:title",
-      content: "PAPA FOOD - Quality Products at the Best Prices",
+      content: "Loan System - Quality Products at the Best Prices",
     },
     {
       name: "twitter:description",
       content:
-        "Discover quality products and great deals at PAPA FOOD. Shop online with confidence.",
+        "Discover quality products and great deals at Loan System. Shop online with confidence.",
     },
     {
       name: "twitter:image",

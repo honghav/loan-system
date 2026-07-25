@@ -1,27 +1,30 @@
-<!-- <script setup>
-import gsap from "gsap";
-import Lenis from "@studio-freight/lenis";
-import ScrollTrigger from "gsap/ScrollTrigger";
-
-onMounted(() => {
-  gsap.registerPlugin(ScrollTrigger);
-  const lenis = new Lenis();
-  lenis.on("scroll", ScrollTrigger.update);
-  gsap.ticker.add((time) => {
-    lenis.raf(time * 1000);
-  });
-  gsap.ticker.lagSmoothing(0);
-});
-</script> -->
-
 <template>
   <div class="grid grid-cols-8">
-    <div class="min-h-screen bg-gray-500"></div>
-    <div class="col-span-7">
-      <div class="w-full h-10 bg-secondary py-auto border-b-2 border-primary">
-        <!-- <Navbar /> -->
+    <div class="min-h-screen bg-gray-500">
+      <div v-for="module in modulePage" :key="module.value">
+        <NuxtLink
+          :to="
+            module.under_page === '..'
+              ? `/${module.route}`
+              : `/${module.under_page}/${module.route}`
+          "
+          class="h-8 flex items-center gap-4 px-3 my-2 rounded-lg cursor-pointer transition-all duration-200 animate-spring-slide-up hover:bg-primary/20 focus:bg-primary/30 focus:outline-none"
+          exact-active-class="bg-primary/30"
+        >
+          <h4 class="font-medium text-white">
+            {{ module.name }}
+          </h4>
+        </NuxtLink>
       </div>
-      <div class="mt-10 md:mt-20 min-h-200">
+    </div>
+    <div class="col-span-7">
+      <div
+        class="w-full h-10 bg-secondary py-auto border-b-2 border-primary flex justify-end gap-5 px-25"
+      >
+        <NuxtImg src="images/businessman.png" />
+        <UButton label="Logout" />
+      </div>
+      <div class="min-h-screen">
         <slot />
       </div>
     </div>
@@ -42,25 +45,13 @@ onMounted(() => {
     </div>
     <!-- <Footer /> -->
   </div>
-  <!-- <div class="fixed z-100 bottom-10 right-10 sm:hidden"> -->
-  <!-- <ToolTip /> -->
-  <!-- </div> -->
 </template>
 <script setup lang="ts">
-async function toggleWithRipple(e: MouseEvent) {
-  document.documentElement.style.setProperty("--click-x", `${e.clientX}px`);
-  document.documentElement.style.setProperty("--click-y", `${e.clientY}px`);
+import { moduleData } from "~/model_dto/module_page";
+const route = useRoute();
+const modulePage = computed(() => moduleData);
 
-  if (!document.startViewTransition) {
-    toggleTheme();
-    return;
-  }
-
-  document.startViewTransition(toggleTheme);
-}
-// const { toggleDarkMode } = useTheme();
 const colorMode = useColorMode();
-
 const toggleTheme = () => {
   const newMode = colorMode.value === "dark" ? "light" : "dark";
 
