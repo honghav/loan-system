@@ -1,4 +1,5 @@
-export async function apiFetchTwo(
+export async function apiFetch(
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   endpoint: string,
   body?: any,
   token?: string,
@@ -18,10 +19,10 @@ export async function apiFetchTwo(
   }
 
   return await $fetch(`${config.public.baseUrl}/${endpoint}`, {
-    method: "POST",
+    method: method,
     body,
     headers,
   });
 }
 
-export default apiFetchTwo;
+export default apiFetch;

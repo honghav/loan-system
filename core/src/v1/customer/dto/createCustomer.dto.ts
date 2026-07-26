@@ -33,10 +33,18 @@ export class CreateCustomerDto {
   @IsString()
   @IsOptional()
   image?: string;
+
+  @ApiPropertyOptional({
+    description: 'The citizen ID of the customer',
+    example: '123456789',
+  })
+  @IsString()
+  @IsOptional()
+  citizenId?: string;
  
   @ApiPropertyOptional({
-    description: 'The image of the customer',
-    example: 'https://example.com/image.jpg',
+    description: 'The user ID of the customer',
+    example: 'user_12345',
   })
   @IsString()
   @IsOptional()
