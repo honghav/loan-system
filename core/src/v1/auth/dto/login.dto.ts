@@ -79,5 +79,5 @@ export class LoginDto {
   @ValidateIf((o) => o.loginType === LoginType.TELEGRAM)
   @IsString()
   @IsNotEmpty({ message: 'Telegram chat ID is required' })
-  telegramChatId?: string;
+  telegramUsername?: string;
 }

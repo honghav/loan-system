@@ -4,12 +4,11 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
   MinLength,
   ValidateIf,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { LoginType, UserRole, UserPosition } from '../user.entity';
+import { LoginType, UserRole } from '../user.entity';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -48,12 +47,6 @@ export class CreateUserDto {
   @IsEmail({}, { message: 'A valid email address is required' })
   @IsNotEmpty({ message: 'Email is required for email login' })
   email?: string;
-
-  // Password is required ONLY if loginType is EMAIL
-  @ApiPropertyOptional({
-    description: 'User password (Required for EMAIL login type)',
-    example: 'password123',
-  })
 
   // Google Account ID is required ONLY if loginType is GOOGLE
   @ApiPropertyOptional({
@@ -96,15 +89,12 @@ export class CreateUserDto {
   facebookId?: string;
 
   // Telegram fields are required ONLY if loginType is TELEGRAM
+
+  // Password is required ONLY if loginType is EMAIL
   @ApiPropertyOptional({
-    description: 'Telegram chat ID (Required for TELEGRAM login type)',
-    example: '123456789',
+    description: 'User password (Required for EMAIL login type)',
+    example: 'password123',
   })
-  @ValidateIf((o) => o.loginType === LoginType.TELEGRAM)
-  @IsString()
-  @IsNotEmpty({ message: 'Telegram chat ID is required' })
-  telegramChatId?: string;
-  @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @IsNotEmpty({ message: 'Password is required for email login' })
   password!: string;
@@ -118,13 +108,20 @@ export class CreateUserDto {
   telegramUsername?: string;
 
   // --- Optional Fields ---
+  @ApiPropertyOptional({
+    description: 'Telegram chat ID (Required for TELEGRAM login type)',
+    example: '123456789',
+  })
+  @IsString()
+  @IsOptional({ message: 'Telegram chat ID is required' })
+  telegramChatId?: string;
 
   @ApiPropertyOptional({
-    description: 'Profile image URL',
+    description: 'Profile image URL or Base64 string',
     example: 'https://example.com/avatar.jpg',
   })
   @IsOptional()
-  @IsUrl({}, { message: 'Profile image must be a valid URL' })
+  @IsString({ message: 'Profile image must be a string' })
   image?: string;
 
   @ApiPropertyOptional({

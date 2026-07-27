@@ -59,6 +59,18 @@ export class AuthService {
   }
 
   /**
+   * Get current authenticated user details by token (without password)
+   */
+  async getMe(user: User) {
+    const { password, ...userWithoutPassword } = user;
+    return {
+      data: {
+        user: userWithoutPassword,
+      },
+    };
+  }
+
+  /**
    * Private helper method to centralize token signing and user payload serialization
    */
   private generateAuthResponse(user: User) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoanInformation } from './loan_infor.entity';
 import { Repository } from 'typeorm';
@@ -15,7 +15,7 @@ export class LoanInformationService {
     private loanInfoRepo: Repository<LoanInformation>,
     @InjectRepository(PaymentTable)
     private paymentTableRepo: Repository<PaymentTable>,
-  ) {}
+  ) { }
 
   private getTotalMonths(
     startDate: Date | string,
@@ -154,5 +154,14 @@ export class LoanInformationService {
       // This sends the REAL database error back to Postman instead of "Internal server error"
       throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
     }
+  }
+  async remove(id: string) {
+    const loan = await this.loanInfoRepo.findOne({ where: { id } });
+    if (!loan) {
+      throw new NotFoundException(`Loan information record with ID "${id}" not found.`);
+    }
+
+    await this.loanInfoRepo.remove(loan);
+    return { success: true, message: 'Loan information record deleted successfully' };
   }
 }

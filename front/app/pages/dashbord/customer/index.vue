@@ -229,7 +229,7 @@
                 customerByIdData.cusImage.trim() !== '' &&
                 !customerByIdData.cusImage.includes('heart.png')
               "
-              :src="customerByIdData.cusImage"
+              :src="getImagePath(customerByIdData.cusImage)"
               alt="Customer Image"
               class="w-24 h-24 object-cover rounded-full border-4 border-white dark:border-neutral-900 shadow-md ring-1 ring-neutral-200/50"
             />
@@ -607,6 +607,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, reactive, watch, onMounted } from "vue";
+import { currentUserData } from "~/model_dto/auth/get_current_user.dto";
 import {
   createCustomerService,
   mapperCreateCustomer,
@@ -738,7 +739,7 @@ const stateEdit = reactive<createCustomerDTO>({
   cusCitizenId: customerByIdData.value?.cusCitizenId || "",
   cusImage: customerByIdData.value?.cusImage || "",
   cusTelegramUsername: customerByIdData.value?.cusTelegramUsername || "",
-  userId: "19ea1b72-6a4f-4b0b-a6a2-ae1b29de20eb",
+  userId: currentUserData.value?.Id,
 });
 
 const stateCreate = reactive<createCustomerDTO>({
@@ -748,7 +749,7 @@ const stateCreate = reactive<createCustomerDTO>({
   cusCitizenId: "",
   cusImage: "",
   cusTelegramUsername: "",
-  userId: "19ea1b72-6a4f-4b0b-a6a2-ae1b29de20eb",
+  userId: currentUserData.value?.Id,
 });
 
 const formState = computed(() =>

@@ -63,8 +63,6 @@ export default defineNuxtConfig({
       appUrl: process.env.APP_URL,
       googleMapsApiKey: process.env.GOOGLE_MAP_API_KEY,
       tokenKey: process.env.COOKIE_KEY,
-      tokenUserIdKey: process.env.COOKIE_USERID_KEY,
-      baseUrlTwo: process.env.BASE_URL_TWO,
       // Firebase Config
       firebaseApiKey: process.env.PAPA_FOOD_FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.PAPA_FOOD_FIREBASE_AUTH_DOMAIN,

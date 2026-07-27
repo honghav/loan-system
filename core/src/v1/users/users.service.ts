@@ -4,6 +4,43 @@ import { Repository } from 'typeorm';
 import { User, UserStatus } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Helper to check if a string is a base64 encoded image
+function isBase64Image(str: string): boolean {
+  if (!str) return false;
+  return /^data:image\/[a-zA-Z+.-]+;base64,/.test(str);
+}
+
+// Helper to save a base64 encoded image to local storage
+function saveBase64Image(base64Str: string): string {
+  const matches = base64Str.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
+  if (!matches || matches.length !== 3) {
+    return base64Str;
+  }
+
+  const mimeType = matches[1];
+  const base64Data = matches[2];
+
+  let extension = '.jpg';
+  if (mimeType === 'image/png') extension = '.png';
+  else if (mimeType === 'image/webp') extension = '.webp';
+  else if (mimeType === 'image/gif') extension = '.gif';
+  else if (mimeType === 'image/svg+xml') extension = '.svg';
+
+  const filename = `usr_${Date.now()}_${Math.round(Math.random() * 1e6)}${extension}`;
+  const storageDir = path.join(process.cwd(), 'storage', 'users');
+
+  if (!fs.existsSync(storageDir)) {
+    fs.mkdirSync(storageDir, { recursive: true });
+  }
+
+  const filePath = path.join(storageDir, filename);
+  fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+
+  return `/storage/users/${filename}`;
+}
 
 @Injectable()
 export class UsersService {
@@ -16,7 +53,12 @@ async createUser(createUserDto: CreateUserDto): Promise<User> {
     // 1. Clone the DTO data so we don't mutate the original request object
     const userData: Partial<User> = { ...createUserDto };
 
-    // 2. Conditionally hash the password only if it's an Email registration
+    // 2. Conditionally process base64 image and save to local storage
+    if (userData.image && isBase64Image(userData.image)) {
+      userData.image = saveBase64Image(userData.image);
+    }
+
+    // 3. Conditionally hash the password only if it's provided
     if (userData.password) {
       const saltRounds = 10;
       userData.password = await bcrypt.hash(userData.password, saltRounds);

@@ -110,12 +110,12 @@ export class User {
   })
   role!: UserRole;
 
-  @Column({
-    type: 'enum',
-    enum: UserPosition,
-    default: UserPosition.OFFICE_STAFF,
-  })
-  position!: UserPosition;
+  // @Column({
+  //   type: 'enum',
+  //   enum: UserPosition,
+  //   default: UserPosition.OFFICE_STAFF,
+  // })
+  // position!: UserPosition;
 
   @Column({
     type: 'enum',
