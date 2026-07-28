@@ -1,26 +1,40 @@
 <template>
-  <div class="min-h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+  <div
+    class="min-h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300"
+  >
     <!-- Sidebar -->
     <aside
-      class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 shadow-sm transition-all duration-300"
+      class="sticky top-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 shadow-sm transition-all duration-300"
     >
       <!-- Sidebar Header & Logo -->
       <div>
-        <div class="h-16 flex items-center gap-3 px-6 border-b border-slate-100 dark:border-slate-800">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center text-white shadow-md shadow-primary/20">
+        <div
+          class="h-16 flex items-center gap-3 px-6 border-b border-slate-100 dark:border-slate-800"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center text-white shadow-md shadow-primary/20"
+          >
             <UIcon name="i-lucide-landmark" class="w-6 h-6" />
           </div>
           <div>
-            <h2 class="font-bold text-lg leading-tight text-slate-900 dark:text-white tracking-tight">
+            <h2
+              class="font-bold text-lg leading-tight text-slate-900 dark:text-white tracking-tight"
+            >
               Loan<span class="text-primary">System</span>
             </h2>
-            <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest">Management</p>
+            <p
+              class="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest"
+            >
+              Management
+            </p>
           </div>
         </div>
 
         <!-- Navigation Section -->
         <nav class="p-4 space-y-1.5">
-          <p class="px-3 pb-2 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+          <p
+            class="px-3 pb-2 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
+          >
             Navigation
           </p>
           <NuxtLink
@@ -45,8 +59,12 @@
 
       <!-- Sidebar Footer User Profile Card -->
       <div class="p-4 border-t border-slate-100 dark:border-slate-800">
-        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50">
-          <div class="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+        <div
+          class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50"
+        >
+          <div
+            class="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0"
+          >
             <img
               v-if="currentUserData?.Image"
               :src="getImagePath(currentUserData?.Image)"
@@ -58,11 +76,15 @@
             </span>
           </div>
           <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-semibold text-slate-900 dark:text-white truncate leading-snug">
-              {{ currentUserData?.Name || 'User' }}
+            <h4
+              class="text-sm font-semibold text-slate-900 dark:text-white truncate leading-snug"
+            >
+              {{ currentUserData?.Name || "User" }}
             </h4>
-            <p class="text-xs text-slate-500 dark:text-slate-400 capitalize truncate">
-              {{ currentUserData?.Role || 'Guest' }}
+            <p
+              class="text-xs text-slate-500 dark:text-slate-400 capitalize truncate"
+            >
+              {{ currentUserData?.Role || "Guest" }}
             </p>
           </div>
         </div>
@@ -72,10 +94,14 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Topbar Header -->
-      <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shadow-xs sticky top-0 z-30">
+      <header
+        class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shadow-xs sticky top-0 z-30"
+      >
         <!-- Page Context / Title -->
         <div class="flex items-center gap-2">
-          <h1 class="text-lg font-bold text-slate-900 dark:text-white capitalize">
+          <h1
+            class="text-lg font-bold text-slate-900 dark:text-white capitalize"
+          >
             {{ currentPageTitle }}
           </h1>
         </div>
@@ -83,11 +109,15 @@
         <!-- Right Action Controls -->
         <div class="flex items-center gap-4">
           <!-- Layout Container Switcher -->
-          <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+          <div
+            class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700"
+          >
             <UIcon name="i-lucide-layout" class="w-4 h-4 text-slate-400" />
             <select
               :value="activeLayoutId"
-              @change="setLayout(Number(($event.target as HTMLSelectElement).value))"
+              @change="
+                setLayout(Number(($event.target as HTMLSelectElement).value))
+              "
               class="bg-transparent text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
             >
               <option
@@ -165,6 +195,8 @@ const getModuleIcon = (value: string) => {
       return "i-lucide-credit-card";
     case "report":
       return "i-lucide-file-bar-chart";
+    case "logger":
+      return "i-lucide-database";
     default:
       return "i-lucide-folder";
   }

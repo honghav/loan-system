@@ -5,6 +5,8 @@ import { Customer } from 'src/v1/customer/customer.enitity';
 import { LoanType } from 'src/v1/loan_type/loan_type.entity';
 import { LoanInformation } from 'src/v1/loan_info/loan_infor.entity';
 import { PaymentTable } from 'src/v1/payment_table/payment_table.entity';
+import { AuditLog } from 'src/v1/logger/logger.entity';
+import { CustomTypeOrmLogger } from 'src/v1/logger/typeorm-custom.logger';
 // import { Revenue } from 'src/v1/accounting/accounting.enitity';
 // import { Attendance } from 'src/v1/attendance/attendance.entity';
 // import { UserFace } from 'src/v1/face/entities/face.entity';
@@ -28,12 +30,21 @@ export const getDatabaseConfig = (
     username: configService.get('DB_USERNAME'),
     password: password, // Ensure this is a string
     database: configService.get('DB_DATABASE'),
-    entities: [User, Customer, LoanType, LoanInformation, PaymentTable],
+    entities: [
+      User,
+      Customer,
+      LoanType,
+      LoanInformation,
+      PaymentTable,
+      AuditLog,
+    ],
     synchronize: true,
     logging: true,
+    logger: new CustomTypeOrmLogger(),
     // Add these options for better compatibility
     extra: {
       ssl: false, // Set to true if using SSL
     },
   };
 };
+

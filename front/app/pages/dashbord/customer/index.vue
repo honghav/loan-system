@@ -24,6 +24,14 @@
           size="md"
         />
         <UButton
+          label="Create Loan"
+          icon="i-lucide-hand-coins"
+          color="neutral"
+          variant="outline"
+          size="md"
+          @click="openCreateLoanModal('')"
+        />
+        <UButton
           label="Add Customer"
           icon="i-lucide-plus"
           color="primary"
@@ -36,6 +44,7 @@
           "
         />
       </div>
+
     </div>
 
     <!-- Table Card Container -->
@@ -583,13 +592,21 @@
 
         <!-- Action Row -->
         <div
-          class="flex justify-end gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800"
+          class="flex flex-wrap justify-end gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800"
         >
           <UButton
             label="Cancel"
             color="neutral"
             variant="ghost"
             @click="formCustomerIsOpen = false"
+          />
+          <UButton
+            v-if="!customerEdit"
+            label="Register & Create Loan"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-hand-coins"
+            @click="onSubmit(true)"
           />
           <UButton
             type="submit"
@@ -600,9 +617,254 @@
             {{ customerEdit ? "Save Changes" : "Register Customer" }}
           </UButton>
         </div>
+
       </UForm>
     </template>
   </UModal>
+
+  <!-- Modal 2: Loan Information Form (Modern Horizontal Style) -->
+  <UModal
+    :dismissible="true"
+    v-model:open="formLoanInfoIsOpen"
+    :title="
+      loanInfoEditIsOpen ? 'Edit Loan Record' : 'Create New Loan Record'
+    "
+    :ui="{
+      content:
+        'sm:max-w-4xl rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl overflow-hidden',
+    }"
+  >
+    <template #body>
+      <UForm
+        :state="stateCreateLoanInfor"
+        class="space-y-6 p-1"
+        @submit="onSubmitLoanInfo"
+      >
+        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+          Configure borrower details, financial amounts, payment schedules, and terms in this modern horizontal layout.
+        </p>
+
+        <!-- Horizontal Multi-Column Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left Column: Borrower & Financial Details -->
+          <div class="space-y-5 p-4 rounded-xl bg-neutral-50/70 dark:bg-neutral-800/40 border border-neutral-200/60 dark:border-neutral-800">
+            <div class="flex items-center gap-2 pb-2 border-b border-neutral-200/60 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400">
+              <span class="i-lucide-user-check w-4 h-4" />
+              1. Borrower & Loan Amount
+            </div>
+
+            <!-- Customer Selection -->
+            <UFormField
+              label="Customer / Borrower"
+              name="loanInfoLoanerId"
+              required
+              class="flex flex-col gap-1 text-xs"
+            >
+              <select
+                v-model="stateCreateLoanInfor.loanInfoLoanerId"
+                required
+                class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
+              >
+                <option value="" disabled>Select Customer</option>
+                <option v-for="c in customerData" :key="c.cusId" :value="c.cusId">
+                  {{ c.cusName }} ({{ c.cusPhone }})
+                </option>
+              </select>
+            </UFormField>
+
+            <!-- Loan Type Selection -->
+            <UFormField
+              label="Loan Configuration Type"
+              name="loanInfoTypeId"
+              required
+              class="flex flex-col gap-1 text-xs"
+            >
+              <select
+                v-model="stateCreateLoanInfor.loanInfoTypeId"
+                required
+                class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
+              >
+                <option value="" disabled>Select Loan Type</option>
+                <option
+                  v-for="t in loanTypeData"
+                  :key="t.loanTypeId"
+                  :value="t.loanTypeId"
+                >
+                  {{ t.loanTypeFrequency }} - {{ t.loanTypeDescription }} ({{ t.loanTypeFrequencyDay }} days)
+                </option>
+              </select>
+            </UFormField>
+
+            <!-- Loan Amount & Fee Grid -->
+            <div class="grid grid-cols-2 gap-3">
+              <UFormField
+                label="Principal Amount ($)"
+                name="loanInfoAmount"
+                required
+                class="flex flex-col gap-1 text-xs"
+              >
+                <UInput
+                  v-model.number="stateCreateLoanInfor.loanInfoAmount"
+                  type="number"
+                  placeholder="5000"
+                  icon="i-lucide-dollar-sign"
+                  class="w-full font-mono"
+                  size="md"
+                />
+              </UFormField>
+
+              <UFormField
+                label="Loan Fee ($)"
+                name="loanInfoLoanFee"
+                required
+                class="flex flex-col gap-1 text-xs"
+              >
+                <UInput
+                  v-model.number="stateCreateLoanInfor.loanInfoLoanFee"
+                  type="number"
+                  placeholder="50"
+                  icon="i-lucide-receipt"
+                  class="w-full font-mono"
+                  size="md"
+                />
+              </UFormField>
+            </div>
+
+            <!-- Purpose of Loan -->
+            <UFormField
+              label="Purpose of Loan"
+              name="loanInfoPurposeOfLoan"
+              required
+              class="flex flex-col gap-1 text-xs"
+            >
+              <UInput
+                v-model="stateCreateLoanInfor.loanInfoPurposeOfLoan"
+                placeholder="e.g. Business expansion"
+                icon="i-lucide-file-text"
+                class="w-full"
+                size="md"
+              />
+            </UFormField>
+          </div>
+
+          <!-- Right Column: Terms, Dates & Status -->
+          <div class="space-y-5 p-4 rounded-xl bg-neutral-50/70 dark:bg-neutral-800/40 border border-neutral-200/60 dark:border-neutral-800">
+            <div class="flex items-center gap-2 pb-2 border-b border-neutral-200/60 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-indigo-500">
+              <span class="i-lucide-calendar-clock w-4 h-4" />
+              2. Terms, Dates & Status
+            </div>
+
+            <!-- Penalty & Payment Type Grid -->
+            <div class="grid grid-cols-2 gap-3">
+              <UFormField
+                label="Penalty Rate (%)"
+                name="loanInfoPenaltyRate"
+                required
+                class="flex flex-col gap-1 text-xs"
+              >
+                <UInput
+                  v-model.number="stateCreateLoanInfor.loanInfoPenaltyRate"
+                  type="number"
+                  placeholder="5"
+                  icon="i-lucide-percent"
+                  class="w-full font-mono"
+                  size="md"
+                />
+              </UFormField>
+
+              <UFormField
+                label="Payment Type"
+                name="loanInfoPaymentType"
+                required
+                class="flex flex-col gap-1 text-xs"
+              >
+                <select
+                  v-model="stateCreateLoanInfor.loanInfoPaymentType"
+                  class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
+                >
+                  <option value="installment_payment">Installment Payment</option>
+                  <option value="completed_payment">Completed Payment</option>
+                  <option value="fee_payment">Fee Payment</option>
+                </select>
+              </UFormField>
+            </div>
+
+            <!-- Dates Grid -->
+            <div :class="[stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() === 'completed_payment' ? 'grid grid-cols-2 gap-3' : 'space-y-4']">
+              <UFormField
+                label="Start Date"
+                name="loanInfoStartDate"
+                required
+                class="flex flex-col gap-1 text-xs"
+              >
+                <UInput
+                  v-model="stateCreateLoanInfor.loanInfoStartDate"
+                  type="date"
+                  class="w-full font-mono"
+                  size="md"
+                />
+              </UFormField>
+
+              <UFormField
+                v-if="
+                  stateCreateLoanInfor.loanInfoPaymentType === 'completed_payment' ||
+                  stateCreateLoanInfor.loanInfoPaymentType === 'COMPLETED_PAYMENT' ||
+                  stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() === 'completed_payment'
+                "
+                label="End Date"
+                name="loanInfoEndDate"
+                required
+                class="flex flex-col gap-1 text-xs"
+              >
+                <UInput
+                  v-model="stateCreateLoanInfor.loanInfoEndDate"
+                  type="date"
+                  class="w-full font-mono"
+                  size="md"
+                />
+              </UFormField>
+            </div>
+
+
+            <!-- Status -->
+            <UFormField
+              label="Loan Status"
+              name="loanInfoStatus"
+              required
+              class="flex flex-col gap-1 text-xs"
+            >
+              <select
+                v-model="stateCreateLoanInfor.loanInfoStatus"
+                class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-semibold"
+              >
+                <option value="in_payment">In Payment (Active)</option>
+                <option value="completed">Completed</option>
+              </select>
+            </UFormField>
+          </div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="flex justify-end gap-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+          <UButton
+            label="Cancel"
+            color="neutral"
+            variant="ghost"
+            @click="formLoanInfoIsOpen = false"
+          />
+          <UButton
+            type="submit"
+            color="primary"
+            icon="i-lucide-check"
+            class="px-6"
+          >
+            {{ loanInfoEditIsOpen ? "Save Changes" : "Create Record" }}
+          </UButton>
+        </div>
+      </UForm>
+    </template>
+  </UModal>
+
 </template>
 
 <script lang="ts" setup>
@@ -621,11 +883,76 @@ import {
   getCustomerService,
 } from "~/model_dto/customer/getCustomer.dto";
 import { updateCustomerService } from "~/model_dto/customer/updateCustomer.dto";
+import {
+  createLoanInformationService,
+  type CreateLoanInformationDTO,
+} from "~/model_dto/loan/loan_list/create_loan_list.dto";
+import {
+  LoanInformationPaymentType,
+  LoanInformationStatus,
+} from "~/model_dto/loan/loan_list/enum_loan_lnformation";
+import { getLoanInformationService } from "~/model_dto/loan/loan_list/get_loan_list.dto";
+import {
+  getLoanTypeService,
+  loanTypeData,
+} from "~/model_dto/loan/loan_type/get_loan_type.dto";
+
+// ==================================//
+// Loan Information Action Control   //
+// ==================================//
+const formLoanInfoIsOpen = ref(false);
+const loanInfoEditIsOpen = ref(false);
+const viewLoandetailIsOpen = ref(false);
+const stateCreateLoanInfor = reactive<CreateLoanInformationDTO>({
+  loanInfoAmount: 0,
+  loanInfoPurposeOfLoan: "",
+  loanInfoLoanFee: 0,
+  loanInfoPenaltyRate: 0,
+  loanInfoStartDate: "",
+  loanInfoEndDate: undefined,
+  loanInfoStatus: LoanInformationStatus.IN_PAYMENT,
+  loanInfoPaymentType: LoanInformationPaymentType.INSTALLMENT_PAYMENT,
+  loanInfoLoanerId: "",
+  loanInfoTypeId: "",
+  loanInfoUserId: "",
+});
+
+function openCreateLoanModal(cusId?: string) {
+  loanInfoEditIsOpen.value = false;
+  stateCreateLoanInfor.loanInfoAmount = 0;
+  stateCreateLoanInfor.loanInfoPurposeOfLoan = "";
+  stateCreateLoanInfor.loanInfoLoanFee = 0;
+  stateCreateLoanInfor.loanInfoPenaltyRate = 0;
+  stateCreateLoanInfor.loanInfoStartDate = new Date().toISOString().split("T")[0];
+  stateCreateLoanInfor.loanInfoEndDate = undefined;
+  stateCreateLoanInfor.loanInfoStatus = LoanInformationStatus.IN_PAYMENT;
+  stateCreateLoanInfor.loanInfoPaymentType = LoanInformationPaymentType.INSTALLMENT_PAYMENT;
+  stateCreateLoanInfor.loanInfoLoanerId = cusId || (customerData.value[0]?.cusId || "");
+  stateCreateLoanInfor.loanInfoTypeId = loanTypeData.value[0]?.loanTypeId || "";
+  formLoanInfoIsOpen.value = true;
+}
+
+async function onSubmitLoanInfo() {
+  try {
+    if (currentUserData.value?.Id) {
+      stateCreateLoanInfor.loanInfoUserId = currentUserData.value.Id;
+    }
+    await createLoanInformationService(stateCreateLoanInfor);
+    await getLoanInformationService();
+    formLoanInfoIsOpen.value = false;
+  } catch (error) {
+    console.error("Error creating loan information:", error);
+  }
+}
 
 onMounted(async () => {
   await getCustomerService();
+  await getLoanTypeService();
 });
 
+//=======================//
+//handle Customer action //
+//=======================//
 const viewCustomerIsOpen = ref(false);
 const formCustomerIsOpen = ref(false);
 const customerEdit = ref(false);
@@ -650,6 +977,13 @@ const filteredCustomerData = computed(() => {
 const getItems = (customer: any) => [
   [
     {
+      label: "Create Loan",
+      icon: "i-lucide-hand-coins",
+      onSelect: () => {
+        openCreateLoanModal(customer.cusId);
+      },
+    },
+    {
       label: "View Profile",
       icon: "i-lucide-eye",
       onSelect: async () => {
@@ -673,7 +1007,6 @@ const getItems = (customer: any) => [
       icon: "i-lucide-trash",
       color: "error" as const,
       onSelect: async () => {
-        // console.log("Deleting customer ID:", customer.cusId);
         await deleteCustomerService(customer.cusId);
       },
     },
@@ -801,19 +1134,25 @@ function onFileChange(e: Event) {
   reader.readAsDataURL(file);
 }
 
-async function onSubmit() {
+async function onSubmit(createLoanAfter: boolean = false) {
   toast.add({
     title: "Success",
     description: "The form has been submitted.",
     color: "success",
   });
+
   if (customerEdit.value) {
-    updateCustomerService(stateEdit, customerByIdData.value?.cusId || "");
-    console.log("Editing customer:", stateEdit);
+    await updateCustomerService(stateEdit, customerByIdData.value?.cusId || "");
   } else {
-    console.log("Creating new customer:", stateCreate);
-    createCustomerService(stateCreate);
+    await createCustomerService(stateCreate);
   }
+
   formCustomerIsOpen.value = false;
+
+  if (createLoanAfter) {
+    const newestCusId = customerData.value[0]?.cusId || "";
+    openCreateLoanModal(newestCusId);
+  }
 }
 </script>
+

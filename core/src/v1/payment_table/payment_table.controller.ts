@@ -52,7 +52,9 @@ export class PaymentLoanController {
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: string,
+    @Body('amount') amount?: number,
   ) {
-    return await this.paymentTableService.updateStatus(id, status);
+    return await this.paymentTableService.updateStatus(id, status, amount);
   }
 }
+

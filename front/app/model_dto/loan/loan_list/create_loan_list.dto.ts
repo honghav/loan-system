@@ -9,7 +9,7 @@ export interface CreateLoanInformationDTO {
   loanInfoLoanFee: number;
   loanInfoPenaltyRate: number;
   loanInfoStartDate: string;
-  loanInfoEndDate: string;
+  loanInfoEndDate?: string;
   loanInfoStatus: LoanInformationStatus;
   loanInfoPaymentType: LoanInformationPaymentType;
   loanInfoLoanerId: string;
@@ -22,7 +22,7 @@ export interface CreateLoanInformationRequestDTO {
   loanFee: string;
   penaltyRate: string;
   startDate: string;
-  endDate: string;
+  endDate?: string;
   status: string;
   paymentType: string;
   userId: string;
@@ -45,12 +45,18 @@ export const mapperCreateLoanInformation = (
     userId: data.loanInfoUserId,
     loanTypeId: data.loanInfoTypeId,
     customerId: data.loanInfoLoanerId,
-  }
+  };
 };
 
-export async function createLoanInformationService(data: CreateLoanInformationDTO) {
+export async function createLoanInformationService(
+  data: CreateLoanInformationDTO,
+) {
   try {
-    const res = await apiFetch("POST", "loan_information", mapperCreateLoanInformation(data));
+    const res = await apiFetch(
+      "POST",
+      "loan_information",
+      mapperCreateLoanInformation(data),
+    );
     return res;
   } catch (error) {
     console.error("Create Loan Information Error", error);

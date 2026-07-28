@@ -3,6 +3,7 @@ export interface CalculateScheduleParams {
   durationMonths: number; // e.g., 12
   monthlyRate: number; // e.g., 1.2 (for 1.2%)
   startDate?: string | Date | null; // e.g., "2026-01-01" or null
+  frequencyDay?: number | null;
 }
 
 export interface PaymentScheduleItem {
@@ -19,6 +20,7 @@ export function generatePaymentSchedule({
   durationMonths,
   monthlyRate,
   startDate = null,
+  frequencyDay = null,
 }: CalculateScheduleParams): PaymentScheduleItem[] {
   const schedule: PaymentScheduleItem[] = [];
   const rateFraction = monthlyRate / 100;
@@ -56,10 +58,14 @@ export function generatePaymentSchedule({
     let paymentRequiredDate: string;
     if (baseDate) {
       const payDate = new Date(baseDate);
-      payDate.setMonth(payDate.getMonth() + (month - 1));
+      if (frequencyDay && frequencyDay > 0) {
+        payDate.setDate(payDate.getDate() + (month - 1) * frequencyDay);
+      } else {
+        payDate.setMonth(payDate.getMonth() + (month - 1));
+      }
       paymentRequiredDate = payDate.toISOString().split('T')[0];
     } else {
-      paymentRequiredDate = `Month ${month}`;
+      paymentRequiredDate = `Period ${month}`;
     }
 
     schedule.push({
@@ -74,3 +80,4 @@ export function generatePaymentSchedule({
 
   return schedule;
 }
+

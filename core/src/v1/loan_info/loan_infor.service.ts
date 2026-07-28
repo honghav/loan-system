@@ -7,6 +7,7 @@ import { GetLoanInfoDto } from './dto/get_loan_info.dto';
 import { PaymentTable } from '../payment_table/payment_table.entity';
 import { PaymentTableService } from '../payment_table/payment_table.service';
 import { generatePaymentSchedule } from './dto/generate_payment_table.dto';
+import { LoanType } from '../loan_type/loan_type.entity';
 
 @Injectable()
 export class LoanInformationService {
@@ -15,11 +16,14 @@ export class LoanInformationService {
     private loanInfoRepo: Repository<LoanInformation>,
     @InjectRepository(PaymentTable)
     private paymentTableRepo: Repository<PaymentTable>,
-  ) { }
+    @InjectRepository(LoanType)
+    private loanTypeRepo: Repository<LoanType>,
+  ) {}
 
-  private getTotalMonths(
+  private getTotalTable(
     startDate: Date | string,
     endDate?: Date | string | null,
+    frequencyDay?: number | null,
   ): number {
     if (!endDate) {
       return 1;
@@ -30,6 +34,13 @@ export class LoanInformationService {
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       return 1;
+    }
+
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (frequencyDay && frequencyDay > 0) {
+      return Math.max(Math.ceil(diffDays / frequencyDay), 1);
     }
 
     const years = end.getFullYear() - start.getFullYear();
@@ -47,22 +58,33 @@ export class LoanInformationService {
     const newLoanInfo = this.loanInfoRepo.create({ ...dto });
     const savedLoan = await this.loanInfoRepo.save(newLoanInfo);
 
-    // 2. Calculate total months for the loan
-    const totalMonth = this.getTotalMonths(
+    // 2. Retrieve frequency_day from LoanType if loanTypeId exists
+    let frequencyDay: number | undefined;
+    if (savedLoan.loanTypeId) {
+      const loanType = await this.loanTypeRepo.findOne({
+        where: { id: savedLoan.loanTypeId },
+      });
+      frequencyDay = loanType?.frequency_day;
+    }
+
+    // 3. Calculate total periods for the loan based on frequency_day & start/end dates
+    const totalTable = this.getTotalTable(
       savedLoan.startDate,
       savedLoan.endDate ?? null,
+      frequencyDay,
     );
 
-    // 3. Generate payment schedule table
-    const tableMonth = generatePaymentSchedule({
+    // 4. Generate payment schedule table
+    const tableList = generatePaymentSchedule({
       amount: Number(savedLoan.amount),
-      durationMonths: totalMonth,
+      durationMonths: totalTable,
       monthlyRate: Number(savedLoan.loanFee || 0),
       startDate: savedLoan.startDate,
+      frequencyDay,
     });
 
-    // 4. Persist payment schedule items to database
-    const paymentRecords = tableMonth.map((item) =>
+    // 5. Persist payment schedule items to database
+    const paymentRecords = tableList.map((item) =>
       this.paymentTableRepo.create({
         paymentRequiredDate: new Date(item.paymentRequiredDate),
         beginningBalance: item.beginningBalance,
@@ -75,12 +97,13 @@ export class LoanInformationService {
     );
     await this.paymentTableRepo.save(paymentRecords);
 
-    // 5. Return success payload
+    // 6. Return success payload
     return {
       success: true,
       data: {
         ...savedLoan,
-        tableMonth,
+        totalTable,
+        tableList,
       },
     };
   }
@@ -94,13 +117,14 @@ export class LoanInformationService {
           loanType: true,
           paymentTables: true,
         },
-
         order: { createdAt: 'DESC' },
       });
       const result = loanInfo.map((loan) => {
-        const totalMonth = this.getTotalMonths(
+        const frequencyDay = loan.loanType?.frequency_day;
+        const totalMonth = this.getTotalTable(
           loan.startDate,
           loan.endDate ?? null,
+          frequencyDay,
         );
 
         return {
@@ -109,8 +133,9 @@ export class LoanInformationService {
           tableMonth: generatePaymentSchedule({
             amount: Number(loan.amount),
             durationMonths: totalMonth,
-            monthlyRate: Number(loan.loanFee),
+            monthlyRate: Number(loan.loanFee || 0),
             startDate: loan.startDate,
+            frequencyDay,
           }),
         };
       });
@@ -120,13 +145,13 @@ export class LoanInformationService {
         data: result,
       };
     } catch (error: any) {
-      // This sends the REAL database error back to Postman instead of "Internal server error"
       throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
     }
   }
+
   async getById(id: string) {
     try {
-      const loanInfo = await this.loanInfoRepo.find({
+      const loanInfo = await this.loanInfoRepo.findOne({
         relations: {
           user: true,
           customer: true,
@@ -136,32 +161,51 @@ export class LoanInformationService {
         where: { id },
         order: { createdAt: 'DESC' },
       });
-      const result = loanInfo.map((loan) => {
-        // const totalMonth = this.getTotalMonths(
-        //   loan.startDate,
-        //   loan.endDate ?? null,
-        // );
 
-        return {
-          ...loan,
-        };
-      });
+      if (!loanInfo) {
+        throw new NotFoundException(
+          `Loan information record with ID "${id}" not found.`,
+        );
+      }
+
+      const frequencyDay = loanInfo.loanType?.frequency_day;
+      const totalMonth = this.getTotalTable(
+        loanInfo.startDate,
+        loanInfo.endDate ?? null,
+        frequencyDay,
+      );
+
       return {
         success: true,
-        data: result,
+        data: {
+          ...loanInfo,
+          totalMonth,
+          tableMonth: generatePaymentSchedule({
+            amount: Number(loanInfo.amount),
+            durationMonths: totalMonth,
+            monthlyRate: Number(loanInfo.loanFee || 0),
+            startDate: loanInfo.startDate,
+            frequencyDay,
+          }),
+        },
       };
     } catch (error: any) {
-      // This sends the REAL database error back to Postman instead of "Internal server error"
       throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
     }
   }
+
   async remove(id: string) {
     const loan = await this.loanInfoRepo.findOne({ where: { id } });
     if (!loan) {
-      throw new NotFoundException(`Loan information record with ID "${id}" not found.`);
+      throw new NotFoundException(
+        `Loan information record with ID "${id}" not found.`,
+      );
     }
 
     await this.loanInfoRepo.remove(loan);
-    return { success: true, message: 'Loan information record deleted successfully' };
+    return {
+      success: true,
+      message: 'Loan information record deleted successfully',
+    };
   }
 }

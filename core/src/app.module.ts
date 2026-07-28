@@ -9,6 +9,7 @@ import { AuthModule } from './v1/auth/auth.module';
 import { LoanTypeModule } from './v1/loan_type/loan_type.module';
 import { LoanInformationModule } from './v1/loan_info/loan_infor.module';
 import { PaymentTableModule } from './v1/payment_table/payment_table.module';
+import { LoggerModule } from './v1/logger/logger.module';
 
 @Module({
   imports: [
@@ -29,6 +30,9 @@ import { PaymentTableModule } from './v1/payment_table/payment_table.module';
     LoanInformationModule,
     LoanTypeModule,
     PaymentTableModule,
+    LoggerModule,
   ],
 })
 export class AppModule {}
+
+

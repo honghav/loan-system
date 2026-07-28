@@ -53,4 +53,12 @@ export const moduleData: ModulePage[] = [
     under_page: "dashbord",
     type: MouldeEnum.PAGE,
   },
+  {
+    value: "logger",
+    name: "Logger",
+    icon: "",
+    route: "logger",
+    under_page: "dashbord",
+    type: MouldeEnum.PAGE,
+  },
 ];
