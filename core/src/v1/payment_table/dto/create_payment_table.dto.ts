@@ -34,6 +34,15 @@ export class CreatePaymenttable {
   totalPayment?: number | null;
 
   @ApiPropertyOptional({
+    description: 'Payment table number',
+    example: 1,
+    nullable: true,
+  })
+  @IsNumber()
+  @IsOptional()
+  totalPaymentNo?: number | null;
+
+  @ApiPropertyOptional({
     description: 'Beginning balance before this payment period',
     example: 1000.0,
     nullable: true,

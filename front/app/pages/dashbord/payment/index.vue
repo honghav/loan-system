@@ -11,12 +11,15 @@
           Payment Kanban & Management
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          Drag and drop cards across status columns or switch to table view to manage repayments.
+          Drag and drop cards across status columns or switch to table view to
+          manage repayments.
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
         <!-- View Switcher Toggle -->
-        <div class="inline-flex p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+        <div
+          class="inline-flex p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+        >
           <button
             @click="currentView = 'kanban'"
             :class="[
@@ -139,7 +142,9 @@
 
     <!-- KANBAN BOARD VIEW -->
     <div v-if="currentView === 'kanban'" class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-start"
+      >
         <!-- Loop over columns defined by PaymentStatus -->
         <div
           v-for="col in kanbanColumns"
@@ -181,7 +186,9 @@
           </div>
 
           <!-- Column Header Summary (Total amount in column) -->
-          <div class="px-4 py-2 bg-white/50 dark:bg-neutral-850/50 border-b border-neutral-200/40 dark:border-neutral-800/40 text-xs font-mono text-neutral-500 flex justify-between">
+          <div
+            class="px-4 py-2 bg-white/50 dark:bg-neutral-850/50 border-b border-neutral-200/40 dark:border-neutral-800/40 text-xs font-mono text-neutral-500 flex justify-between"
+          >
             <span>Column Total:</span>
             <span class="font-semibold text-neutral-900 dark:text-white">
               {{ formatCurrency(getColumnTotal(col.status)) }}
@@ -189,7 +196,9 @@
           </div>
 
           <!-- Column Cards Container -->
-          <div class="p-3 space-y-3 flex-1 overflow-y-auto max-h-[650px] scrollbar-thin">
+          <div
+            class="p-3 space-y-3 flex-1 overflow-y-auto max-h-[650px] scrollbar-thin"
+          >
             <!-- Kanban Card (Draggable) -->
             <div
               v-for="payment in getKanbanCards(col.status)"
@@ -199,14 +208,23 @@
               @dragend="onDragEnd"
               :class="[
                 'group relative p-4 rounded-xl bg-white dark:bg-neutral-850 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md hover:border-primary-400 dark:hover:border-primary-600 cursor-grab active:cursor-grabbing transition-all duration-200 space-y-3 select-none',
-                draggedPayment?.payId === payment.payId ? 'opacity-40 scale-95 border-dashed border-primary-500' : '',
+                draggedPayment?.payId === payment.payId
+                  ? 'opacity-40 scale-95 border-dashed border-primary-500'
+                  : '',
               ]"
             >
               <!-- Card Top Bar: Date & Drag Handle & Dropdown Menu -->
               <div class="flex items-center justify-between text-xs">
-                <div class="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 font-medium">
-                  <span class="i-lucide-grip-vertical w-4 h-4 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500 transition-colors" />
-                  <span class="i-lucide-calendar w-3.5 h-3.5 text-neutral-400" />
+                <div
+                  class="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 font-medium"
+                >
+                  <span
+                    class="i-lucide-grip-vertical w-4 h-4 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500 transition-colors"
+                    >{{ payment.payNumber }}</span
+                  >
+                  <span
+                    class="i-lucide-calendar w-3.5 h-3.5 text-neutral-400"
+                  />
                   Due: {{ formatDate(payment.payPaymentRequiredDate) }}
                 </div>
                 <UDropdownMenu :items="getItemsPayment(payment)">
@@ -222,48 +240,77 @@
 
               <!-- Main Amount -->
               <div class="space-y-0.5">
-                <span class="text-xs text-neutral-400 uppercase tracking-wider font-medium">Total Required</span>
-                <p class="text-xl font-extrabold font-mono text-neutral-900 dark:text-white">
+                <span
+                  class="text-xs text-neutral-400 uppercase tracking-wider font-medium"
+                  >Total Required</span
+                >
+                <p
+                  class="text-xl font-extrabold font-mono text-neutral-900 dark:text-white"
+                >
                   {{ formatCurrency(payment.payTotalPayment) }}
                 </p>
               </div>
 
               <!-- Breakdown Grid -->
-              <div class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-lg bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-100 dark:border-neutral-800/60 font-mono">
+              <div
+                class="grid grid-cols-2 gap-2 text-xs p-2.5 rounded-lg bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-100 dark:border-neutral-800/60 font-mono"
+              >
                 <div>
-                  <span class="text-[10px] text-neutral-400 block">Principal</span>
-                  <span class="font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span class="text-[10px] text-neutral-400 block"
+                    >Principal</span
+                  >
+                  <span
+                    class="font-semibold text-emerald-600 dark:text-emerald-400"
+                  >
                     {{ formatCurrency(payment.payPrincipal) }}
                   </span>
                 </div>
                 <div>
-                  <span class="text-[10px] text-neutral-400 block">Interest</span>
-                  <span class="font-semibold text-amber-600 dark:text-amber-400">
+                  <span class="text-[10px] text-neutral-400 block"
+                    >Interest</span
+                  >
+                  <span
+                    class="font-semibold text-amber-600 dark:text-amber-400"
+                  >
                     {{ formatCurrency(payment.payInterest) }}
                   </span>
                 </div>
               </div>
 
               <!-- Remaining Balance & Pay Date -->
-              <div class="flex items-center justify-between text-xs font-mono pt-1">
+              <div
+                class="flex items-center justify-between text-xs font-mono pt-1"
+              >
                 <span class="text-neutral-400">Remaining:</span>
                 <span class="font-bold text-neutral-800 dark:text-neutral-200">
                   {{ formatCurrency(payment.payRemainingBalance) }}
                 </span>
               </div>
 
-              <div v-if="payment.payPayDate" class="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-t border-neutral-100 dark:border-neutral-800 pt-2">
+              <div
+                v-if="payment.payPayDate"
+                class="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-t border-neutral-100 dark:border-neutral-800 pt-2"
+              >
                 <span class="i-lucide-check-circle-2 w-3.5 h-3.5" />
                 Paid on: {{ formatDate(payment.payPayDate) }}
               </div>
 
               <!-- Quick Status Transition Buttons on Card -->
-              <div class="pt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between gap-1">
-                <span class="text-[10px] text-neutral-400 font-medium">Move:</span>
+              <div
+                class="pt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between gap-1"
+              >
+                <span class="text-[10px] text-neutral-400 font-medium"
+                  >Move:</span
+                >
                 <div class="flex items-center gap-1">
                   <button
                     v-if="payment.payStatus !== PaymentStatus.PAID"
-                    @click="updateStatusPaymentService({ payStatus: PaymentStatus.PAID }, payment.payId)"
+                    @click="
+                      updateStatusPaymentService(
+                        { payStatus: PaymentStatus.PAID },
+                        payment.payId,
+                      )
+                    "
                     title="Mark as Paid"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition-colors flex items-center gap-1"
                   >
@@ -272,7 +319,12 @@
 
                   <button
                     v-if="payment.payStatus !== PaymentStatus.PENDING"
-                    @click="updateStatusPaymentService({ payStatus: PaymentStatus.PENDING }, payment.payId)"
+                    @click="
+                      updateStatusPaymentService(
+                        { payStatus: PaymentStatus.PENDING },
+                        payment.payId,
+                      )
+                    "
                     title="Mark as Pending"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 transition-colors flex items-center gap-1"
                   >
@@ -281,7 +333,12 @@
 
                   <button
                     v-if="payment.payStatus !== PaymentStatus.OVERDUE"
-                    @click="updateStatusPaymentService({ payStatus: PaymentStatus.OVERDUE }, payment.payId)"
+                    @click="
+                      updateStatusPaymentService(
+                        { payStatus: PaymentStatus.OVERDUE },
+                        payment.payId,
+                      )
+                    "
                     title="Mark as Overdue"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors flex items-center gap-1"
                   >
@@ -290,7 +347,12 @@
 
                   <button
                     v-if="payment.payStatus !== PaymentStatus.CANCELLED"
-                    @click="updateStatusPaymentService({ payStatus: PaymentStatus.CANCELLED }, payment.payId)"
+                    @click="
+                      updateStatusPaymentService(
+                        { payStatus: PaymentStatus.CANCELLED },
+                        payment.payId,
+                      )
+                    "
                     title="Mark as Cancelled"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700 transition-colors"
                   >
@@ -305,9 +367,15 @@
               v-if="getKanbanCards(col.status).length === 0"
               class="py-12 border-2 border-dashed border-neutral-200 dark:border-neutral-800/80 rounded-xl flex flex-col items-center justify-center text-center p-4"
             >
-              <span :class="[col.icon, 'w-8 h-8 opacity-30 mb-2', col.iconColor]" />
-              <p class="text-xs font-semibold text-neutral-400">No {{ col.title }}</p>
-              <p class="text-[11px] text-neutral-400 mt-1">Drag cards here to update status</p>
+              <span
+                :class="[col.icon, 'w-8 h-8 opacity-30 mb-2', col.iconColor]"
+              />
+              <p class="text-xs font-semibold text-neutral-400">
+                No {{ col.title }}
+              </p>
+              <p class="text-[11px] text-neutral-400 mt-1">
+                Drag cards here to update status
+              </p>
             </div>
           </div>
         </div>
@@ -317,7 +385,9 @@
     <!-- TABLE LIST VIEW (KEPT INTACT) -->
     <div v-else class="space-y-4">
       <!-- Status Tabs Filter for Table -->
-      <div class="flex border-b border-neutral-200 dark:border-neutral-800 gap-1 overflow-x-auto">
+      <div
+        class="flex border-b border-neutral-200 dark:border-neutral-800 gap-1 overflow-x-auto"
+      >
         <button
           v-for="status in statusTabs"
           :key="status.value"
@@ -365,7 +435,9 @@
                 <th class="px-4 py-3.5 text-center">Status</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">
+            <tbody
+              class="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm"
+            >
               <tr
                 v-for="(payment, index) in filteredPaymentData"
                 :key="payment.payId || index"
@@ -382,28 +454,44 @@
                     />
                   </UDropdownMenu>
                 </td>
-                <td class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400">
-                  {{ index + 1 }}
+                <td
+                  class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
+                >
+                  {{ payment.payNumber }}
                 </td>
                 <td class="px-4 py-3.5 font-medium text-xs">
                   {{ formatDate(payment.payPaymentRequiredDate) }}
                 </td>
-                <td class="px-4 py-3.5 font-medium text-xs text-emerald-600 dark:text-emerald-400">
-                  {{ payment.payPayDate ? formatDate(payment.payPayDate) : "-" }}
+                <td
+                  class="px-4 py-3.5 font-medium text-xs text-emerald-600 dark:text-emerald-400"
+                >
+                  {{
+                    payment.payPayDate ? formatDate(payment.payPayDate) : "-"
+                  }}
                 </td>
-                <td class="px-4 py-3.5 text-right font-mono font-semibold text-neutral-900 dark:text-white">
+                <td
+                  class="px-4 py-3.5 text-right font-mono font-semibold text-neutral-900 dark:text-white"
+                >
                   {{ formatCurrency(payment.payTotalPayment) }}
                 </td>
-                <td class="px-4 py-3.5 text-right font-mono text-neutral-600 dark:text-neutral-400">
+                <td
+                  class="px-4 py-3.5 text-right font-mono text-neutral-600 dark:text-neutral-400"
+                >
                   {{ formatCurrency(payment.payBeginningBalance) }}
                 </td>
-                <td class="px-4 py-3.5 text-right font-mono text-emerald-600 dark:text-emerald-400 font-medium">
+                <td
+                  class="px-4 py-3.5 text-right font-mono text-emerald-600 dark:text-emerald-400 font-medium"
+                >
                   {{ formatCurrency(payment.payPrincipal) }}
                 </td>
-                <td class="px-4 py-3.5 text-right font-mono text-amber-600 dark:text-amber-400 font-medium">
+                <td
+                  class="px-4 py-3.5 text-right font-mono text-amber-600 dark:text-amber-400 font-medium"
+                >
                   {{ formatCurrency(payment.payInterest) }}
                 </td>
-                <td class="px-4 py-3.5 text-right font-mono font-semibold text-neutral-900 dark:text-white">
+                <td
+                  class="px-4 py-3.5 text-right font-mono font-semibold text-neutral-900 dark:text-white"
+                >
                   {{ formatCurrency(payment.payRemainingBalance) }}
                 </td>
                 <td class="px-4 py-3.5 text-center">
@@ -419,10 +507,19 @@
               </tr>
 
               <tr v-if="filteredPaymentData.length === 0">
-                <td colspan="10" class="px-6 py-12 text-center text-neutral-400 dark:text-neutral-500">
-                  <div class="flex flex-col items-center justify-center space-y-3">
-                    <span class="i-lucide-calendar-x w-12 h-12 text-neutral-300 dark:text-neutral-700" />
-                    <p class="text-base font-medium text-neutral-500 dark:text-neutral-400">
+                <td
+                  colspan="10"
+                  class="px-6 py-12 text-center text-neutral-400 dark:text-neutral-500"
+                >
+                  <div
+                    class="flex flex-col items-center justify-center space-y-3"
+                  >
+                    <span
+                      class="i-lucide-calendar-x w-12 h-12 text-neutral-300 dark:text-neutral-700"
+                    />
+                    <p
+                      class="text-base font-medium text-neutral-500 dark:text-neutral-400"
+                    >
                       No payment schedules found
                     </p>
                     <p class="text-xs text-neutral-400">
@@ -494,7 +591,10 @@ async function onDrop(event: DragEvent, targetStatus: PaymentStatus) {
   draggedPayment.value = null;
 
   if (payment.payStatus?.toUpperCase() !== targetStatus.toUpperCase()) {
-    await updateStatusPaymentService({ payStatus: targetStatus }, payment.payId);
+    await updateStatusPaymentService(
+      { payStatus: targetStatus },
+      payment.payId,
+    );
   }
 }
 
@@ -503,7 +603,8 @@ const kanbanColumns = [
     status: PaymentStatus.PENDING,
     title: "Pending",
     headerClass: "bg-amber-50/60 dark:bg-amber-950/20 border-t-amber-500",
-    badgeClass: "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800",
+    badgeClass:
+      "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800",
     icon: "i-lucide-clock",
     iconColor: "text-amber-500",
   },
@@ -511,7 +612,8 @@ const kanbanColumns = [
     status: PaymentStatus.PAID,
     title: "Paid / Settled",
     headerClass: "bg-emerald-50/60 dark:bg-emerald-950/20 border-t-emerald-500",
-    badgeClass: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
+    badgeClass:
+      "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
     icon: "i-lucide-check-circle-2",
     iconColor: "text-emerald-500",
   },
@@ -519,15 +621,18 @@ const kanbanColumns = [
     status: PaymentStatus.OVERDUE,
     title: "Overdue",
     headerClass: "bg-rose-50/60 dark:bg-rose-950/20 border-t-rose-500",
-    badgeClass: "bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800",
+    badgeClass:
+      "bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800",
     icon: "i-lucide-alert-triangle",
     iconColor: "text-rose-500",
   },
   {
     status: PaymentStatus.CANCELLED,
     title: "Cancelled",
-    headerClass: "bg-neutral-100/60 dark:bg-neutral-800/40 border-t-neutral-400",
-    badgeClass: "bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700",
+    headerClass:
+      "bg-neutral-100/60 dark:bg-neutral-800/40 border-t-neutral-400",
+    badgeClass:
+      "bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700",
     icon: "i-lucide-ban",
     iconColor: "text-neutral-400",
   },

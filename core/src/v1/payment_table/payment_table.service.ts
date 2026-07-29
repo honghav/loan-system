@@ -16,7 +16,171 @@ export class PaymentTableService {
   constructor(
     @InjectRepository(PaymentTable)
     private paymentTableRepo: Repository<PaymentTable>,
-  ) {}
+  ) { }
+
+  async getItemAll(loanInformationId?: string, status?: PaymentStatus | string) {
+    try {
+      const targetStatus = status as PaymentStatus | undefined;
+
+      if (loanInformationId) {
+        // If status filter is explicitly provided
+        if (targetStatus) {
+          if (targetStatus === PaymentStatus.PENDING) {
+            // PENDING status filter -> fetch ONLY the first PENDING record
+            const firstPending = await this.paymentTableRepo.findOne({
+              where: {
+                loanInformationId,
+                status: PaymentStatus.PENDING,
+              },
+              relations: {
+                loanInformation: true,
+              },
+              order: {
+                paymentRequiredDate: 'ASC',
+                createdAt: 'ASC',
+              },
+            });
+
+            return {
+              success: true,
+              data: firstPending ? [firstPending] : [],
+            };
+          } else {
+            // Another status (PAID, OVERDUE, CANCELLED, etc.) -> fetch ALL records for that status
+            const records = await this.paymentTableRepo.find({
+              where: {
+                loanInformationId,
+                status: targetStatus,
+              },
+              relations: {
+                loanInformation: true,
+              },
+              order: {
+                paymentRequiredDate: 'ASC',
+                createdAt: 'ASC',
+              },
+            });
+
+            return {
+              success: true,
+              data: records,
+            };
+          }
+        }
+
+        // Default when no status filter is explicitly provided for this loanInformationId:
+        // Fetch ALL payment items for this loan
+        const records = await this.paymentTableRepo.find({
+          where: { loanInformationId },
+          relations: {
+            loanInformation: true,
+          },
+          order: {
+            paymentRequiredDate: 'ASC',
+            createdAt: 'ASC',
+          },
+        });
+
+        // 1. All records with non-PENDING status (e.g. PAID, OVERDUE, CANCELLED)
+        const nonPendingRecords = records.filter(
+          (r) => r.status !== PaymentStatus.PENDING,
+        );
+
+        // 2. ONLY the FIRST record with PENDING status
+        const firstPending = records.find(
+          (r) => r.status === PaymentStatus.PENDING,
+        );
+
+        const data: PaymentTable[] = [...nonPendingRecords];
+        if (firstPending) {
+          data.push(firstPending);
+        }
+
+        // Sort data chronologically by paymentRequiredDate / totalPaymentNo
+        data.sort((a, b) => {
+          const dateA = new Date(a.paymentRequiredDate).getTime();
+          const dateB = new Date(b.paymentRequiredDate).getTime();
+          if (dateA !== dateB) return dateA - dateB;
+          return (a.totalPaymentNo || 0) - (b.totalPaymentNo || 0);
+        });
+
+        return {
+          success: true,
+          data,
+        };
+      }
+
+      // If no loanInformationId is provided:
+      const whereCondition = targetStatus ? { status: targetStatus } : {};
+      const records = await this.paymentTableRepo.find({
+        where: whereCondition,
+        relations: {
+          loanInformation: true,
+        },
+        order: {
+          paymentRequiredDate: 'ASC',
+          createdAt: 'ASC',
+        },
+      });
+
+      // If explicit status filter is provided and it's not PENDING, return all records
+      if (targetStatus && targetStatus !== PaymentStatus.PENDING) {
+        return {
+          success: true,
+          data: records,
+        };
+      }
+
+      // Group records by loanInformationId
+      const groupedByLoan = new Map<string, PaymentTable[]>();
+      const nullLoanRecords: PaymentTable[] = [];
+
+      for (const record of records) {
+        if (!record.loanInformationId) {
+          nullLoanRecords.push(record);
+        } else {
+          const list = groupedByLoan.get(record.loanInformationId) || [];
+          list.push(record);
+          groupedByLoan.set(record.loanInformationId, list);
+        }
+      }
+
+      const result: PaymentTable[] = [...nullLoanRecords];
+
+      for (const [, loanRecords] of groupedByLoan) {
+        const nonPending = loanRecords.filter(
+          (r) => r.status !== PaymentStatus.PENDING,
+        );
+        const firstPending = loanRecords.find(
+          (r) => r.status === PaymentStatus.PENDING,
+        );
+
+        result.push(...nonPending);
+        if (firstPending) {
+          result.push(firstPending);
+        }
+      }
+
+      // Sort final result chronologically by paymentRequiredDate / totalPaymentNo
+      result.sort((a, b) => {
+        const dateA = new Date(a.paymentRequiredDate).getTime();
+        const dateB = new Date(b.paymentRequiredDate).getTime();
+        if (dateA !== dateB) return dateA - dateB;
+        return (a.totalPaymentNo || 0) - (b.totalPaymentNo || 0);
+      });
+
+      return {
+        success: true,
+        data: result,
+      };
+    } catch (error: any) {
+      throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
+    }
+  }
+
+  async getAll(query?: GetPaymenttable) {
+    return await this.getItemAll(query?.loanInformationId, query?.status);
+  }
 
   async create(dto: CreatePaymenttable) {
     if (dto.loanInformationId == null) {
@@ -24,24 +188,6 @@ export class PaymentTableService {
     }
     const paymentRecord = this.paymentTableRepo.create({ ...dto });
     return await this.paymentTableRepo.save(paymentRecord);
-  }
-
-  async getAll(query?: GetPaymenttable) {
-    try {
-      const records = await this.paymentTableRepo.find({
-        relations: {
-          loanInformation: true,
-        },
-        order: { createdAt: 'DESC' },
-      });
-      return {
-        success: true,
-        data: records,
-      };
-    } catch (error: any) {
-      // Real database error details
-      throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
-    }
   }
 
   async updateStatus(
@@ -65,7 +211,7 @@ export class PaymentTableService {
     // If loanInformation paymentType is installment_payment and marking as PAID, amount is required
     if (
       record.loanInformation?.paymentType ===
-        LoanInformationPaymentType.INSTALLMENT_PAYMENT &&
+      LoanInformationPaymentType.INSTALLMENT_PAYMENT &&
       targetStatus === PaymentStatus.PAID
     ) {
       if (amount === undefined || amount === null) {
@@ -115,6 +261,12 @@ export class PaymentTableService {
       success: true,
       data: savedRecord,
     };
+  }
+
+  async deleteByLoanId(loanInformationId: string) {
+    return await this.paymentTableRepo.delete({
+      loanInformation: { id: loanInformationId }
+    });
   }
 }
 

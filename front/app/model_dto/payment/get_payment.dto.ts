@@ -2,6 +2,7 @@ import type { PaymentStatus } from "./enum_payment";
 
 export interface GetPaymentTableDTO {
   payId: string;
+  payNumber: number;
   payPaymentRequiredDate: string;
   payPayDate?: string;
   payTotalPayment: number;
@@ -15,6 +16,7 @@ export interface GetPaymentTableDTO {
 export interface GetPaymentTableResponeDTO {
   id: string;
   paymentRequiredDate: string;
+  totalPaymentNo: number;
   payDate?: string;
   totalPayment: number;
   beginningBalance: number;
@@ -29,6 +31,7 @@ export const mapperPaymentTable = (
 ): GetPaymentTableDTO => {
   return {
     payId: data.id,
+    payNumber: data.totalPaymentNo,
     payPaymentRequiredDate: data.paymentRequiredDate,
     payPayDate: data.payDate,
     payTotalPayment: data.totalPayment,

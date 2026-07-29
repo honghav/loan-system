@@ -18,7 +18,7 @@ export class LoanInformationService {
     private paymentTableRepo: Repository<PaymentTable>,
     @InjectRepository(LoanType)
     private loanTypeRepo: Repository<LoanType>,
-  ) {}
+  ) { }
 
   private getTotalTable(
     startDate: Date | string,
@@ -84,8 +84,9 @@ export class LoanInformationService {
     });
 
     // 5. Persist payment schedule items to database
-    const paymentRecords = tableList.map((item) =>
+    const paymentRecords = tableList.map((item, index) =>
       this.paymentTableRepo.create({
+        totalPaymentNo: index + 1,
         paymentRequiredDate: new Date(item.paymentRequiredDate),
         beginningBalance: item.beginningBalance,
         totalPayment: item.totalPayment,
@@ -201,7 +202,7 @@ export class LoanInformationService {
         `Loan information record with ID "${id}" not found.`,
       );
     }
-
+    await this.paymentTableRepo.delete({ loanInformationId: id });
     await this.loanInfoRepo.remove(loan);
     return {
       success: true,

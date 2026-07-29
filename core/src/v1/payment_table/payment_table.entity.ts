@@ -42,6 +42,14 @@ export class PaymentTable {
 
   @IsOptional()
   @Column({
+    name: 'total_payment_no',
+    type: 'integer',
+    nullable: true,
+  })
+  totalPaymentNo?: number | null;
+
+  @IsOptional()
+  @Column({
     name: 'beginning_balance',
     type: 'decimal',
     precision: 12,
@@ -79,14 +87,14 @@ export class PaymentTable {
     nullable: true,
   })
   remainingBalance?: number | null;
-    @Column({
-      name: 'status',
-      type: 'enum',
-      enum: PaymentStatus,
-      default: PaymentStatus.PENDING,
-    })
-    status!: PaymentStatus;
-  
+  @Column({
+    name: 'status',
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
+  })
+  status!: PaymentStatus;
+
   @ManyToOne(() => LoanInformation, (loanInfo) => loanInfo.paymentTables, {
     nullable: true,
     onDelete: 'SET NULL',
