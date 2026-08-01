@@ -167,6 +167,7 @@
               class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
             >
               <th class="px-6 py-4 w-20 text-center">Action</th>
+              <th class="px-6 py-4">Loan Number</th>
               <th class="px-6 py-4">Loaner</th>
               <th class="px-6 py-4">Amount</th>
               <th class="px-6 py-4">Loan Fee</th>
@@ -195,6 +196,11 @@
                     class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   />
                 </UDropdownMenu>
+              </td>
+              <td
+                class="px-6 py-4 font-semibold text-neutral-900 dark:text-white"
+              >
+                {{ loan.loanInfoNumber || "N/A" }}
               </td>
               <td
                 class="px-6 py-4 font-semibold text-neutral-900 dark:text-white"

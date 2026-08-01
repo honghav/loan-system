@@ -10,6 +10,8 @@ import { LoanTypeModule } from './v1/loan_type/loan_type.module';
 import { LoanInformationModule } from './v1/loan_info/loan_infor.module';
 import { PaymentTableModule } from './v1/payment_table/payment_table.module';
 import { LoggerModule } from './v1/logger/logger.module';
+import { SizeDataModule } from './v1/size_data/size_data.module';
+import { DashboardModule } from './v1/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { LoggerModule } from './v1/logger/logger.module';
     LoanTypeModule,
     PaymentTableModule,
     LoggerModule,
+    SizeDataModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}

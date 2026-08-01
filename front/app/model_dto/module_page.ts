@@ -61,4 +61,12 @@ export const moduleData: ModulePage[] = [
     under_page: "dashbord",
     type: MouldeEnum.PAGE,
   },
+  {
+    value: "size_data",
+    name: "Size Data",
+    icon: "",
+    route: "size_data",
+    under_page: "dashbord",
+    type: MouldeEnum.PAGE,
+  },
 ];

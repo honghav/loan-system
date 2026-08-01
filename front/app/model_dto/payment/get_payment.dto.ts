@@ -1,4 +1,6 @@
 import type { PaymentStatus } from "./enum_payment";
+import { LoanInformationPaymentType } from "../loan/loan_list/enum_loan_lnformation";
+import type { GetLoanInformationResponeDTO } from "../loan/loan_list/get_loan_list.dto";
 
 export interface GetPaymentTableDTO {
   payId: string;
@@ -11,6 +13,14 @@ export interface GetPaymentTableDTO {
   payInterest: number;
   payRemainingBalance: number;
   payStatus: PaymentStatus;
+  loanInformation?: {
+    id?: string;
+    paymentType?: LoanInformationPaymentType | string;
+    [key: string]: any;
+  };
+  payCustomerName: string
+  payCustomerImage: string
+  paymentType?: LoanInformationPaymentType | string;
 }
 
 export interface GetPaymentTableResponeDTO {
@@ -24,6 +34,8 @@ export interface GetPaymentTableResponeDTO {
   interest: number;
   remainingBalance: number;
   status: PaymentStatus;
+  loanInformation?: GetLoanInformationResponeDTO
+  paymentType?: LoanInformationPaymentType | string;
 }
 
 export const mapperPaymentTable = (
@@ -40,6 +52,10 @@ export const mapperPaymentTable = (
     payInterest: data.interest,
     payRemainingBalance: data.remainingBalance,
     payStatus: data.status,
+    loanInformation: data.loanInformation,
+    payCustomerImage: data.loanInformation?.customer?.image ?? "",
+    payCustomerName: data.loanInformation?.customer?.customerName ?? "",
+    paymentType: data.paymentType || data.loanInformation?.paymentType,
   };
 };
 

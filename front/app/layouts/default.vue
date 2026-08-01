@@ -197,6 +197,8 @@ const getModuleIcon = (value: string) => {
       return "i-lucide-file-bar-chart";
     case "logger":
       return "i-lucide-database";
+    case "size_data":
+      return "i-lucide-box";
     default:
       return "i-lucide-folder";
   }

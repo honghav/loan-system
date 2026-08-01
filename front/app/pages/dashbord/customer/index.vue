@@ -61,9 +61,9 @@
               <th class="px-6 py-4 w-24">Photo</th>
               <th class="px-6 py-4">Name</th>
               <th class="px-6 py-4">Phone Number</th>
-              <th class="px-6 py-4">Telegram Link</th>
               <th class="px-6 py-4">Telegram Username</th>
               <th class="px-6 py-4">Citizen ID</th>
+              <th class="px-6 py-4">Loan Active</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -127,27 +127,7 @@
                 </div>
               </td>
 
-              <!-- Telegram Link -->
-              <td class="px-6 py-4">
-                <div
-                  v-if="customer.cusTelegram"
-                  class="flex items-center gap-1.5"
-                >
-                  <a
-                    :href="`https://t.me/${customer.cusTelegram.replace('@', '')}`"
-                    target="_blank"
-                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-sky-50 dark:bg-sky-950/30 text-sky-600 dark:text-sky-400 hover:underline transition-all"
-                  >
-                    <span class="i-lucide-send w-3 h-3" />
-                    {{ customer.cusTelegram }}
-                  </a>
-                </div>
-                <span
-                  v-else
-                  class="text-xs text-neutral-400 dark:text-neutral-600"
-                  >Not Linked</span
-                >
-              </td>
+             
 
               <!-- Telegram Username -->
               <td class="px-6 py-4">
@@ -184,6 +164,15 @@
                   class="text-xs text-neutral-400 dark:text-neutral-600"
                   >—</span
                 >
+              </td>
+
+               <!-- Active Loan -->
+              <td class="px-6 py-4">
+                <div
+                  class="flex items-center justify-center gap-1.5"
+                >
+                  {{ customer.cusActiveLoansCount }}
+                </div>
               </td>
             </tr>
 

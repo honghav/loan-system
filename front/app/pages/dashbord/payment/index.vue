@@ -218,14 +218,8 @@
                 <div
                   class="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 font-medium"
                 >
-                  <span
-                    class="i-lucide-grip-vertical w-4 h-4 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500 transition-colors"
-                    >{{ payment.payNumber }}</span
-                  >
-                  <span
-                    class="i-lucide-calendar w-3.5 h-3.5 text-neutral-400"
-                  />
-                  Due: {{ formatDate(payment.payPaymentRequiredDate) }}
+                <img :src="getImagePath (payment.payCustomerImage)" alt="" class="h-10 w-10 rounded-full">
+                 {{ payment.payNumber }} - Due: {{ formatDate(payment.payPaymentRequiredDate) }}
                 </div>
                 <UDropdownMenu :items="getItemsPayment(payment)">
                   <UButton
@@ -305,12 +299,7 @@
                 <div class="flex items-center gap-1">
                   <button
                     v-if="payment.payStatus !== PaymentStatus.PAID"
-                    @click="
-                      updateStatusPaymentService(
-                        { payStatus: PaymentStatus.PAID },
-                        payment.payId,
-                      )
-                    "
+                    @click="handleStatusUpdate(payment, PaymentStatus.PAID)"
                     title="Mark as Paid"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition-colors flex items-center gap-1"
                   >
@@ -320,10 +309,7 @@
                   <button
                     v-if="payment.payStatus !== PaymentStatus.PENDING"
                     @click="
-                      updateStatusPaymentService(
-                        { payStatus: PaymentStatus.PENDING },
-                        payment.payId,
-                      )
+                      handleStatusUpdate(payment, PaymentStatus.PENDING)
                     "
                     title="Mark as Pending"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 transition-colors flex items-center gap-1"
@@ -334,10 +320,7 @@
                   <button
                     v-if="payment.payStatus !== PaymentStatus.OVERDUE"
                     @click="
-                      updateStatusPaymentService(
-                        { payStatus: PaymentStatus.OVERDUE },
-                        payment.payId,
-                      )
+                      handleStatusUpdate(payment, PaymentStatus.OVERDUE)
                     "
                     title="Mark as Overdue"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors flex items-center gap-1"
@@ -348,10 +331,7 @@
                   <button
                     v-if="payment.payStatus !== PaymentStatus.CANCELLED"
                     @click="
-                      updateStatusPaymentService(
-                        { payStatus: PaymentStatus.CANCELLED },
-                        payment.payId,
-                      )
+                      handleStatusUpdate(payment, PaymentStatus.CANCELLED)
                     "
                     title="Mark as Cancelled"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700 transition-colors"
@@ -425,6 +405,7 @@
               >
                 <th class="px-4 py-3.5 text-center w-16">Action</th>
                 <th class="px-4 py-3.5 text-center w-12">#</th>
+                <th class="px-4 py-3.5 text-center w-12">Profile</th>
                 <th class="px-4 py-3.5">Required Date</th>
                 <th class="px-4 py-3.5">Pay Date</th>
                 <th class="px-4 py-3.5 text-right">Total Payment</th>
@@ -458,6 +439,11 @@
                   class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
                 >
                   {{ payment.payNumber }}
+                </td>
+                <td
+                  class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
+                >
+                  <img :src="getImagePath (payment.payCustomerImage)" alt="" class="h-10 w-10 rounded-full">
                 </td>
                 <td class="px-4 py-3.5 font-medium text-xs">
                   {{ formatDate(payment.payPaymentRequiredDate) }}
@@ -538,6 +524,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import Swal from "sweetalert2";
 import {
   getPaymentTableService,
   paymentTableData,
@@ -545,14 +532,82 @@ import {
 } from "~/model_dto/payment/get_payment.dto";
 import { updateStatusPaymentService } from "~/model_dto/payment/update_payment";
 import { PaymentStatus } from "~/model_dto/payment/enum_payment";
+import { LoanInformationPaymentType } from "~/model_dto/loan/loan_list/enum_loan_lnformation";
 
-const currentView = ref<"kanban" | "table">("kanban");
+const currentView = ref<"kanban" | "table">("table");
 const searchQuery = ref("");
 const selectedStatusFilter = ref("ALL");
 
 // Drag and Drop state
 const draggedPayment = ref<GetPaymentTableDTO | null>(null);
 const activeDropColumn = ref<PaymentStatus | null>(null);
+
+async function handleStatusUpdate(
+  payment: GetPaymentTableDTO,
+  targetStatus: PaymentStatus,
+) {
+  let amount: number | undefined = undefined;
+
+  const paymentType =
+    payment.paymentType || payment.loanInformation?.paymentType;
+
+  if (
+    targetStatus === PaymentStatus.PAID &&
+    paymentType !== LoanInformationPaymentType.COMPLETED_PAYMENT &&
+    paymentType !== "completed_payment"
+  ) {
+    const initialVal = payment.payInterest || 0;
+
+    const { value: inputAmount, isConfirmed } = await Swal.fire({
+      title: "Enter Payment Amount",
+      text: "Please fill in the payment amount (leave empty or 0 to use Total Amount - Interest):",
+      input: "number",
+      inputAttributes: {
+        step: "any",
+        min: "0",
+      },
+      inputValue: initialVal.toString(),
+      inputPlaceholder: `Default: ${initialVal}`,
+      showCancelButton: true,
+      confirmButtonText: "Confirm Payment",
+      cancelButtonText: "Cancel",
+      customClass: {
+        confirmButton:
+          "bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl mx-1",
+        cancelButton:
+          "bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 font-bold px-4 py-2 rounded-xl mx-1",
+        input:
+          "border border-neutral-300 dark:border-neutral-700 rounded-xl px-3 py-2 text-center text-lg font-mono",
+      },
+      buttonsStyling: false,
+    });
+
+    if (!isConfirmed) {
+      return; // User cancelled prompt
+    }
+
+    const trimmed = (inputAmount || "").trim();
+    const parsedAmount = Number(trimmed);
+
+    if (trimmed === "" || parsedAmount === 0 || isNaN(parsedAmount)) {
+      amount = initialVal;
+    } else if (parsedAmount > 0) {
+      amount = parsedAmount;
+    } else {
+      await Swal.fire({
+        title: "Invalid Amount",
+        text: "Please enter a valid positive payment amount.",
+        icon: "error",
+      });
+      return;
+    }
+  }
+
+  await updateStatusPaymentService(
+    { payStatus: targetStatus, payAmount: amount },
+    payment.payId,
+  );
+}
 
 function onDragStart(event: DragEvent, payment: GetPaymentTableDTO) {
   draggedPayment.value = payment;
@@ -591,10 +646,7 @@ async function onDrop(event: DragEvent, targetStatus: PaymentStatus) {
   draggedPayment.value = null;
 
   if (payment.payStatus?.toUpperCase() !== targetStatus.toUpperCase()) {
-    await updateStatusPaymentService(
-      { payStatus: targetStatus },
-      payment.payId,
-    );
+    await handleStatusUpdate(payment, targetStatus);
   }
 }
 
@@ -758,20 +810,14 @@ const getItemsPayment = (payment: GetPaymentTableDTO) => [
       label: "Mark as Paid",
       icon: "i-lucide-check-circle-2",
       onSelect: async () => {
-        await updateStatusPaymentService(
-          { payStatus: PaymentStatus.PAID },
-          payment.payId,
-        );
+        await handleStatusUpdate(payment, PaymentStatus.PAID);
       },
     },
     {
       label: "Mark as Pending",
       icon: "i-lucide-clock",
       onSelect: async () => {
-        await updateStatusPaymentService(
-          { payStatus: PaymentStatus.PENDING },
-          payment.payId,
-        );
+        await handleStatusUpdate(payment, PaymentStatus.PENDING);
       },
     },
     {
@@ -779,10 +825,7 @@ const getItemsPayment = (payment: GetPaymentTableDTO) => [
       icon: "i-lucide-alert-triangle",
       color: "warning" as const,
       onSelect: async () => {
-        await updateStatusPaymentService(
-          { payStatus: PaymentStatus.OVERDUE },
-          payment.payId,
-        );
+        await handleStatusUpdate(payment, PaymentStatus.OVERDUE);
       },
     },
     {
@@ -790,10 +833,7 @@ const getItemsPayment = (payment: GetPaymentTableDTO) => [
       icon: "i-lucide-ban",
       color: "error" as const,
       onSelect: async () => {
-        await updateStatusPaymentService(
-          { payStatus: PaymentStatus.CANCELLED },
-          payment.payId,
-        );
+        await handleStatusUpdate(payment, PaymentStatus.CANCELLED);
       },
     },
   ],

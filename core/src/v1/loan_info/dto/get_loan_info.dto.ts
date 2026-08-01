@@ -13,6 +13,7 @@ import {
   LoanInformationPaymentType,
   LoanInformationStatus,
 } from '../loan_infor.entity';
+import { Customer } from 'src/v1/customer/customer.enitity';
 
 export class GetLoanInfoDto {
   @ApiPropertyOptional({
@@ -91,7 +92,8 @@ export class GetLoanInfoDto {
   customerId?: string;
 
   @ApiPropertyOptional({
-    description: 'Filter loans with start date on or after this date (YYYY-MM-DD)',
+    description:
+      'Filter loans with start date on or after this date (YYYY-MM-DD)',
     example: '2026-01-01',
   })
   @IsOptional()
@@ -99,7 +101,8 @@ export class GetLoanInfoDto {
   startDate?: string;
 
   @ApiPropertyOptional({
-    description: 'Filter loans with end date on or before this date (YYYY-MM-DD)',
+    description:
+      'Filter loans with end date on or before this date (YYYY-MM-DD)',
     example: '2026-12-31',
   })
   @IsOptional()
@@ -107,4 +110,5 @@ export class GetLoanInfoDto {
   endDate?: string;
 
   user?: User;
+  customer?: Customer; // Assuming Customer entity is defined elsewhere in your project. Make sure to import it if it's in a different file.
 }

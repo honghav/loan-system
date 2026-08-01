@@ -17,6 +17,7 @@ import {
 export interface GetLoanInformationResponeDTO {
   id: string;
   amount: number;
+  loanNumber?: string;
   purposeOfLoan: string;
   loanFee: number;
   penaltyRate: number;
@@ -30,6 +31,7 @@ export interface GetLoanInformationResponeDTO {
 }
 export interface GetLoanInformationDTO {
   loanInfoId: string;
+  loanInfoNumber: string;
   loanInfoAmount: number;
   loanInfoPurposeOfLoan: string;
   loanInfoLoanFee: number;
@@ -50,6 +52,7 @@ export const mapperLoanInformation = (
 ): GetLoanInformationDTO => {
   return {
     loanInfoId: data.id,
+    loanInfoNumber: data.loanNumber || "N/A",
     loanInfoAmount: data.amount,
     loanInfoPurposeOfLoan: data.purposeOfLoan,
     loanInfoLoanFee: data.loanFee,

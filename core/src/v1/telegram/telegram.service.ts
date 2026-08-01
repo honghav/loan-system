@@ -26,7 +26,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     private readonly customerRepository: Repository<Customer>,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   onModuleInit() {
     const token = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
@@ -62,12 +62,12 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     // Command: /start
     this.bot.start((ctx) => {
       const greeting =
-        `Welcome to the Notification Bot! 🤖\n\n` +
-        `To link your system account and receive alerts, please use the /link command with your registered email.\n\n` +
+        `Welcome to the Customer Notification Bot! 🤖\n\n` +
+        `To link your customer account and receive alerts, please use the /link command with your registered Telegram username.\n\n` +
         `Example:\n` +
-        `/link customer@example.com\n\n` +
+        `/link your_telegram_username\n\n` +
         `Available Commands:\n` +
-        `/link <email> - Link your registered email\n` +
+        `/link <telegram_username> - Link your registered Telegram username\n` +
         `/status - Check your linking status\n` +
         `/unlink - Unlink your account\n` +
         `/help - Show this guide`;
@@ -78,50 +78,57 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     this.bot.help((ctx) => {
       ctx.reply(
         `Help Guide ℹ️\n\n` +
-          `• Link account: /link your_email@example.com\n` +
-          `• Check status: /status\n` +
-          `• Unlink account: /unlink`,
+        `• Link account: /link <telegram_username>\n` +
+        `• Check status: /status\n` +
+        `• Unlink account: /unlink`,
       );
     });
 
-    // Command: /link <email>
+    // Command: /link <telegram_username>
     this.bot.command('link', async (ctx) => {
       const messageText = ctx.message.text;
       const args = messageText.split(/\s+/).slice(1);
 
       if (args.length < 1) {
         return ctx.reply(
-          '❌ Usage: /link <your_registered_email>\nExample: /link customer@example.com',
+          '❌ Usage: /link <telegram_username>\nExample: /link john_tg',
         );
       }
 
-      const email = args[0].trim().toLowerCase();
+      const tele_username = args[0].trim().replace(/^@/, '').toLowerCase();
       const chatId = ctx.chat.id.toString();
-      const username = ctx.from?.username || '';
+      const tgHandle = ctx.from?.username || '';
 
       try {
-        const customer = await this.customerRepository.findOne({
-          where: { customerName: email },
-        });
+        const customer = await this.customerRepository
+          .createQueryBuilder('customer')
+          .where('LOWER(customer.telegramUsername) = :username', {
+            username: tele_username,
+          })
+          .getOne();
+
         if (!customer) {
           return ctx.reply(
-            `❌ No registered user found with the email: ${email}`,
+            `❌ No registered customer found with Telegram username: ${tele_username}`,
           );
         }
 
         // Link the telegram chat ID
         customer.telegramChatId = chatId;
-        customer.telegramUsername = username;
+        customer.telegramLinked = 'true';
+        if (tgHandle) {
+          customer.telegramUsername = tgHandle;
+        }
         await this.customerRepository.save(customer);
 
         this.logger.log(
-          `Telegram account linked successfully: ${email} -> Chat ID: ${chatId}`,
+          `Telegram account linked successfully: ${customer.customerName} (${customer.telegramUsername}) -> Chat ID: ${chatId}`,
         );
         return ctx.reply(
-          `✅ Successfully linked your Telegram account to ${customer.customerName} (${customer.telegramUsername}). You will now receive system notifications here!`,
+          `✅ Successfully linked your Telegram account to ${customer.customerName}! You will now receive customer notifications here.`,
         );
       } catch (error: any) {
-        this.logger.error(`Error linking user with Telegram: ${error.message}`);
+        this.logger.error(`Error linking customer with Telegram: ${error.message}`);
         return ctx.reply(
           '❌ An error occurred while linking your account. Please try again later.',
         );
@@ -138,19 +145,19 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         });
         if (!customer) {
           return ctx.reply(
-            '❌ No account is currently linked to this Telegram chat.',
+            '❌ No customer account is currently linked to this Telegram chat.',
           );
         }
 
         const name = customer.customerName;
         customer.telegramChatId = undefined;
-        customer.telegramUsername = undefined;
+        customer.telegramLinked = 'false';
         await this.customerRepository.save(customer);
 
-        this.logger.log(`Telegram account unlinked: ${name}`);
+        this.logger.log(`Telegram customer account unlinked: ${name}`);
         return ctx.reply(`✅ Successfully unlinked from account: ${name}.`);
       } catch (error: any) {
-        this.logger.error(`Error unlinking user: ${error.message}`);
+        this.logger.error(`Error unlinking customer: ${error.message}`);
         return ctx.reply(
           '❌ An error occurred while unlinking. Please try again.',
         );
@@ -166,13 +173,14 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         });
         if (customer) {
           return ctx.reply(
-            `ℹ️ Telegram Connection Status:\n` +
-              `• Linked Account: ${customer.customerName}\n` +
-              `• Phone: ${customer.phoneNumber}\n`,
+            `ℹ️ Customer Telegram Connection Status:\n` +
+            `• Linked Customer: ${customer.customerName}\n` +
+            `• Phone: ${customer.phoneNumber || 'N/A'}\n` +
+            `• Username: @${customer.telegramUsername || 'N/A'}`,
           );
         } else {
           return ctx.reply(
-            'ℹ️ Account Status: Not linked.\nUse `/link <your_email>` to connect.',
+            'ℹ️ Account Status: Not linked.\nUse `/link <your_telegram_username>` to connect.',
           );
         }
       } catch (error) {
@@ -182,27 +190,31 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Replace placeholders in message template with user properties
+   * Replace placeholders in message template with customer/user properties
    */
   private formatMessage(
     template: string,
-    user: User | Customer,
+    customer: Customer,
   ): string {
-    const name = 'customerName' in user ? user.customerName : user.name;
-    const phone = 'phoneNumber' in user ? user.phoneNumber : user.telegramUsername;
-    const role = 'role' in user ? user.role : '';
-    const position = 'position' in user ? (user as any).position : '';
+    const name = customer.customerName || '';
+    const phone = customer.phoneNumber || '';
+    const telegramUsername = customer.telegramUsername ? `@${customer.telegramUsername}` : '';
+    const citizenId = customer.citizenId || '';
+    const email = customer.user?.email || '';
+    const role = customer.user?.role || '';
 
     return template
-      .replace(/{name}/g, name || '')
-      // .replace(/{email}/g, email || '')
-      .replace(/{role}/g, role || '')
-      .replace(/{position}/g, position || '')
+      .replace(/{name}/g, name)
+      .replace(/{phone}/g, phone)
+      .replace(/{telegramUsername}/g, telegramUsername)
+      .replace(/{citizenId}/g, citizenId)
+      .replace(/{email}/g, email)
+      .replace(/{role}/g, role)
       .replace(/{date}/g, new Date().toLocaleDateString());
   }
 
   /**
-   * Broadcast a customized message to matching registered users
+   * Broadcast a customized message to matching registered customers
    */
   async broadcastNotification(dto: BroadcastNotificationDto) {
     if (!this.bot) {
@@ -211,12 +223,13 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       );
     }
 
-    const query = this.usersRepository
-      .createQueryBuilder('user')
-      .where('user.telegramChatId IS NOT NULL');
+    const query = this.customerRepository
+      .createQueryBuilder('customer')
+      .leftJoinAndSelect('customer.user', 'user')
+      .where('customer.telegramChatId IS NOT NULL');
 
     if (dto.userIds && dto.userIds.length > 0) {
-      query.andWhere('user.id IN (:...userIds)', { userIds: dto.userIds });
+      query.andWhere('customer.id IN (:...userIds)', { userIds: dto.userIds });
     }
 
     if (dto.role) {
@@ -227,13 +240,13 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       query.andWhere('user.position = :position', { position: dto.position });
     }
 
-    const users = await query.getMany();
+    const customers = await query.getMany();
 
-    if (users.length === 0) {
+    if (customers.length === 0) {
       return {
         success: true,
         message:
-          'No users found matching the filter criteria with linked Telegram accounts.',
+          'No customers found matching the filter criteria with linked Telegram accounts.',
         sentCount: 0,
       };
     }
@@ -242,23 +255,23 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     let failedCount = 0;
     const failures: { userId: string; name: string; error: string }[] = [];
 
-    for (const user of users) {
-      if (!user.telegramChatId) continue;
-      const customizedMessage = this.formatMessage(dto.message, user);
+    for (const customer of customers) {
+      if (!customer.telegramChatId) continue;
+      const customizedMessage = this.formatMessage(dto.message, customer);
       try {
         await this.bot.telegram.sendMessage(
-          user.telegramChatId,
+          customer.telegramChatId,
           customizedMessage,
         );
         sentCount++;
       } catch (error: any) {
         this.logger.error(
-          `Failed to send telegram message to user ${user.id} (${user.email}): ${error.message}`,
+          `Failed to send telegram message to customer ${customer.id} (${customer.customerName}): ${error.message}`,
         );
         failedCount++;
         failures.push({
-          userId: user.id,
-          name: user.name,
+          userId: customer.id,
+          name: customer.customerName,
           error: error.message,
         });
       }
@@ -274,7 +287,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Send a customized message to a single registered user
+   * Send a customized message to a single registered customer
    */
   async sendNotification(dto: SendNotificationDto) {
     if (!this.bot) {
@@ -283,107 +296,117 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       );
     }
 
-    const user = await this.customerRepository.findOne({
+    const customer = await this.customerRepository.findOne({
       where: { id: dto.userId },
+      relations: { user: true },
     });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${dto.userId} not found.`);
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${dto.userId} not found.`);
     }
 
-    if (!user.telegramChatId) {
+    if (!customer.telegramChatId) {
       throw new BadRequestException(
-        `User ${user.customerName} (${user.phoneNumber}) does not have a linked Telegram account.`,
+        `Customer ${customer.customerName} (${customer.phoneNumber || customer.id}) does not have a linked Telegram account.`,
       );
     }
 
-    const customizedMessage = this.formatMessage(dto.message, user);
+    const customizedMessage = this.formatMessage(dto.message, customer);
     try {
       await this.bot.telegram.sendMessage(
-        user.telegramChatId,
+        customer.telegramChatId,
         customizedMessage,
       );
       return {
         success: true,
-        message: `Notification sent successfully to ${user.customerName}.`,
+        message: `Notification sent successfully to ${customer.customerName}.`,
       };
     } catch (error: any) {
       this.logger.error(
-        `Failed to send telegram message to user ${user.id}: ${error.message}`,
+        `Failed to send telegram message to customer ${customer.id}: ${error.message}`,
       );
       throw new BadRequestException(`Failed to send message: ${error.message}`);
     }
   }
 
   /**
-   * Get linking status for all users (or only linked users)
+   * Get linking status for all customers (or only linked customers)
    */
   async getLinkingStatus(linkedOnly?: boolean) {
     const query = this.customerRepository
       .createQueryBuilder('customer')
+      .leftJoinAndSelect('customer.user', 'user')
       .select([
         'customer.id',
-        'customer.customer_name',
-        'customer.customer_email',
-        'customer.phone_number',
-        'customer.telegram_chat_id',
-        'customer.telegram_username',
+        'customer.customerName',
+        'customer.phoneNumber',
+        'customer.telegramChatId',
+        'customer.telegramUsername',
+        'customer.telegramLinked',
       ]);
 
     if (linkedOnly) {
       query.where('customer.telegramChatId IS NOT NULL');
     }
 
-    const users = await query.getMany();
-    return users.map((user) => ({
-      id: user.id,
-      name: user.customerName,
-      phone: user.phoneNumber,
-      // phone: user.phone_number,
-      telegramLinked: !!user.telegramLinked,
-      telegramUsername: user.telegramUsername || null,
-      telegramChatId: user.telegramChatId || null,
+    const customers = await query.getMany();
+    return customers.map((customer) => ({
+      id: customer.id,
+      name: customer.customerName,
+      phone: customer.phoneNumber || null,
+      telegramLinked: !!customer.telegramChatId || customer.telegramLinked === 'true',
+      telegramUsername: customer.telegramUsername || null,
+      telegramChatId: customer.telegramChatId || null,
     }));
   }
 
   /**
-   * Manually link a user to a Telegram Chat ID via REST API
+   * Manually link a customer to a Telegram Chat ID via REST API
    */
   async linkManually(
-    email: string,
+    identifier: string,
     telegramChatId: string,
     telegramUsername?: string,
   ) {
-    const normalizedEmail = email.trim().toLowerCase();
-    const user = await this.usersRepository.findOne({
-      where: { email: normalizedEmail },
-    });
+    const searchStr = identifier.trim().toLowerCase();
 
-    if (!user) {
+    // Find customer by ID, telegramUsername, phoneNumber, customerName, or linked user email
+    let customer = await this.customerRepository
+      .createQueryBuilder('customer')
+      .leftJoinAndSelect('customer.user', 'user')
+      .where('customer.id = :id', { id: identifier })
+      .orWhere('LOWER(customer.telegramUsername) = :username', { username: searchStr.replace(/^@/, '') })
+      .orWhere('customer.phoneNumber = :phone', { phone: identifier })
+      .orWhere('LOWER(customer.customerName) = :name', { name: searchStr })
+      .orWhere('LOWER(user.email) = :email', { email: searchStr })
+      .getOne();
+
+    if (!customer) {
       throw new NotFoundException(
-        `No registered user found with the email: ${email}`,
+        `No registered customer found matching: ${identifier}`,
       );
     }
 
-    user.telegramChatId = telegramChatId;
+    customer.telegramChatId = telegramChatId;
+    customer.telegramLinked = 'true';
     if (telegramUsername) {
-      user.telegramUsername = telegramUsername;
+      customer.telegramUsername = telegramUsername.replace(/^@/, '');
     }
 
-    await this.usersRepository.save(user);
+    await this.customerRepository.save(customer);
     this.logger.log(
-      `Telegram account linked manually via API: ${normalizedEmail} -> Chat ID: ${telegramChatId}`,
+      `Telegram customer account linked manually via API: ${customer.customerName} (${customer.id}) -> Chat ID: ${telegramChatId}`,
     );
 
     return {
       success: true,
-      message: `Successfully linked user ${user.name} (${user.email}) to Telegram Chat ID ${telegramChatId}.`,
+      message: `Successfully linked customer ${customer.customerName} to Telegram Chat ID ${telegramChatId}.`,
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        id: customer.id,
+        name: customer.customerName,
+        phone: customer.phoneNumber || null,
         telegramLinked: true,
-        telegramChatId: user.telegramChatId,
-        telegramUsername: user.telegramUsername,
+        telegramChatId: customer.telegramChatId,
+        telegramUsername: customer.telegramUsername || null,
       },
     };
   }

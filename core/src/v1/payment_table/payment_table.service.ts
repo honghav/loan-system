@@ -16,9 +16,12 @@ export class PaymentTableService {
   constructor(
     @InjectRepository(PaymentTable)
     private paymentTableRepo: Repository<PaymentTable>,
-  ) { }
+  ) {}
 
-  async getItemAll(loanInformationId?: string, status?: PaymentStatus | string) {
+  async getItemAll(
+    loanInformationId?: string,
+    status?: PaymentStatus | string,
+  ) {
     try {
       const targetStatus = status as PaymentStatus | undefined;
 
@@ -33,7 +36,9 @@ export class PaymentTableService {
                 status: PaymentStatus.PENDING,
               },
               relations: {
-                loanInformation: true,
+                loanInformation: {
+                  customer: true,
+                },
               },
               order: {
                 paymentRequiredDate: 'ASC',
@@ -53,7 +58,9 @@ export class PaymentTableService {
                 status: targetStatus,
               },
               relations: {
-                loanInformation: true,
+                loanInformation: {
+                  customer: true,
+                },
               },
               order: {
                 paymentRequiredDate: 'ASC',
@@ -73,7 +80,9 @@ export class PaymentTableService {
         const records = await this.paymentTableRepo.find({
           where: { loanInformationId },
           relations: {
-            loanInformation: true,
+            loanInformation: {
+              customer: true,
+            },
           },
           order: {
             paymentRequiredDate: 'ASC',
@@ -115,7 +124,9 @@ export class PaymentTableService {
       const records = await this.paymentTableRepo.find({
         where: whereCondition,
         relations: {
-          loanInformation: true,
+          loanInformation: {
+            customer: true,
+          },
         },
         order: {
           paymentRequiredDate: 'ASC',
@@ -193,7 +204,7 @@ export class PaymentTableService {
   async updateStatus(
     id: string,
     status: PaymentStatus | string,
-    amount?: number,
+    amount?: number | string,
   ) {
     const record = await this.paymentTableRepo.findOne({
       where: { id },
@@ -206,45 +217,102 @@ export class PaymentTableService {
       throw new NotFoundException('Payment record not found');
     }
 
+    // Prevent updating a record that is already PAID
+    if (record.status === PaymentStatus.PAID) {
+      throw new BadRequestException(
+        'This payment record has already been paid and cannot be updated.',
+      );
+    }
+
     const targetStatus = status as PaymentStatus;
 
-    // If loanInformation paymentType is installment_payment and marking as PAID, amount is required
+    // If marking as PAID and amount is provided, recalculate principal, interest, and remaining balance
     if (
-      record.loanInformation?.paymentType ===
-      LoanInformationPaymentType.INSTALLMENT_PAYMENT &&
-      targetStatus === PaymentStatus.PAID
+      targetStatus === PaymentStatus.PAID &&
+      amount !== undefined &&
+      amount !== null
     ) {
-      if (amount === undefined || amount === null) {
-        throw new BadRequestException(
-          'Amount is required when payment type is installment_payment',
-        );
-      }
-      const paidAmount = Number(amount);
+      const paidAmount = parseFloat(String(amount));
       if (isNaN(paidAmount) || paidAmount <= 0) {
-        throw new BadRequestException(
-          'Amount must be a valid positive number',
-        );
+        throw new BadRequestException('Amount must be a valid positive number');
       }
 
-      // Divide principal and interest proportionally by ratio of paid amount to total payment
-      if (record.totalPayment && Number(record.totalPayment) > 0) {
-        const ratio = paidAmount / Number(record.totalPayment);
-        record.principal = Number(
-          (Number(record.principal || 0) * ratio).toFixed(2),
-        );
-        record.interest = Number(
-          (Number(record.interest || 0) * ratio).toFixed(2),
-        );
+      const originalTotal = parseFloat(String(record.totalPayment || 0));
+      const originalPrincipal = parseFloat(String(record.principal || 0));
+      const originalInterest = parseFloat(String(record.interest || 0));
+      const originalBeginningBalance = parseFloat(String(record.beginningBalance || 0));
+
+      if (originalTotal > 0 && paidAmount < originalTotal) {
+        // Partial payment: recalculate current record for paidAmount
+        const ratio = paidAmount / originalTotal;
+        const paidPrincipal = parseFloat((originalPrincipal * ratio).toFixed(2));
+        const paidInterest = parseFloat((originalInterest * ratio).toFixed(2));
+
+        record.principal = paidPrincipal;
+        record.interest = paidInterest;
         record.totalPayment = paidAmount;
         if (record.beginningBalance != null) {
-          record.remainingBalance = Number(
-            (
-              Number(record.beginningBalance) - Number(record.principal)
-            ).toFixed(2),
+          record.remainingBalance = parseFloat(
+            (originalBeginningBalance - paidPrincipal).toFixed(2),
           );
         }
+
+        // Calculate remaining unpaid amounts for new payment record
+        const remainingTotal = parseFloat((originalTotal - paidAmount).toFixed(2));
+        const remainingPrincipal = parseFloat(
+          (originalPrincipal - paidPrincipal).toFixed(2),
+        );
+        const remainingInterest = parseFloat(
+          (originalInterest - paidInterest).toFixed(2),
+        );
+
+        if (remainingTotal > 0) {
+          // Generate next table number (totalPaymentNo index + 1)
+          let nextPaymentNo = (record.totalPaymentNo || 0) + 1;
+          if (record.loanInformationId) {
+            const lastRecord = await this.paymentTableRepo.findOne({
+              where: { loanInformationId: record.loanInformationId },
+              order: { totalPaymentNo: 'DESC' },
+            });
+            if (lastRecord && lastRecord.totalPaymentNo != null) {
+              nextPaymentNo = lastRecord.totalPaymentNo + 1;
+            }
+          }
+
+          const newPaymentRecord = this.paymentTableRepo.create({
+            loanInformationId: record.loanInformationId,
+            paymentRequiredDate: record.paymentRequiredDate,
+            totalPaymentNo: nextPaymentNo,
+            beginningBalance: record.remainingBalance,
+            totalPayment: remainingTotal,
+            principal: remainingPrincipal,
+            interest: remainingInterest,
+            remainingBalance: parseFloat(
+              (
+                parseFloat(String(record.remainingBalance || 0)) - remainingPrincipal
+              ).toFixed(2),
+            ),
+            status: PaymentStatus.PENDING,
+            payDate: null,
+          });
+
+          await this.paymentTableRepo.save(newPaymentRecord);
+        }
       } else {
-        record.totalPayment = paidAmount;
+        // Full payment or amount >= originalTotal
+        if (originalTotal > 0) {
+          const ratio = paidAmount / originalTotal;
+          record.principal = parseFloat((originalPrincipal * ratio).toFixed(2));
+          record.interest = parseFloat((originalInterest * ratio).toFixed(2));
+          record.totalPayment = paidAmount;
+          if (record.beginningBalance != null) {
+            record.remainingBalance = parseFloat(
+              (originalBeginningBalance - record.principal).toFixed(2),
+            );
+          }
+        } else {
+          record.totalPayment = paidAmount;
+        }
       }
     }
 
@@ -265,8 +333,7 @@ export class PaymentTableService {
 
   async deleteByLoanId(loanInformationId: string) {
     return await this.paymentTableRepo.delete({
-      loanInformation: { id: loanInformationId }
+      loanInformation: { id: loanInformationId },
     });
   }
 }
-

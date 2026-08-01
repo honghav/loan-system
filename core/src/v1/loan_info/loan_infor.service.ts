@@ -49,9 +49,40 @@ export class LoanInformationService {
     return Math.max(years * 12 + months, 1);
   }
 
+  private async generateUniqueLoanNumber(): Promise<string> {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const prefix = `LN-${day}${month}`;
+
+    let isUnique = false;
+    let loanNum = '';
+    let attempts = 0;
+
+    while (!isUnique && attempts < 100) {
+      attempts++;
+      const random4 = Math.floor(1000 + Math.random() * 9000).toString();
+      loanNum = `${prefix}-${random4}`;
+
+      const existing = await this.loanInfoRepo.findOne({
+        where: { loanNumber: loanNum },
+      });
+
+      if (!existing) {
+        isUnique = true;
+      }
+    }
+
+    return loanNum;
+  }
+
   async create(dto: CreateLoanInformation) {
     if (dto.customerId == null) {
       throw new Error('The Customer Id is required');
+    }
+
+    if (!dto.loanNumber) {
+      dto.loanNumber = await this.generateUniqueLoanNumber();
     }
 
     // 1. Create and save the loan information in database

@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -31,6 +32,26 @@ export enum LoanInformationPaymentType {
 export class LoanInformation {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+
+  @Index({ unique: true })
+  @Column({
+    name: 'loan_number',
+    type: 'varchar',
+    unique: true,
+    nullable: true,
+  })
+  loanNumber?: string;
+
+  @BeforeInsert()
+  generateLoanNumber() {
+    if (!this.loanNumber) {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const random4 = Math.floor(1000 + Math.random() * 9000).toString();
+      this.loanNumber = `LN-${day}${month}-${random4}`;
+    }
+  }
 
   @IsNotEmpty()
   @Column({

@@ -22,13 +22,12 @@ import {
 
 @ApiTags('Telegram Notifications')
 @Controller('v1/telegram')
-@UseGuards(JwtAuthGuard, RolesGuard)
+// @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class TelegramController {
-  constructor(private readonly telegramService: TelegramService) {}
+  constructor(private readonly telegramService: TelegramService) { }
 
   @Post('broadcast')
-  @Roles('hr', 'manager', 'it')
   @ApiOperation({
     summary: 'Broadcast custom notification to registered users',
     description:
@@ -60,7 +59,7 @@ export class TelegramController {
   }
 
   @Post('send')
-  @Roles('hr', 'manager', 'it')
+  // @Roles('hr', 'manager', 'it')
   @ApiOperation({
     summary: 'Send custom notification to a specific registered user',
     description:

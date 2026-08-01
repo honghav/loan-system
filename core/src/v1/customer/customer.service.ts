@@ -6,6 +6,7 @@ import { UpdateCustomerDto } from './dto/updateCustomer.dto';
 import { Customer } from './customer.enitity';
 import * as fs from 'fs';
 import * as path from 'path';
+import { LoanInformationStatus } from '../loan_info/loan_infor.entity';
 
 // Helper to check if a string is a base64 encoded image
 function isBase64Image(str: string): boolean {
@@ -47,7 +48,7 @@ export class CustomerService {
   constructor(
     @InjectRepository(Customer)
     private customerRepo: Repository<Customer>,
-  ) {}
+  ) { }
 
   async create(dto: CreateCustomerDto) {
     let imagePath = dto.image;
@@ -61,15 +62,45 @@ export class CustomerService {
     const customer = this.customerRepo.create({ ...dto, image: imagePath });
     return await this.customerRepo.save(customer);
   }
+  async countActiveLoansByCustomerId(customerId: string): Promise<number> {
+    try {
+      const customer = await this.customerRepo.findOne({
+        where: { id: customerId },
+        relations: { loanInformation: true },
+      });
+
+      if (!customer) {
+        throw new NotFoundException('Customer not found');
+      }
+
+      return customer.loanInformation?.filter(
+        (loan) => loan.status === LoanInformationStatus.IN_PAYMENT
+      ).length || 0;
+    } catch (error: any) {
+      throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
+    }
+  }
 
   async getAll() {
     try {
-      return await this.customerRepo.find({
+
+      const customer = await this.customerRepo.find({
         relations: {
           user: true,
+          loanInformation: true,
         },
         order: { createdAt: 'DESC' },
       });
+      // countActiveLoansByCustomerId(customer.id)
+      const data = customer.map(async (customer) => {
+        const activeLoansCount = await this.countActiveLoansByCustomerId(customer.id);
+        return {
+          ...customer,
+          activeLoansCount,
+        };
+      });
+
+      return { data: { count: data.length, customer: await Promise.all(data) } }
     } catch (error: any) {
       // This sends the REAL database error back to Postman instead of "Internal server error"
       throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
@@ -135,6 +166,4 @@ export class CustomerService {
     await this.customerRepo.remove(customer);
     return { message: 'Customer deleted successfully' };
   }
-
-  
 }

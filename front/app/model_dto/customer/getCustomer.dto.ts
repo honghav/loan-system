@@ -7,6 +7,7 @@ export interface GetCustomerDTO {
   cusImage?: string;
   cusTelegram?: string;
   cusTelegramChatId?: string;
+  cusActiveLoansCount?: number;
 }
 
 export interface GetCustomerResponseDTO {
@@ -18,6 +19,7 @@ export interface GetCustomerResponseDTO {
   image?: string;
   telegramUsername?: string;
   telegramChatId?: string;
+  activeLoansCount?: number;
 }
 
 export const mapperCustomer = (
@@ -31,6 +33,7 @@ export const mapperCustomer = (
   cusImage: data.image,
   cusTelegram: data.telegramLinked,
   cusTelegramChatId: data.telegramChatId,
+  cusActiveLoansCount: data.activeLoansCount,
 });
 
 // Holds RAW API Response
@@ -50,7 +53,7 @@ export async function getCustomerService(): Promise<void> {
   // Store raw API data directly without mapping here
   try {
     const res: any = await apiFetch("GET", "customers");
-    customerResponse.value = res;
+    customerResponse.value = res.data.customer;
   } catch (error) {
     console.error("Error fetching customer data:", error);
   }
@@ -59,7 +62,7 @@ export async function getByIdCustomerService(id: string): Promise<void> {
   // Store raw API data directly without mapping here
   try {
     const res: any = await apiFetch("GET", `customers/${id}`);
-    customerByIdResponse.value = res;
+    customerByIdResponse.value = res.data.customer;
   } catch (error) {
     console.error("Error fetching customer data:", error);
   }

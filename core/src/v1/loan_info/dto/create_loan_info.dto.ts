@@ -7,6 +7,15 @@ import {
 import { CreatePaymenttable } from 'src/v1/payment_table/dto/create_payment_table.dto';
 
 export class CreateLoanInformation {
+  @ApiPropertyOptional({
+    description: 'Auto-generated unique loan number in format LN-DDMM-XXXX',
+    example: 'LN-0108-1024',
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  loanNumber?: string;
+
   @ApiProperty({
     description: 'The principal loan amount',
     example: '1000.00',
