@@ -6,10 +6,11 @@ import { AuthModule } from '../auth/auth.module';
 import { CustomerModule } from '../customer/customer.module';
 import { User } from '../users/user.entity';
 import { Customer } from '../customer/customer.enitity';
+import { PaymentTable } from '../payment_table/payment_table.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Customer, User]),
+    TypeOrmModule.forFeature([Customer, User, PaymentTable]),
     AuthModule,
     CustomerModule,
   ],

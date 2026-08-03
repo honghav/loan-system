@@ -406,6 +406,7 @@
                 <th class="px-4 py-3.5 text-center w-16">Action</th>
                 <th class="px-4 py-3.5 text-center w-12">#</th>
                 <th class="px-4 py-3.5 text-center w-12">Profile</th>
+                <th class="px-4 py-3.5 text-center w-12">Loan Number</th>
                 <th class="px-4 py-3.5">Required Date</th>
                 <th class="px-4 py-3.5">Pay Date</th>
                 <th class="px-4 py-3.5 text-right">Total Payment</th>
@@ -440,6 +441,7 @@
                 >
                   {{ payment.payNumber }}
                 </td>
+         
                 <td
                   class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
                 >
@@ -447,6 +449,11 @@
                 </td>
                 <td class="px-4 py-3.5 font-medium text-xs">
                   {{ formatDate(payment.payPaymentRequiredDate) }}
+                </td>
+                       <td
+                  class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
+                >
+                  {{ payment.payLoanNumber }}
                 </td>
                 <td
                   class="px-4 py-3.5 font-medium text-xs text-emerald-600 dark:text-emerald-400"

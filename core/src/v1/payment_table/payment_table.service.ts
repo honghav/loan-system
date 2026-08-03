@@ -9,14 +9,22 @@ import { Repository } from 'typeorm';
 import { CreatePaymenttable } from './dto/create_payment_table.dto';
 import { GetPaymenttable } from './dto/get_payment_table.dto';
 import { UpdatePaymenttable } from './dto/update_payment_table.dto';
-import { LoanInformationPaymentType } from '../loan_info/loan_infor.entity';
+import {
+  LoanInformation,
+  LoanInformationStatus,
+  LoanInformationPaymentType,
+} from '../loan_info/loan_infor.entity';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
 export class PaymentTableService {
   constructor(
     @InjectRepository(PaymentTable)
     private paymentTableRepo: Repository<PaymentTable>,
-  ) {}
+    @InjectRepository(LoanInformation)
+    private loanInfoRepo: Repository<LoanInformation>,
+    private readonly telegramService: TelegramService,
+  ) { }
 
   async getItemAll(
     loanInformationId?: string,
@@ -209,7 +217,9 @@ export class PaymentTableService {
     const record = await this.paymentTableRepo.findOne({
       where: { id },
       relations: {
-        loanInformation: true,
+        loanInformation: {
+          customer: true,
+        },
       },
     });
 
@@ -325,6 +335,79 @@ export class PaymentTableService {
     }
 
     const savedRecord = await this.paymentTableRepo.save(record);
+
+    // Auto-update LoanInformation status to COMPLETED if completion criteria are met
+    const loanInfo = record.loanInformation;
+    if (loanInfo && loanInfo.id) {
+      if (loanInfo.paymentType === LoanInformationPaymentType.COMPLETED_PAYMENT) {
+        // If paymentType is completed_payment: check if all payment records for this loan are PAID
+        const allPayments = await this.paymentTableRepo.find({
+          where: { loanInformationId: loanInfo.id },
+        });
+        const allPaid =
+          allPayments.length > 0 &&
+          allPayments.every((p) => p.status === PaymentStatus.PAID);
+        if (allPaid) {
+          loanInfo.status = LoanInformationStatus.COMPLETED;
+          await this.loanInfoRepo.save(loanInfo);
+        }
+      } else if (
+        loanInfo.paymentType === LoanInformationPaymentType.INSTALLMENT_PAYMENT
+      ) {
+        // If paymentType is installment_payment: check if next total/remaining balance is 0 or all records are PAID
+        const remBalance =
+          savedRecord.remainingBalance != null
+            ? Number(savedRecord.remainingBalance)
+            : null;
+
+        const allPayments = await this.paymentTableRepo.find({
+          where: { loanInformationId: loanInfo.id },
+        });
+        const allPaid =
+          allPayments.length > 0 &&
+          allPayments.every((p) => p.status === PaymentStatus.PAID);
+
+        if ((remBalance !== null && remBalance <= 0) || allPaid) {
+          loanInfo.status = LoanInformationStatus.COMPLETED;
+          await this.loanInfoRepo.save(loanInfo);
+        }
+      }
+    }
+
+    // Trigger Telegram notification to customer if linked
+    const customer = record.loanInformation?.customer;
+    if (customer && customer.id && customer.telegramChatId) {
+      try {
+        const statusText = targetStatus.toUpperCase();
+        const loanNum = record.loanInformation?.loanNumber || 'N/A';
+        const periodNo = record.totalPaymentNo ?? 'N/A';
+        const amountStr = savedRecord.totalPayment ? `$${savedRecord.totalPayment}` : 'N/A';
+
+        const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
+        const frontUrl = rawFrontUrl.replace(/\/+$/, '');
+        const targetLoanId = loanInfo?.id || record.loanInformation?.id || '';
+        const loanUrl = targetLoanId ? `${frontUrl}/customer/${targetLoanId}` : `${frontUrl}/customer`;
+
+        const message =
+          `🔔 *Payment Status Notification*\n\n` +
+          `Hello *${customer.customerName}*,\n` +
+          `Your payment status for loan *${loanNum}* (Period #${periodNo}) has been updated to *${statusText}*.\n\n` +
+          `• *Amount:* ${amountStr}\n` +
+          `• *Date:* ${new Date().toLocaleDateString()}\n\n` +
+          `👉 [View Loan Detail](${loanUrl})`;
+
+        await this.telegramService.sendNotification({
+          userId: customer.id,
+          message,
+        });
+      } catch (error: any) {
+        // Log telegram error without failing the payment status update operation
+        console.error(
+          `Failed to send Telegram notification to customer ${customer.id}: ${error.message}`,
+        );
+      }
+    }
+
     return {
       success: true,
       data: savedRecord,

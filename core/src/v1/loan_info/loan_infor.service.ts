@@ -7,6 +7,8 @@ import { GetLoanInfoDto } from './dto/get_loan_info.dto';
 import { PaymentTable } from '../payment_table/payment_table.entity';
 import { PaymentTableService } from '../payment_table/payment_table.service';
 import { generatePaymentSchedule } from './dto/generate_payment_table.dto';
+import { Customer } from '../customer/customer.enitity';
+import { TelegramService } from '../telegram/telegram.service';
 import { LoanType } from '../loan_type/loan_type.entity';
 
 @Injectable()
@@ -18,6 +20,9 @@ export class LoanInformationService {
     private paymentTableRepo: Repository<PaymentTable>,
     @InjectRepository(LoanType)
     private loanTypeRepo: Repository<LoanType>,
+    @InjectRepository(Customer)
+    private customerRepo: Repository<Customer>,
+    private readonly telegramService: TelegramService,
   ) { }
 
   private getTotalTable(
@@ -129,7 +134,41 @@ export class LoanInformationService {
     );
     await this.paymentTableRepo.save(paymentRecords);
 
-    // 6. Return success payload
+    // 6. Send Telegram notification to customer if linked
+    if (dto.customerId) {
+      try {
+        const customer = await this.customerRepo.findOne({
+          where: { id: dto.customerId },
+        });
+
+        if (customer && customer.telegramChatId) {
+          const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
+          const frontUrl = rawFrontUrl.replace(/\/+$/, '');
+          const loanUrl = `${frontUrl}/customer/${savedLoan.id}`;
+          const amountStr = `$${Number(savedLoan.amount).toFixed(2)}`;
+
+          const message =
+            `🎉 *New Loan Created!* 🎉\n\n` +
+            `Hello *${customer.customerName}*,\n` +
+            `Your new loan account (*${savedLoan.loanNumber}*) has been successfully registered.\n\n` +
+            `• *Amount:* ${amountStr}\n` +
+            `• *Total Periods:* ${totalTable}\n` +
+            `• *Start Date:* ${new Date(savedLoan.startDate).toLocaleDateString()}\n\n` +
+            `👉 [View Loan Detail](${loanUrl})`;
+
+          await this.telegramService.sendNotification({
+            userId: customer.id,
+            message,
+          });
+        }
+      } catch (error: any) {
+        console.error(
+          `Failed to send Telegram notification for loan creation: ${error.message}`,
+        );
+      }
+    }
+
+    // 7. Return success payload
     return {
       success: true,
       data: {
@@ -160,15 +199,15 @@ export class LoanInformationService {
         );
 
         return {
-          ...loan,
           totalMonth,
-          tableMonth: generatePaymentSchedule({
-            amount: Number(loan.amount),
-            durationMonths: totalMonth,
-            monthlyRate: Number(loan.loanFee || 0),
-            startDate: loan.startDate,
-            frequencyDay,
-          }),
+          ...loan,
+          // tableMonth: generatePaymentSchedule({
+          //   amount: Number(loan.amount),
+          //   durationMonths: totalMonth,
+          //   monthlyRate: Number(loan.loanFee || 0),
+          //   startDate: loan.startDate,
+          //   frequencyDay,
+          // }),
         };
       });
       return {
@@ -212,13 +251,13 @@ export class LoanInformationService {
         data: {
           ...loanInfo,
           totalMonth,
-          tableMonth: generatePaymentSchedule({
-            amount: Number(loanInfo.amount),
-            durationMonths: totalMonth,
-            monthlyRate: Number(loanInfo.loanFee || 0),
-            startDate: loanInfo.startDate,
-            frequencyDay,
-          }),
+          // tableMonth: generatePaymentSchedule({
+          //   amount: Number(loanInfo.amount),
+          //   durationMonths: totalMonth,
+          //   monthlyRate: Number(loanInfo.loanFee || 0),
+          //   startDate: loanInfo.startDate,
+          //   frequencyDay,
+          // }),
         },
       };
     } catch (error: any) {

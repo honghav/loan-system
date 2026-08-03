@@ -21,6 +21,8 @@ export interface GetPaymentTableDTO {
   payCustomerName: string
   payCustomerImage: string
   paymentType?: LoanInformationPaymentType | string;
+  payLoanNumber: string
+
 }
 
 export interface GetPaymentTableResponeDTO {
@@ -56,6 +58,7 @@ export const mapperPaymentTable = (
     payCustomerImage: data.loanInformation?.customer?.image ?? "",
     payCustomerName: data.loanInformation?.customer?.customerName ?? "",
     paymentType: data.paymentType || data.loanInformation?.paymentType,
+    payLoanNumber: data.loanInformation?.loanNumber || "NA",
   };
 };
 

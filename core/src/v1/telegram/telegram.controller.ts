@@ -149,4 +149,18 @@ export class TelegramController {
       dto.telegramUsername,
     );
   }
+
+  @Post('alert-payments')
+  @ApiOperation({
+    summary: 'Auto-send Telegram payment alerts for due and upcoming payments',
+    description:
+      'Queries pending payments in payment_table due today or 1 day before (tomorrow) and sends Telegram reminders to linked customers.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment alerts processed successfully.',
+  })
+  async alertPaymentTable() {
+    return this.telegramService.alertPaymentTable();
+  }
 }

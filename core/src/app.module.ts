@@ -26,7 +26,7 @@ import { DashboardModule } from './v1/dashboard/dashboard.module';
       inject: [ConfigService],
     }),
     UsersModule,
-    // TelegramModule,
+    TelegramModule,
     CustomerModule,
     AuthModule,
     LoanInformationModule,
@@ -38,5 +38,3 @@ import { DashboardModule } from './v1/dashboard/dashboard.module';
   ],
 })
 export class AppModule {}
-
-

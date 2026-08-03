@@ -14,6 +14,7 @@ import { BroadcastNotificationDto } from './dto/broadcast-notification.dto';
 import { SendNotificationDto } from './dto/send-notification.dto';
 import { User } from '../users/user.entity';
 import { Customer } from '../customer/customer.enitity';
+import { PaymentTable, PaymentStatus } from '../payment_table/payment_table.entity';
 
 @Injectable()
 export class TelegramService implements OnModuleInit, OnModuleDestroy {
@@ -26,6 +27,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     private readonly customerRepository: Repository<Customer>,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(PaymentTable)
+    private readonly paymentTableRepository: Repository<PaymentTable>,
   ) { }
 
   onModuleInit() {
@@ -102,14 +105,14 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       try {
         const customer = await this.customerRepository
           .createQueryBuilder('customer')
-          .where('LOWER(customer.telegramUsername) = :username', {
+          .where("LOWER(REPLACE(customer.telegramUsername, '@', '')) = :username", {
             username: tele_username,
           })
           .getOne();
 
         if (!customer) {
           return ctx.reply(
-            `❌ No registered customer found with Telegram username: ${tele_username}`,
+            `❌ No registered customer found with Telegram username: @${tele_username}`,
           );
         }
 
@@ -128,7 +131,9 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
           `✅ Successfully linked your Telegram account to ${customer.customerName}! You will now receive customer notifications here.`,
         );
       } catch (error: any) {
-        this.logger.error(`Error linking customer with Telegram: ${error.message}`);
+        this.logger.error(
+          `Error linking customer with Telegram: ${error.message}`,
+        );
         return ctx.reply(
           '❌ An error occurred while linking your account. Please try again later.',
         );
@@ -192,13 +197,12 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
   /**
    * Replace placeholders in message template with customer/user properties
    */
-  private formatMessage(
-    template: string,
-    customer: Customer,
-  ): string {
+  private formatMessage(template: string, customer: Customer): string {
     const name = customer.customerName || '';
     const phone = customer.phoneNumber || '';
-    const telegramUsername = customer.telegramUsername ? `@${customer.telegramUsername}` : '';
+    const telegramUsername = customer.telegramUsername
+      ? `@${customer.telegramUsername}`
+      : '';
     const citizenId = customer.citizenId || '';
     const email = customer.user?.email || '';
     const role = customer.user?.role || '';
@@ -262,6 +266,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
         await this.bot.telegram.sendMessage(
           customer.telegramChatId,
           customizedMessage,
+          { parse_mode: 'Markdown' },
         );
         sentCount++;
       } catch (error: any) {
@@ -315,6 +320,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       await this.bot.telegram.sendMessage(
         customer.telegramChatId,
         customizedMessage,
+        { parse_mode: 'Markdown' },
       );
       return {
         success: true,
@@ -326,6 +332,136 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       );
       throw new BadRequestException(`Failed to send message: ${error.message}`);
     }
+  }
+
+  /**
+   * Auto-send Telegram alerts for pending payments:
+   * 1. 1 day before paymentRequiredDate (Due Tomorrow)
+   * 2. On paymentRequiredDate (Due Today)
+   */
+  async alertPaymentTable() {
+    if (!this.bot) {
+      throw new BadRequestException(
+        'Telegram bot is not initialized. Please verify your TELEGRAM_BOT_TOKEN.',
+      );
+    }
+
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const formatDateStr = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const todayStr = formatDateStr(today);
+    const tomorrowStr = formatDateStr(tomorrow);
+
+    // Query pending payments with paymentRequiredDate equal to today OR tomorrow
+    const pendingPayments = await this.paymentTableRepository
+      .createQueryBuilder('payment')
+      .leftJoinAndSelect('payment.loanInformation', 'loan')
+      .leftJoinAndSelect('loan.customer', 'customer')
+      .where('payment.status = :status', { status: PaymentStatus.PENDING })
+      .andWhere('payment.paymentRequiredDate IN (:...dates)', {
+        dates: [todayStr, tomorrowStr],
+      })
+      .andWhere('customer.telegramChatId IS NOT NULL')
+      .getMany();
+
+    if (pendingPayments.length === 0) {
+      return {
+        success: true,
+        message: 'No pending payments due today or tomorrow with linked Telegram accounts.',
+        sentCount: 0,
+        todayCount: 0,
+        tomorrowCount: 0,
+      };
+    }
+
+    let sentCount = 0;
+    let failedCount = 0;
+    let todayCount = 0;
+    let tomorrowCount = 0;
+    const failures: { paymentId: string; customerName: string; error: string }[] = [];
+
+    for (const payment of pendingPayments) {
+      const customer = payment.loanInformation?.customer;
+      if (!customer || !customer.telegramChatId) continue;
+
+      const requiredDateStr =
+        payment.paymentRequiredDate instanceof Date
+          ? formatDateStr(payment.paymentRequiredDate)
+          : String(payment.paymentRequiredDate).split('T')[0];
+
+      const isToday = requiredDateStr === todayStr;
+      const isTomorrow = requiredDateStr === tomorrowStr;
+
+      if (isToday) todayCount++;
+      if (isTomorrow) tomorrowCount++;
+
+      const loanNum = payment.loanInformation?.loanNumber || 'N/A';
+      const periodNo = payment.totalPaymentNo ?? 'N/A';
+      const amount = payment.totalPayment ? `$${payment.totalPayment}` : 'N/A';
+
+      const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
+      const frontUrl = rawFrontUrl.replace(/\/+$/, '');
+      const loanId = payment.loanInformation?.id || '';
+      const loanUrl = loanId ? `${frontUrl}/customer/${loanId}` : `${frontUrl}/customer`;
+
+      let message = '';
+      if (isToday) {
+        message =
+          `🚨 *Payment Due Today* 🚨\n\n` +
+          `Hello *${customer.customerName}*,\n` +
+          `Your loan payment is due today (${requiredDateStr}).\n\n` +
+          `• *Loan No:* ${loanNum}\n` +
+          `• *Period:* #${periodNo}\n` +
+          `• *Amount Due:* ${amount}\n\n` +
+          `👉 [View Loan Detail](${loanUrl})`;
+      } else {
+        message =
+          `⚠️ *Payment Reminder (Due Tomorrow)* ⚠️\n\n` +
+          `Hello *${customer.customerName}*,\n` +
+          `This is a friendly reminder that your loan payment is due tomorrow (${requiredDateStr}).\n\n` +
+          `• *Loan No:* ${loanNum}\n` +
+          `• *Period:* #${periodNo}\n` +
+          `• *Amount Due:* ${amount}\n\n` +
+          `👉 [View Loan Detail](${loanUrl})`;
+      }
+
+      try {
+        await this.bot.telegram.sendMessage(
+          customer.telegramChatId,
+          message,
+          { parse_mode: 'Markdown' },
+        );
+        sentCount++;
+      } catch (error: any) {
+        this.logger.error(
+          `Failed to send payment alert for payment ID ${payment.id} to customer ${customer.customerName}: ${error.message}`,
+        );
+        failedCount++;
+        failures.push({
+          paymentId: payment.id,
+          customerName: customer.customerName,
+          error: error.message,
+        });
+      }
+    }
+
+    return {
+      success: true,
+      message: `Payment alerts process completed. Total Sent: ${sentCount} (Today: ${todayCount}, Tomorrow: ${tomorrowCount}), Failed: ${failedCount}`,
+      sentCount,
+      todayCount,
+      tomorrowCount,
+      failedCount,
+      failures,
+    };
   }
 
   /**
@@ -353,7 +489,8 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       id: customer.id,
       name: customer.customerName,
       phone: customer.phoneNumber || null,
-      telegramLinked: !!customer.telegramChatId || customer.telegramLinked === 'true',
+      telegramLinked:
+        !!customer.telegramChatId || customer.telegramLinked === 'true',
       telegramUsername: customer.telegramUsername || null,
       telegramChatId: customer.telegramChatId || null,
     }));
@@ -374,7 +511,9 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       .createQueryBuilder('customer')
       .leftJoinAndSelect('customer.user', 'user')
       .where('customer.id = :id', { id: identifier })
-      .orWhere('LOWER(customer.telegramUsername) = :username', { username: searchStr.replace(/^@/, '') })
+      .orWhere('LOWER(customer.telegramUsername) = :username', {
+        username: searchStr.replace(/^@/, ''),
+      })
       .orWhere('customer.phoneNumber = :phone', { phone: identifier })
       .orWhere('LOWER(customer.customerName) = :name', { name: searchStr })
       .orWhere('LOWER(user.email) = :email', { email: searchStr })
