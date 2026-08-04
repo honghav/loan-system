@@ -14,22 +14,12 @@ import { CustomTypeOrmLogger } from 'src/v1/logger/typeorm-custom.logger';
 export const getDatabaseConfig = (
   configService: ConfigService,
 ): TypeOrmModuleOptions => {
+  const databaseUrl = configService.get<string>('DATABASE_URL');
   const password = configService.get<string>('DB_PASSWORD');
+  const isSsl = configService.get<string>('DB_SSL') === 'true';
 
-  // Validate password exists
-  if (!password) {
-    throw new Error(
-      'Database password is not defined in environment variables',
-    );
-  }
-
-  return {
+  const baseConfig: TypeOrmModuleOptions = {
     type: 'postgres',
-    host: configService.get('DB_HOST'),
-    port: configService.get<number>('DB_PORT'),
-    username: configService.get('DB_USERNAME'),
-    password: password, // Ensure this is a string
-    database: configService.get('DB_DATABASE'),
     entities: [
       User,
       Customer,
@@ -41,10 +31,31 @@ export const getDatabaseConfig = (
     synchronize: true,
     logging: true,
     logger: new CustomTypeOrmLogger(),
-    // Add these options for better compatibility
     extra: {
-      ssl: false, // Set to true if using SSL
+      ssl: isSsl || !!databaseUrl ? { rejectUnauthorized: false } : false,
     },
+  };
+
+  if (databaseUrl) {
+    return {
+      ...baseConfig,
+      url: databaseUrl,
+    };
+  }
+
+  if (!password) {
+    throw new Error(
+      'Database password is not defined in environment variables',
+    );
+  }
+
+  return {
+    ...baseConfig,
+    host: configService.get<string>('DB_HOST'),
+    port: configService.get<number>('DB_PORT'),
+    username: configService.get<string>('DB_USERNAME'),
+    password: password,
+    database: configService.get<string>('DB_DATABASE'),
   };
 };
 

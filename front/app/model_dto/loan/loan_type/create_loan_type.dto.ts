@@ -9,14 +9,14 @@ export interface CreateLoanTypeDTO {
 
 export interface CreateLoanTypeResponseDTO {
   frequency: string;
-  frequency_day?: number;
+  frequency_day?: string;
   description?: string;
   userId?: string;
 }
 
 export const mapperCreateLoanType = (data: CreateLoanTypeDTO): CreateLoanTypeResponseDTO => ({
   frequency: data.loanTypeFrequency || "",
-  frequency_day: data.loanTypeFrequencyDay,
+  frequency_day: data.loanTypeFrequencyDay?.toString() || "",
   description: data.loanTypeDescription,
   userId: data.loanTypeUserId,
 });
