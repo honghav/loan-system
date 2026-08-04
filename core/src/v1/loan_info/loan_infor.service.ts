@@ -134,7 +134,12 @@ export class LoanInformationService {
     );
     await this.paymentTableRepo.save(paymentRecords);
 
-    // 6. Send Telegram notification to customer if linked
+    // 6. Build front loan URL
+    const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
+    const frontUrl = rawFrontUrl.replace(/\/+$/, '');
+    const loanUrl = `${frontUrl}/customer/${savedLoan.id}`;
+
+    // 7. Send Telegram notification to customer if linked
     if (dto.customerId) {
       try {
         const customer = await this.customerRepo.findOne({
@@ -142,9 +147,6 @@ export class LoanInformationService {
         });
 
         if (customer && customer.telegramChatId) {
-          const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
-          const frontUrl = rawFrontUrl.replace(/\/+$/, '');
-          const loanUrl = `${frontUrl}/customer/${savedLoan.id}`;
           const amountStr = `$${Number(savedLoan.amount).toFixed(2)}`;
 
           const message =
@@ -154,7 +156,7 @@ export class LoanInformationService {
             `• *Amount:* ${amountStr}\n` +
             `• *Total Periods:* ${totalTable}\n` +
             `• *Start Date:* ${new Date(savedLoan.startDate).toLocaleDateString()}\n\n` +
-            `👉 [View Loan Detail](${loanUrl})`;
+            `👉 *View Loan Detail:*\n${loanUrl}`;
 
           await this.telegramService.sendNotification({
             userId: customer.id,
@@ -168,9 +170,10 @@ export class LoanInformationService {
       }
     }
 
-    // 7. Return success payload
+    // 8. Return success payload
     return {
       success: true,
+      url: loanUrl,
       data: {
         ...savedLoan,
         totalTable,
@@ -220,25 +223,44 @@ export class LoanInformationService {
     }
   }
 
-  async getById(id: string) {
+  async getById(idOrNumber: string) {
     try {
-      const loanInfo = await this.loanInfoRepo.findOne({
-        relations: {
-          user: true,
-          customer: true,
-          loanType: true,
-          paymentTables: true,
-        },
-        where: { id },
-        order: { createdAt: 'DESC' },
-      });
+      const relations = {
+        user: true,
+        customer: true,
+        loanType: true,
+        paymentTables: true,
+      };
+
+      const isUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          idOrNumber,
+        );
+
+      let loanInfo: LoanInformation | null = null;
+
+      if (isUuid) {
+        loanInfo = await this.loanInfoRepo.findOne({
+          relations,
+          where: { id: idOrNumber },
+        });
+      }
 
       if (!loanInfo) {
+        loanInfo = await this.loanInfoRepo.findOne({
+          relations,
+          where: { loanNumber: idOrNumber },
+        });
+      }
+
+      // 2. Safely handle the case where record is not found in both
+      if (!loanInfo) {
         throw new NotFoundException(
-          `Loan information record with ID "${id}" not found.`,
+          `Loan information record with ID or Loan Number "${idOrNumber}" not found.`,
         );
       }
 
+      // 3. Process calculations once
       const frequencyDay = loanInfo.loanType?.frequency_day;
       const totalMonth = this.getTotalTable(
         loanInfo.startDate,
@@ -249,30 +271,43 @@ export class LoanInformationService {
       return {
         success: true,
         data: {
-          ...loanInfo,
           totalMonth,
-          // tableMonth: generatePaymentSchedule({
-          //   amount: Number(loanInfo.amount),
-          //   durationMonths: totalMonth,
-          //   monthlyRate: Number(loanInfo.loanFee || 0),
-          //   startDate: loanInfo.startDate,
-          //   frequencyDay,
-          // }),
+          ...loanInfo,
         },
       };
     } catch (error: any) {
+      // Re-throw NestJS HTTP exceptions (like NotFoundException) so they are properly returned to client
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`DB Error: ${error.message} -> Code: ${error.code}`);
     }
   }
 
-  async remove(id: string) {
-    const loan = await this.loanInfoRepo.findOne({ where: { id } });
+  async remove(idOrNumber: string) {
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        idOrNumber,
+      );
+
+    let loan: LoanInformation | null = null;
+
+    if (isUuid) {
+      loan = await this.loanInfoRepo.findOne({ where: { id: idOrNumber } });
+    }
+
+    if (!loan) {
+      loan = await this.loanInfoRepo.findOne({
+        where: { loanNumber: idOrNumber },
+      });
+    }
+
     if (!loan) {
       throw new NotFoundException(
-        `Loan information record with ID "${id}" not found.`,
+        `Loan information record with ID or Loan Number "${idOrNumber}" not found.`,
       );
     }
-    await this.paymentTableRepo.delete({ loanInformationId: id });
+    await this.paymentTableRepo.delete({ loanInformationId: loan.id });
     await this.loanInfoRepo.remove(loan);
     return {
       success: true,

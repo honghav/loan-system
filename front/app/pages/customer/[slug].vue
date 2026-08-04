@@ -215,15 +215,15 @@
               <thead>
                 <tr class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-neutral-500 font-semibold uppercase tracking-wider">
                   <th class="px-4 py-3.5 text-center w-12">#</th>
-                  <th class="px-4 py-3.5">Loan Number</th>
-                  <th class="px-4 py-3.5 text-center">Status</th>
-                  <th class="px-4 py-3.5">Required Date</th>
-                  <th class="px-4 py-3.5">Pay Date</th>
-                  <th class="px-4 py-3.5 text-right">Total Payment</th>
-                  <th class="px-4 py-3.5 text-right">Principal</th>
-                  <th class="px-4 py-3.5 text-right">Interest</th>
-                  <th class="px-4 py-3.5 text-right">Remaining Balance</th>
-                  <th class="px-4 py-3.5 text-center">Action</th>
+                  <th class="px-4 py-3.5">{{ $t('loan.loan_number') }}</th>
+                  <th class="px-4 py-3.5 text-center">{{ $t('common.status') }}</th>
+                  <th class="px-4 py-3.5">{{ $t('payment.required_date') }}</th>
+                  <th class="px-4 py-3.5">{{ $t('payment.pay_date') }}</th>
+                  <th class="px-4 py-3.5 text-right">{{ $t('payment.total_payment') }}</th>
+                  <th class="px-4 py-3.5 text-right">{{ $t('payment.principal') }}</th>
+                  <th class="px-4 py-3.5 text-right">{{ $t('payment.interest') }}</th>
+                  <th class="px-4 py-3.5 text-right">{{ $t('payment.remaining_balance') }}</th>
+                  <th class="px-4 py-3.5 text-center">{{ $t('common.actions') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -376,6 +376,7 @@ definePageMeta({
   layout: 'customer',
 });
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const slug = computed(() => route.params.slug as string);
@@ -460,28 +461,28 @@ const getStatusBadge = (status?: string) => {
   switch (s) {
     case 'PAID':
       return {
-        label: 'Paid',
+        label: t('status.paid'),
         bgClass:
           'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
         icon: 'i-lucide-check-circle-2',
       };
     case 'PENDING':
       return {
-        label: 'Pending',
+        label: t('status.pending'),
         bgClass:
           'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800',
         icon: 'i-lucide-clock',
       };
     case 'OVERDUE':
       return {
-        label: 'Overdue',
+        label: t('status.overdue'),
         bgClass:
           'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800',
         icon: 'i-lucide-alert-circle',
       };
     default:
       return {
-        label: status || 'Unknown',
+        label: status || t('common.no_data'),
         bgClass:
           'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700',
         icon: 'i-lucide-help-circle',
@@ -494,13 +495,13 @@ const getLoanStatusBadge = (status?: string) => {
   const s = String(status || '').toLowerCase();
   if (s === 'completed') {
     return {
-      label: 'Completed',
+      label: t('status.completed'),
       class:
         'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     };
   }
   return {
-    label: 'In Payment',
+    label: t('status.in_payment'),
     class:
       'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
   };

@@ -52,7 +52,7 @@
               :name="getModuleIcon(module.value)"
               class="w-5 h-5 transition-transform duration-200 group-hover:scale-110"
             />
-            <span>{{ module.name }}</span>
+            <span>{{ $t(`nav.${module.value?.toLowerCase()}`, module.name) }}</span>
           </NuxtLink>
         </nav>
       </div>
@@ -102,12 +102,28 @@
           <h1
             class="text-lg font-bold text-slate-900 dark:text-white capitalize"
           >
-            {{ currentPageTitle }}
+            {{ $t(`nav.${route.name ? String(route.name).toLowerCase() : 'dashboard'}`, currentPageTitle) }}
           </h1>
         </div>
 
         <!-- Right Action Controls -->
         <div class="flex items-center gap-4">
+          <!-- Language Switcher -->
+          <div
+            class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700"
+          >
+            <UIcon name="i-lucide-globe" class="w-4 h-4 text-slate-400" />
+            <select
+              :value="locale"
+              @change="setLocale(($event.target as HTMLSelectElement).value)"
+              class="bg-transparent text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+            >
+              <option value="KH" class="bg-white dark:bg-slate-900">ខ្មែរ (KH)</option>
+              <option value="EN" class="bg-white dark:bg-slate-900">English (EN)</option>
+              <option value="CH" class="bg-white dark:bg-slate-900">中文 (CH)</option>
+            </select>
+          </div>
+
           <!-- Layout Container Switcher -->
           <div
             class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700"
@@ -150,7 +166,7 @@
             class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 cursor-pointer font-medium"
             @click="handleLogout"
           >
-            Logout
+            {{ $t('common.logout') }}
           </UButton>
         </div>
       </header>
@@ -172,6 +188,7 @@ import { moduleData } from "~/model_dto/module_page";
 
 const route = useRoute();
 const router = useRouter();
+const { locale, setLocale } = useI18n();
 const modulePage = computed(() => moduleData);
 const { activeLayoutId, setLayout, LAYOUT_OPTIONS } = useLayoutContainer(1);
 const token = useAuthToken();

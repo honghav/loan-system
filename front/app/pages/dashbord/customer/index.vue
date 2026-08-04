@@ -8,11 +8,10 @@
         <h1
           class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white"
         >
-          Customer Directory
+          {{ $t('customer.title') }}
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          Manage and view details of all your loan customers, contact channels,
-          and system identities.
+          {{ $t('customer.subtitle') }}
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
@@ -57,13 +56,13 @@
             <tr
               class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
             >
-              <th class="px-6 py-4 w-20 text-center">Action</th>
-              <th class="px-6 py-4 w-24">Photo</th>
-              <th class="px-6 py-4">Name</th>
-              <th class="px-6 py-4">Phone Number</th>
-              <th class="px-6 py-4">Telegram Username</th>
-              <th class="px-6 py-4">Citizen ID</th>
-              <th class="px-6 py-4">Loan Active</th>
+              <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
+              <th class="px-6 py-4 w-24">{{ $t('customer.profile_image') }}</th>
+              <th class="px-6 py-4">{{ $t('customer.name') }}</th>
+              <th class="px-6 py-4">{{ $t('customer.phone') }}</th>
+              <th class="px-6 py-4">{{ $t('customer.telegram') }}</th>
+              <th class="px-6 py-4">{{ $t('customer.citizen_id') }}</th>
+              <th class="px-6 py-4">{{ $t('nav.loan') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -429,7 +428,7 @@
   <UModal
     :dismissible="true"
     v-model:open="formCustomerIsOpen"
-    :title="customerEdit ? 'Edit Customer Information' : 'Add New Customer'"
+    :title="customerEdit ? $t('customer.edit_customer') : $t('customer.add_customer')"
     :ui="{
       content:
         'sm:max-w-lg rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xl',
@@ -445,7 +444,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Full Name -->
           <UFormField
-            label="Full Name"
+            :label="$t('customer.name')"
             name="cusName"
             required
             class="flex flex-col gap-1"
@@ -463,7 +462,7 @@
 
           <!-- Phone Number -->
           <UFormField
-            label="Phone Number"
+            :label="$t('customer.phone')"
             name="cusPhone"
             required
             class="flex flex-col gap-1"
@@ -481,7 +480,7 @@
 
           <!-- Citizen ID -->
           <UFormField
-            label="Citizen ID"
+            :label="$t('customer.citizen_id')"
             name="cusCitizenId"
             class="flex flex-col gap-1"
           >
@@ -498,7 +497,7 @@
 
           <!-- Telegram Username -->
           <UFormField
-            label="Telegram Username"
+            :label="$t('customer.telegram')"
             name="cusTelegramUsername"
             class="flex flex-col gap-1"
           >
@@ -515,7 +514,7 @@
 
           <!-- Avatar Image Input / Upload (Base64) -->
           <UFormField
-            label="Profile Image"
+            :label="$t('customer.profile_image')"
             name="cusImage"
             class="col-span-1 md:col-span-2 flex flex-col gap-1"
           >
@@ -542,15 +541,6 @@
 
               <!-- URL Input & Upload Action -->
               <div class="flex-1 space-y-2">
-                <!-- <UInput
-                  v-model="formState.cusImage"
-                  placeholder="Paste image URL or upload file below..."
-                  icon="i-lucide-image"
-                  class="w-full"
-                  :ui="{
-                    base: 'h-10 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary',
-                  }"
-                /> -->
                 <div class="flex flex-wrap items-center gap-2">
                   <label
                     class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
@@ -584,14 +574,14 @@
           class="flex flex-wrap justify-end gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800"
         >
           <UButton
-            label="Cancel"
+            :label="$t('common.cancel')"
             color="neutral"
             variant="ghost"
             @click="formCustomerIsOpen = false"
           />
           <UButton
             v-if="!customerEdit"
-            label="Register & Create Loan"
+            :label="$t('customer.register_and_create_loan')"
             color="neutral"
             variant="outline"
             icon="i-lucide-hand-coins"
@@ -603,7 +593,7 @@
             icon="i-lucide-check"
             class="px-4"
           >
-            {{ customerEdit ? "Save Changes" : "Register Customer" }}
+            {{ customerEdit ? $t('common.save') : $t('customer.register_customer') }}
           </UButton>
         </div>
 
@@ -616,7 +606,7 @@
     :dismissible="true"
     v-model:open="formLoanInfoIsOpen"
     :title="
-      loanInfoEditIsOpen ? 'Edit Loan Record' : 'Create New Loan Record'
+      loanInfoEditIsOpen ? $t('loan.edit_loan') : $t('loan.create_loan')
     "
     :ui="{
       content:
@@ -639,12 +629,12 @@
           <div class="space-y-5 p-4 rounded-xl bg-neutral-50/70 dark:bg-neutral-800/40 border border-neutral-200/60 dark:border-neutral-800">
             <div class="flex items-center gap-2 pb-2 border-b border-neutral-200/60 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400">
               <span class="i-lucide-user-check w-4 h-4" />
-              1. Borrower & Loan Amount
+              {{ $t('loan.borrower_and_amount_section') }}
             </div>
 
             <!-- Customer Selection -->
             <UFormField
-              label="Customer / Borrower"
+              :label="$t('customer.name')"
               name="loanInfoLoanerId"
               required
               class="flex flex-col gap-1 text-xs"
@@ -654,7 +644,7 @@
                 required
                 class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
               >
-                <option value="" disabled>Select Customer</option>
+                <option value="" disabled>{{ $t('loan.select_customer') }}</option>
                 <option v-for="c in customerData" :key="c.cusId" :value="c.cusId">
                   {{ c.cusName }} ({{ c.cusPhone }})
                 </option>
@@ -663,7 +653,7 @@
 
             <!-- Loan Type Selection -->
             <UFormField
-              label="Loan Configuration Type"
+              :label="$t('loan.loan_type')"
               name="loanInfoTypeId"
               required
               class="flex flex-col gap-1 text-xs"
@@ -673,7 +663,7 @@
                 required
                 class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
               >
-                <option value="" disabled>Select Loan Type</option>
+                <option value="" disabled>{{ $t('loan.select_loan_type') }}</option>
                 <option
                   v-for="t in loanTypeData"
                   :key="t.loanTypeId"
@@ -687,7 +677,7 @@
             <!-- Loan Amount & Fee Grid -->
             <div class="grid grid-cols-2 gap-3">
               <UFormField
-                label="Principal Amount ($)"
+                :label="$t('loan.amount')"
                 name="loanInfoAmount"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -703,7 +693,7 @@
               </UFormField>
 
               <UFormField
-                label="Loan Fee ($)"
+                :label="$t('loan.loan_fee')"
                 name="loanInfoLoanFee"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -721,7 +711,7 @@
 
             <!-- Purpose of Loan -->
             <UFormField
-              label="Purpose of Loan"
+              :label="$t('loan.purpose')"
               name="loanInfoPurposeOfLoan"
               required
               class="flex flex-col gap-1 text-xs"
@@ -740,13 +730,13 @@
           <div class="space-y-5 p-4 rounded-xl bg-neutral-50/70 dark:bg-neutral-800/40 border border-neutral-200/60 dark:border-neutral-800">
             <div class="flex items-center gap-2 pb-2 border-b border-neutral-200/60 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-indigo-500">
               <span class="i-lucide-calendar-clock w-4 h-4" />
-              2. Terms, Dates & Status
+              {{ $t('loan.terms_dates_status_section') }}
             </div>
 
             <!-- Penalty & Payment Type Grid -->
             <div class="grid grid-cols-2 gap-3">
               <UFormField
-                label="Penalty Rate (%)"
+                :label="$t('loan.penalty_rate')"
                 name="loanInfoPenaltyRate"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -762,7 +752,7 @@
               </UFormField>
 
               <UFormField
-                label="Payment Type"
+                :label="$t('loan.payment_type')"
                 name="loanInfoPaymentType"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -771,9 +761,9 @@
                   v-model="stateCreateLoanInfor.loanInfoPaymentType"
                   class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
                 >
-                  <option value="installment_payment">Installment Payment</option>
-                  <option value="completed_payment">Completed Payment</option>
-                  <option value="fee_payment">Fee Payment</option>
+                  <option value="installment_payment">{{ $t('loan.installment_payment') }}</option>
+                  <option value="completed_payment">{{ $t('loan.completed_payment') }}</option>
+                  <option value="fee_payment">{{ $t('loan.fee_payment') }}</option>
                 </select>
               </UFormField>
             </div>
@@ -781,7 +771,7 @@
             <!-- Dates Grid -->
             <div :class="[stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() === 'completed_payment' ? 'grid grid-cols-2 gap-3' : 'space-y-4']">
               <UFormField
-                label="Start Date"
+                :label="$t('loan.start_date')"
                 name="loanInfoStartDate"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -800,7 +790,7 @@
                   stateCreateLoanInfor.loanInfoPaymentType === 'COMPLETED_PAYMENT' ||
                   stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() === 'completed_payment'
                 "
-                label="End Date"
+                :label="$t('loan.end_date')"
                 name="loanInfoEndDate"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -814,29 +804,13 @@
               </UFormField>
             </div>
 
-
-            <!-- Status -->
-            <UFormField
-              label="Loan Status"
-              name="loanInfoStatus"
-              required
-              class="flex flex-col gap-1 text-xs"
-            >
-              <select
-                v-model="stateCreateLoanInfor.loanInfoStatus"
-                class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-semibold"
-              >
-                <option value="in_payment">In Payment (Active)</option>
-                <option value="completed">Completed</option>
-              </select>
-            </UFormField>
           </div>
         </div>
 
         <!-- Action Row -->
         <div class="flex justify-end gap-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
           <UButton
-            label="Cancel"
+            :label="$t('common.cancel')"
             color="neutral"
             variant="ghost"
             @click="formLoanInfoIsOpen = false"
@@ -847,7 +821,7 @@
             icon="i-lucide-check"
             class="px-6"
           >
-            {{ loanInfoEditIsOpen ? "Save Changes" : "Create Record" }}
+            {{ loanInfoEditIsOpen ? $t('common.save') : $t('loan.create_loan') }}
           </UButton>
         </div>
       </UForm>

@@ -92,8 +92,8 @@ export default defineNuxtConfig({
   i18n: {
     defaultLocale: "KH",
     locales: [
-      { code: "EN", name: "English", file: "en.json" },
       { code: "KH", name: "Khmer", file: "km.json" },
+      { code: "EN", name: "English", file: "en.json" },
       { code: "CH", name: "Chinese", file: "zh.json" },
     ],
     langDir: "locales/",

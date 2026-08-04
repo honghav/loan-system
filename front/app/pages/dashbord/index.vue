@@ -9,7 +9,7 @@
           <h1
             class="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white"
           >
-            Dashboard Overview
+            {{ $t('dashboard.title') }}
           </h1>
           <span
             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800"
@@ -18,7 +18,7 @@
           </span>
         </div>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          Real-time summary of loan portfolios, scheduled collections, and customer performance.
+          {{ $t('dashboard.subtitle') }}
         </p>
       </div>
 
@@ -38,7 +38,7 @@
           class="rounded-xl font-medium"
           @click="refreshData"
         >
-          Refresh
+          {{ $t('common.refresh') }}
         </UButton>
       </div>
     </div>
@@ -61,7 +61,7 @@
         >
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-              Total Customers
+              {{ $t('dashboard.total_customers') }}
             </span>
             <div class="p-2.5 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
               <span class="i-lucide-users w-5 h-5" />
@@ -71,7 +71,7 @@
             <span class="text-3xl font-black font-mono text-neutral-900 dark:text-white">
               {{ kpi.totalCustomers }}
             </span>
-            <span class="text-xs font-semibold text-neutral-500">Registered</span>
+            <span class="text-xs font-semibold text-neutral-500">{{ $t('dashboard.registered') }}</span>
           </div>
           <div class="mt-3 text-xs text-indigo-700 dark:text-indigo-300 font-medium">
             Active customer portfolio
@@ -84,7 +84,7 @@
         >
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              Active Loans
+              {{ $t('dashboard.active_loans') }}
             </span>
             <div class="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400">
               <span class="i-lucide-file-text w-5 h-5" />
@@ -95,12 +95,12 @@
               {{ kpi.totalActiveLoans }}
             </span>
             <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-              ${{ formatNumber(kpi.totalDisbursedAmount) }} Disbursed
+              ${{ formatNumber(kpi.totalDisbursedAmount) }} {{ $t('dashboard.disbursed') }}
             </span>
           </div>
           <div class="mt-3 flex items-center justify-between text-xs text-neutral-500">
-            <span>Completed: {{ kpi.totalCompletedLoans }}</span>
-            <span class="font-medium text-emerald-600 dark:text-emerald-400">In Payment</span>
+            <span>{{ $t('dashboard.completed') }}: {{ kpi.totalCompletedLoans }}</span>
+            <span class="font-medium text-emerald-600 dark:text-emerald-400">{{ $t('dashboard.in_payment') }}</span>
           </div>
         </div>
 
@@ -110,7 +110,7 @@
         >
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-              This Week Collection
+              {{ $t('dashboard.this_week_collection') }}
             </span>
             <div class="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400">
               <span class="i-lucide-calendar-range w-5 h-5" />
@@ -122,7 +122,7 @@
             </span>
           </div>
           <div class="mt-3 flex items-center justify-between text-xs text-amber-700 dark:text-amber-300 font-medium">
-            <span>{{ kpi.thisWeekPaymentCount }} Payments Scheduled</span>
+            <span>{{ kpi.thisWeekPaymentCount }} {{ $t('dashboard.payments_scheduled') }}</span>
             <span>Current Week</span>
           </div>
         </div>
@@ -133,7 +133,7 @@
         >
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
-              This Month Collection
+              {{ $t('dashboard.this_month_collection') }}
             </span>
             <div class="p-2.5 rounded-xl bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-400">
               <span class="i-lucide-calendar-days w-5 h-5" />
@@ -145,7 +145,7 @@
             </span>
           </div>
           <div class="mt-3 flex items-center justify-between text-xs text-sky-700 dark:text-sky-300 font-medium">
-            <span>{{ kpi.thisMonthPaymentCount }} Payments Scheduled</span>
+            <span>{{ kpi.thisMonthPaymentCount }} {{ $t('dashboard.payments_scheduled') }}</span>
             <span>Current Month</span>
           </div>
         </div>
@@ -156,7 +156,7 @@
         >
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
-              Total Revenue Collected
+              {{ $t('dashboard.total_revenue_collected') }}
             </span>
             <div class="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400">
               <span class="i-lucide-sparkles w-5 h-5" />
@@ -178,7 +178,7 @@
         >
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
-              Overdue Payments
+              {{ $t('dashboard.overdue_payments') }}
             </span>
             <div class="p-2.5 rounded-xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400">
               <span class="i-lucide-alert-triangle w-5 h-5" />
@@ -190,8 +190,8 @@
             </span>
           </div>
           <div class="mt-3 flex items-center justify-between text-xs text-rose-700 dark:text-rose-300 font-medium">
-            <span>{{ kpi.totalOverdueCount }} Payments Overdue</span>
-            <span class="font-bold text-rose-600">Requires Action</span>
+            <span>{{ kpi.totalOverdueCount }} {{ $t('dashboard.payments_scheduled') }}</span>
+            <span class="font-bold text-rose-600">{{ $t('dashboard.requires_action') }}</span>
           </div>
         </div>
       </div>
@@ -206,7 +206,7 @@
             <div>
               <h2 class="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                 <span class="i-lucide-trophy w-5 h-5 text-amber-500" />
-                Top Customers with Active Loans
+                {{ $t('dashboard.top_customers') }}
               </h2>
               <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                 Active borrowers sorted by highest principal loan amount.
@@ -216,7 +216,7 @@
               to="/dashbord/loan"
               class="text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 flex items-center gap-1"
             >
-              View All Loans <span class="i-lucide-arrow-right w-3.5 h-3.5" />
+              {{ $t('dashboard.view_all_loans') }} <span class="i-lucide-arrow-right w-3.5 h-3.5" />
             </NuxtLink>
           </div>
 
@@ -224,10 +224,10 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 border-b border-neutral-100 dark:border-neutral-800">
-                  <th class="px-6 py-3.5">Customer</th>
-                  <th class="px-6 py-3.5">Loan Number</th>
-                  <th class="px-6 py-3.5 text-right">Loan Amount</th>
-                  <th class="px-6 py-3.5 text-center">Status</th>
+                  <th class="px-6 py-3.5">{{ $t('customer.name') }}</th>
+                  <th class="px-6 py-3.5">{{ $t('loan.loan_number') }}</th>
+                  <th class="px-6 py-3.5 text-right">{{ $t('loan.amount') }}</th>
+                  <th class="px-6 py-3.5 text-center">{{ $t('common.status') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">
@@ -263,7 +263,7 @@
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                      In Payment
+                      {{ $t('dashboard.in_payment') }}
                     </span>
                   </td>
                 </tr>
@@ -285,7 +285,7 @@
           <div>
             <h2 class="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
               <span class="i-lucide-pie-chart w-5 h-5 text-indigo-500" />
-              Portfolio Distribution
+              {{ $t('dashboard.portfolio_distribution') }}
             </h2>
             <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
               Breakdown of loan and payment status allocations.
@@ -300,7 +300,7 @@
             <div v-for="st in loanStatusSummary" :key="st.status" class="space-y-1.5">
               <div class="flex items-center justify-between text-xs font-semibold">
                 <span class="capitalize text-neutral-700 dark:text-neutral-300">
-                  {{ st.status.replace('_', ' ') }} ({{ st.count }})
+                  {{ $t(`status.${st.status.toLowerCase()}`) }} ({{ st.count }})
                 </span>
                 <span class="font-mono text-neutral-900 dark:text-white">
                   {{ formatCurrency(st.totalAmount) }}
@@ -334,7 +334,7 @@
                   }"
                 />
                 <span class="font-bold text-neutral-800 dark:text-neutral-200">
-                  {{ pst.status }}
+                  {{ $t(`status.${pst.status.toLowerCase()}`) }}
                 </span>
                 <span class="text-neutral-400">({{ pst.count }})</span>
               </div>
@@ -358,7 +358,7 @@
             <div class="flex items-center gap-2">
               <h2 class="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                 <span class="i-lucide-clock w-5 h-5 text-amber-500" />
-                Scheduled Collections & Payments
+                {{ $t('dashboard.scheduled_collections') }}
               </h2>
               <span
                 class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
@@ -387,7 +387,7 @@
                 "
                 @click="setPeriod('week')"
               >
-                This Week
+                {{ $t('dashboard.this_week') }}
               </button>
               <button
                 type="button"
@@ -399,7 +399,7 @@
                 "
                 @click="setPeriod('month')"
               >
-                Monthly
+                {{ $t('dashboard.monthly') }}
               </button>
             </div>
 
@@ -421,15 +421,15 @@
               <tr
                 class="bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 border-b border-neutral-100 dark:border-neutral-800"
               >
-                <th class="px-6 py-4">Customer</th>
-                <th class="px-6 py-4">Loan Number</th>
+                <th class="px-6 py-4">{{ $t('customer.name') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.loan_number') }}</th>
                 <th class="px-6 py-4 text-center">#</th>
-                <th class="px-6 py-4">Required Due Date</th>
-                <th class="px-6 py-4 text-right">Total Payment</th>
-                <th class="px-6 py-4 text-right">Principal</th>
-                <th class="px-6 py-4 text-right">Interest</th>
-                <th class="px-6 py-4 text-right">Remaining</th>
-                <th class="px-6 py-4 text-center">Status</th>
+                <th class="px-6 py-4">{{ $t('payment.required_date') }}</th>
+                <th class="px-6 py-4 text-right">{{ $t('payment.total_payment') }}</th>
+                <th class="px-6 py-4 text-right">{{ $t('payment.principal') }}</th>
+                <th class="px-6 py-4 text-right">{{ $t('payment.interest') }}</th>
+                <th class="px-6 py-4 text-right">{{ $t('payment.remaining_balance') }}</th>
+                <th class="px-6 py-4 text-center">{{ $t('common.status') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800 text-sm">

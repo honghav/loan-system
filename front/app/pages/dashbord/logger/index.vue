@@ -254,12 +254,12 @@
           <thead>
             <tr class="border-b border-neutral-200/80 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
               <th class="px-6 py-4 w-28">Method</th>
-              <th class="px-6 py-4 w-28">Status</th>
+              <th class="px-6 py-4 w-28">{{ $t('common.status') }}</th>
               <th class="px-6 py-4">URL Path</th>
               <th class="px-6 py-4 w-32 text-center">Duration</th>
               <th class="px-6 py-4 w-36 text-center">SQL Queries</th>
               <th class="px-6 py-4 w-44">Timestamp</th>
-              <th class="px-6 py-4 w-28 text-center">Action</th>
+              <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
             </tr>
           </thead>
           <tbody v-if="isAuditLogLoading" class="divide-y divide-neutral-100 dark:divide-neutral-800">

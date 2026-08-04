@@ -8,11 +8,10 @@
         <h1
           class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white"
         >
-          Payment Kanban & Management
+          {{ $t('payment.title') }}
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          Drag and drop cards across status columns or switch to table view to
-          manage repayments.
+          {{ $t('payment.subtitle') }}
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
@@ -170,7 +169,7 @@
             <div class="flex items-center gap-2">
               <span :class="[col.icon, 'w-5 h-5', col.iconColor]" />
               <h3 class="font-bold text-sm text-neutral-900 dark:text-white">
-                {{ col.title }}
+                {{ $t(`status.${col.status.toLowerCase()}`) }}
               </h3>
             </div>
             <div class="flex items-center gap-2">
@@ -403,18 +402,18 @@
               <tr
                 class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
               >
-                <th class="px-4 py-3.5 text-center w-16">Action</th>
+                <th class="px-4 py-3.5 text-center w-16">{{ $t('common.actions') }}</th>
                 <th class="px-4 py-3.5 text-center w-12">#</th>
-                <th class="px-4 py-3.5 text-center w-12">Profile</th>
-                <th class="px-4 py-3.5 text-center w-12">Loan Number</th>
-                <th class="px-4 py-3.5">Required Date</th>
-                <th class="px-4 py-3.5">Pay Date</th>
-                <th class="px-4 py-3.5 text-right">Total Payment</th>
-                <th class="px-4 py-3.5 text-right">Beginning Balance</th>
-                <th class="px-4 py-3.5 text-right">Principal</th>
-                <th class="px-4 py-3.5 text-right">Interest</th>
-                <th class="px-4 py-3.5 text-right">Remaining Balance</th>
-                <th class="px-4 py-3.5 text-center">Status</th>
+                <th class="px-4 py-3.5 text-center w-12">{{ $t('customer.profile_image') }}</th>
+                <th class="px-4 py-3.5 text-center w-12">{{ $t('loan.loan_number') }}</th>
+                <th class="px-4 py-3.5">{{ $t('payment.required_date') }}</th>
+                <th class="px-4 py-3.5">{{ $t('payment.pay_date') }}</th>
+                <th class="px-4 py-3.5 text-right">{{ $t('payment.total_payment') }}</th>
+                <th class="px-4 py-3.5 text-right">{{ $t('payment.beginning_balance') }}</th>
+                <th class="px-4 py-3.5 text-right">{{ $t('payment.principal') }}</th>
+                <th class="px-4 py-3.5 text-right">{{ $t('payment.interest') }}</th>
+                <th class="px-4 py-3.5 text-right">{{ $t('payment.remaining_balance') }}</th>
+                <th class="px-4 py-3.5 text-center">{{ $t('common.status') }}</th>
               </tr>
             </thead>
             <tbody
@@ -494,7 +493,7 @@
                       getPaymentStatusBadge(payment.payStatus),
                     ]"
                   >
-                    {{ payment.payStatus || "PENDING" }}
+                    {{ $t(`status.${(payment.payStatus || 'PENDING').toLowerCase()}`) }}
                   </span>
                 </td>
               </tr>
@@ -756,7 +755,26 @@ const filteredPaymentData = computed(() => {
     });
   }
 
-  return list;
+  const statusPriority: Record<string, number> = {
+    PENDING: 1,
+    OVERDUE: 2,
+    PAID: 3,
+    CANCELLED: 4,
+  };
+
+  return [...list].sort((a, b) => {
+    const statusA = (a.payStatus || "PENDING").toUpperCase();
+    const statusB = (b.payStatus || "PENDING").toUpperCase();
+
+    const priorityA = statusPriority[statusA] ?? 99;
+    const priorityB = statusPriority[statusB] ?? 99;
+
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+
+    return (a.payNumber || 0) - (b.payNumber || 0);
+  });
 });
 
 const totalReceivable = computed(() =>

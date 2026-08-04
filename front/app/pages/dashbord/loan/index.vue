@@ -8,24 +8,23 @@
         <h1
           class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white"
         >
-          Loan Settings
+          {{ $t('loan.title') }}
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          Manage loan configurations, interest rates, repayment cycles, and
-          custom loan options.
+          {{ $t('loan.subtitle') }}
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
         <UInput
           v-model="searchQuery"
           icon="i-lucide-search"
-          placeholder="Search configurations..."
+          :placeholder="$t('common.search')"
           class="w-full md:w-64"
           size="md"
         />
         <UButton
           v-if="openLoanTable"
-          label="Add Loan Type"
+          :label="$t('loan.create_loan_type')"
           icon="i-lucide-plus"
           color="primary"
           size="md"
@@ -38,7 +37,7 @@
         />
         <UButton
           v-else
-          label="Add Loan Information"
+          :label="$t('loan.create_loan')"
           icon="i-lucide-plus"
           color="primary"
           size="md"
@@ -63,7 +62,7 @@
             : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300',
         ]"
       >
-        Loan List
+        {{ $t('loan.loan_list') }}
       </button>
       <button
         @click="openLoanTable = true"
@@ -74,7 +73,7 @@
             : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300',
         ]"
       >
-        Loan Configurations
+        {{ $t('loan.loan_configurations') }}
       </button>
     </div>
 
@@ -89,10 +88,10 @@
             <tr
               class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
             >
-              <th class="px-6 py-4 w-20 text-center">Action</th>
-              <th class="px-6 py-4">Payment Frequency</th>
-              <th class="px-6 py-4">Repayment Cycle Day</th>
-              <th class="px-6 py-4">Description</th>
+              <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.loan_type') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.total_periods') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.purpose') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -166,18 +165,18 @@
             <tr
               class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
             >
-              <th class="px-6 py-4 w-20 text-center">Action</th>
-              <th class="px-6 py-4">Loan Number</th>
-              <th class="px-6 py-4">Loaner</th>
-              <th class="px-6 py-4">Amount</th>
-              <th class="px-6 py-4">Loan Fee</th>
-              <th class="px-6 py-4">Penalty Rate</th>
-              <th class="px-6 py-4">Loan Type</th>
-              <th class="px-6 py-4">Start Date</th>
-              <th class="px-6 py-4">End Date</th>
-              <th class="px-6 py-4">Status</th>
-              <th class="px-6 py-4">Payment Type</th>
-              <th class="px-6 py-4">Purpose</th>
+              <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.loan_number') }}</th>
+              <th class="px-6 py-4">{{ $t('customer.name') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.amount') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.loan_fee') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.penalty_rate') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.loan_type') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.start_date') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.end_date') }}</th>
+              <th class="px-6 py-4">{{ $t('common.status') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.payment_type') }}</th>
+              <th class="px-6 py-4">{{ $t('loan.purpose') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -210,7 +209,7 @@
               <td class="px-6 py-4 font-mono font-semibold text-primary">
                 ${{ loan.loanInfoAmount }}
               </td>
-              <td class="px-6 py-4 font-mono">${{ loan.loanInfoLoanFee }}</td>
+              <td class="px-6 py-4 font-mono">{{ loan.loanInfoLoanFee }}%</td>
               <td class="px-6 py-4 font-mono">
                 {{ loan.loanInfoPenaltyRate }}%
               </td>
@@ -232,11 +231,11 @@
                       : 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400'
                   "
                 >
-                  {{ loan.loanInfoStatus }}
+                  {{ $t(`status.${(loan.loanInfoStatus || 'in_payment').toLowerCase()}`) }}
                 </span>
               </td>
               <td class="px-6 py-4 text-xs capitalize">
-                {{ loan.loanInfoPaymentType }}
+                {{ $t(`loan.${loan.loanInfoPaymentType?.toLowerCase()}`) || loan.loanInfoPaymentType }}
               </td>
               <td class="px-6 py-4 text-xs max-w-xs truncate">
                 {{ loan.loanInfoPurposeOfLoan }}
@@ -258,7 +257,7 @@
   <UModal
     :dismissible="true"
     v-model:open="formLoanTypeIsOpen"
-    :title="loanTypeEditIsOpen ? 'Edit Loan Type' : 'Add Loan Type'"
+    :title="loanTypeEditIsOpen ? $t('loan.edit_loan_type') : $t('loan.create_loan_type')"
     :ui="{
       content:
         'sm:max-w-md rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xl',
@@ -276,7 +275,7 @@
 
         <div class="space-y-4">
           <UFormField
-            label="Payment Frequency"
+            :label="$t('loan.payment_frequency')"
             name="loanTypeFrequency"
             required
             class="flex flex-col gap-1"
@@ -290,7 +289,7 @@
           </UFormField>
 
           <UFormField
-            label="Repayment Cycle Day"
+            :label="$t('loan.repayment_cycle_day')"
             name="loanTypeFrequencyDay"
             required
             class="flex flex-col gap-1"
@@ -305,7 +304,7 @@
           </UFormField>
 
           <UFormField
-            label="Description / Notes"
+            :label="$t('loan.description')"
             name="loanTypeDescription"
             required
             class="flex flex-col gap-1"
@@ -323,7 +322,7 @@
           class="flex justify-end gap-3 pt-3 border-t border-neutral-100 dark:border-neutral-800"
         >
           <UButton
-            label="Cancel"
+            :label="$t('common.cancel')"
             color="neutral"
             variant="ghost"
             @click="formLoanTypeIsOpen = false"
@@ -334,7 +333,7 @@
             icon="i-lucide-check"
             class="px-4"
           >
-            {{ loanTypeEditIsOpen ? "Save Changes" : "Create Configuration" }}
+            {{ loanTypeEditIsOpen ? $t('common.save') : $t('loan.create_loan_type') }}
           </UButton>
         </div>
       </UForm>
@@ -346,7 +345,7 @@
   <UModal
     :dismissible="false"
     v-model:open="formLoanInfoIsOpen"
-    :title="loanInfoEditIsOpen ? 'Edit Loan Record' : 'Create New Loan Record'"
+    :title="loanInfoEditIsOpen ? $t('loan.edit_loan') : $t('loan.create_loan')"
     :ui="{
       content:
         'sm:max-w-4xl rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-2xl overflow-hidden',
@@ -373,12 +372,12 @@
               class="flex items-center gap-2 pb-2 border-b border-neutral-200/60 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400"
             >
               <span class="i-lucide-user-check w-4 h-4" />
-              1. Borrower & Loan Amount
+              {{ $t('loan.borrower_and_amount_section') }}
             </div>
 
             <!-- Customer Selection -->
             <UFormField
-              label="Customer / Borrower"
+              :label="$t('customer.name')"
               name="loanInfoLoanerId"
               required
               class="flex flex-col gap-1 text-xs"
@@ -388,7 +387,7 @@
                 required
                 class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
               >
-                <option value="" disabled>Select Customer</option>
+                <option value="" disabled>{{ $t('loan.select_customer') }}</option>
                 <option
                   v-for="c in customerData"
                   :key="c.cusId"
@@ -401,7 +400,7 @@
 
             <!-- Loan Type Selection -->
             <UFormField
-              label="Loan Configuration Type"
+              :label="$t('loan.loan_type')"
               name="loanInfoTypeId"
               required
               class="flex flex-col gap-1 text-xs"
@@ -411,7 +410,7 @@
                 required
                 class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
               >
-                <option value="" disabled>Select Loan Type</option>
+                <option value="" disabled>{{ $t('loan.select_loan_type') }}</option>
                 <option
                   v-for="t in loanTypeData"
                   :key="t.loanTypeId"
@@ -428,7 +427,7 @@
             <!-- Loan Amount & Fee Grid -->
             <div class="grid grid-cols-2 gap-3">
               <UFormField
-                label="Principal Amount ($)"
+                :label="$t('loan.amount')"
                 name="loanInfoAmount"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -444,7 +443,7 @@
               </UFormField>
 
               <UFormField
-                label="Loan Fee ($)"
+                :label="$t('loan.loan_fee')"
                 name="loanInfoLoanFee"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -462,7 +461,7 @@
 
             <!-- Purpose of Loan -->
             <UFormField
-              label="Purpose of Loan"
+              :label="$t('loan.purpose')"
               name="loanInfoPurposeOfLoan"
               required
               class="flex flex-col gap-1 text-xs"
@@ -485,13 +484,13 @@
               class="flex items-center gap-2 pb-2 border-b border-neutral-200/60 dark:border-neutral-800 text-xs font-bold uppercase tracking-wider text-indigo-500"
             >
               <span class="i-lucide-calendar-clock w-4 h-4" />
-              2. Terms, Dates & Status
+              {{ $t('loan.terms_dates_status_section') }}
             </div>
 
             <!-- Penalty & Payment Type Grid -->
             <div class="grid grid-cols-2 gap-3">
               <UFormField
-                label="Penalty Rate (%)"
+                :label="$t('loan.penalty_rate')"
                 name="loanInfoPenaltyRate"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -507,7 +506,7 @@
               </UFormField>
 
               <UFormField
-                label="Payment Type"
+                :label="$t('loan.payment_type')"
                 name="loanInfoPaymentType"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -517,10 +516,14 @@
                   class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-medium"
                 >
                   <option value="installment_payment">
-                    Installment Payment
+                    {{ $t('loan.installment_payment') }}
                   </option>
-                  <option value="completed_payment">Completed Payment</option>
-                  <option value="fee_payment">Fee Payment</option>
+                  <option value="completed_payment">
+                    {{ $t('loan.completed_payment') }}
+                  </option>
+                  <option value="fee_payment">
+                    {{ $t('loan.fee_payment') }}
+                  </option>
                 </select>
               </UFormField>
             </div>
@@ -535,7 +538,7 @@
               ]"
             >
               <UFormField
-                label="Start Date"
+                :label="$t('loan.start_date')"
                 name="loanInfoStartDate"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -555,7 +558,7 @@
                   stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() ===
                     'completed_payment'
                 "
-                label="End Date"
+                :label="$t('loan.end_date')"
                 name="loanInfoEndDate"
                 required
                 class="flex flex-col gap-1 text-xs"
@@ -568,22 +571,6 @@
                 />
               </UFormField>
             </div>
-
-            <!-- Status -->
-            <!-- <UFormField
-              label="Loan Status"
-              name="loanInfoStatus"
-              required
-              class="flex flex-col gap-1 text-xs"
-            >
-              <select
-                v-model="stateCreateLoanInfor.loanInfoStatus"
-                class="w-full h-10 px-3 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-sm font-semibold"
-              >
-                <option value="in_payment">In Payment (Active)</option>
-                <option value="completed">Completed</option>
-              </select>
-            </UFormField> -->
           </div>
         </div>
 
@@ -592,7 +579,7 @@
           class="flex justify-end gap-3 pt-4 border-t border-neutral-100 dark:border-neutral-800"
         >
           <UButton
-            label="Cancel"
+            :label="$t('common.cancel')"
             color="neutral"
             variant="ghost"
             @click="formLoanInfoIsOpen = false"
@@ -603,7 +590,7 @@
             icon="i-lucide-check"
             class="px-6"
           >
-            {{ loanInfoEditIsOpen ? "Save Changes" : "Create Record" }}
+            {{ loanInfoEditIsOpen ? $t('common.save') : $t('loan.create_loan') }}
           </UButton>
         </div>
       </UForm>
@@ -723,7 +710,7 @@
                 <strong
                   class="text-neutral-700 dark:text-neutral-300 font-mono"
                 >
-                  {{ formatCurrency(loanInfomationByIdData?.loanInfoLoanFee) }}
+                  {{ loanInfomationByIdData?.loanInfoLoanFee }}%
                 </strong>
               </span>
             </div>
@@ -886,7 +873,7 @@
                           getPaymentStatusBadge(payment.payStatus),
                         ]"
                       >
-                        {{ payment.payStatus || "PENDING" }}
+                        {{ $t(`status.${(payment.payStatus || 'PENDING').toLowerCase()}`) }}
                       </span>
                     </td>
                   </tr>
@@ -1011,6 +998,13 @@ const getItemsInfo = (loanInfor: GetLoanInformationDTO) => [
         viewLoandetailIsOpen.value = true;
         await getLoanInformationByIdService(loanInfor.loanInfoId);
       },
+    },
+    {
+      label: "Loan Payment",
+      icon: "i-lucide-eye",
+      onSelect: async () => {
+        if (!loanInfor?.loanInfoId) return;
+window.open(`../customer/${loanInfor.loanInfoId}`, '_blank');      },
     },
   ],
   [

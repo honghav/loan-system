@@ -16,13 +16,13 @@
           />
         </div>
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
-          {{ authForm ? "Create an Account" : "Welcome Back" }}
+          {{ authForm ? $t('auth.register_title') : $t('auth.login_title') }}
         </h1>
         <p class="text-sm text-slate-500 dark:text-slate-400">
           {{
             authForm
-              ? "Fill in your details to register"
-              : "Enter your credentials to access your account"
+              ? $t('auth.register_subtitle')
+              : $t('auth.login_subtitle')
           }}
         </p>
       </div>
@@ -39,7 +39,7 @@
           "
           @click="authForm = false"
         >
-          Sign In
+          {{ $t('auth.login_button') }}
         </button>
         <button
           type="button"

@@ -421,7 +421,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
           `• *Loan No:* ${loanNum}\n` +
           `• *Period:* #${periodNo}\n` +
           `• *Amount Due:* ${amount}\n\n` +
-          `👉 [View Loan Detail](${loanUrl})`;
+          `👉 *View Loan Detail:*\n${loanUrl}`;
       } else {
         message =
           `⚠️ *Payment Reminder (Due Tomorrow)* ⚠️\n\n` +
@@ -430,7 +430,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
           `• *Loan No:* ${loanNum}\n` +
           `• *Period:* #${periodNo}\n` +
           `• *Amount Due:* ${amount}\n\n` +
-          `👉 [View Loan Detail](${loanUrl})`;
+          `👉 *View Loan Detail:*\n${loanUrl}`;
       }
 
       try {
