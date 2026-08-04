@@ -72,6 +72,8 @@ export default defineNuxtConfig({
         process.env.PAPA_FOOD_FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.PAPA_FOOD_FIREBASE_APP_ID,
       firebaseVapidKey: process.env.PAPA_FOOD_FIREBASE_VAPID_KEY,
+      // image r2
+      r2PublicUrl: process.env.R2_PUBLIC_URL,
     },
   },
   routeRules: {

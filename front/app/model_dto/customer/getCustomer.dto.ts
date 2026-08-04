@@ -62,9 +62,8 @@ export async function getByIdCustomerService(id: string): Promise<void> {
   // Store raw API data directly without mapping here
   try {
     const res: any = await apiFetch("GET", `customers/${id}`);
-    customerByIdResponse.value = res.data.customer;
+    customerByIdResponse.value = res.data?.customer || res.data;
   } catch (error) {
     console.error("Error fetching customer data:", error);
   }
-  // customerByIdResponse.value = mockCustomerData.find((customer) => customer.id === id) || null;
 }

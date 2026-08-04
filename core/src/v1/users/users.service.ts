@@ -1,11 +1,15 @@
-import { Injectable, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserStatus } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import * as fs from 'fs';
-import * as path from 'path';
+import { StorageService } from '../storage/storage.service';
 
 // Helper to check if a string is a base64 encoded image
 function isBase64Image(str: string): boolean {
@@ -13,49 +17,52 @@ function isBase64Image(str: string): boolean {
   return /^data:image\/[a-zA-Z+.-]+;base64,/.test(str);
 }
 
-// Helper to save a base64 encoded image to local storage
-function saveBase64Image(base64Str: string): string {
-  const matches = base64Str.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
-  if (!matches || matches.length !== 3) {
-    return base64Str;
-  }
-
-  const mimeType = matches[1];
-  const base64Data = matches[2];
-
-  let extension = '.jpg';
-  if (mimeType === 'image/png') extension = '.png';
-  else if (mimeType === 'image/webp') extension = '.webp';
-  else if (mimeType === 'image/gif') extension = '.gif';
-  else if (mimeType === 'image/svg+xml') extension = '.svg';
-
-  const filename = `usr_${Date.now()}_${Math.round(Math.random() * 1e6)}${extension}`;
-  const storageDir = path.join(process.cwd(), 'storage', 'users');
-
-  if (!fs.existsSync(storageDir)) {
-    fs.mkdirSync(storageDir, { recursive: true });
-  }
-
-  const filePath = path.join(storageDir, filename);
-  fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
-
-  return `/storage/users/${filename}`;
-}
-
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly storageService: StorageService,
   ) {}
 
-async createUser(createUserDto: CreateUserDto): Promise<User> {
+  /**
+   * Converts base64 image data into a Buffer and uploads directly to Cloudflare R2
+   */
+  private async saveBase64Image(base64Str: string): Promise<string> {
+    const matches = base64Str.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return base64Str;
+    }
+
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    let extension = '.jpg';
+    if (mimeType === 'image/png') extension = '.png';
+    else if (mimeType === 'image/webp') extension = '.webp';
+    else if (mimeType === 'image/gif') extension = '.gif';
+    else if (mimeType === 'image/svg+xml') extension = '.svg';
+
+    const filename = `usr_${Date.now()}_${Math.round(Math.random() * 1e6)}${extension}`;
+
+    const result = await this.storageService.uploadBuffer(
+      buffer,
+      mimeType,
+      'users',
+      filename,
+    );
+
+    return result.key;
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     // 1. Clone the DTO data so we don't mutate the original request object
     const userData: Partial<User> = { ...createUserDto };
 
-    // 2. Conditionally process base64 image and save to local storage
+    // 2. Conditionally process base64 image and save to Cloudflare R2
     if (userData.image && isBase64Image(userData.image)) {
-      userData.image = saveBase64Image(userData.image);
+      userData.image = await this.saveBase64Image(userData.image);
     }
 
     // 3. Conditionally hash the password only if it's provided
@@ -82,19 +89,25 @@ async createUser(createUserDto: CreateUserDto): Promise<User> {
           throw new ConflictException('This username is already taken.');
         }
         if (detail.includes('phone')) {
-          throw new ConflictException('A user with this phone number already exists.');
+          throw new ConflictException(
+            'A user with this phone number already exists.',
+          );
         }
-        
-        throw new ConflictException('User credentials conflict with an existing account.');
+
+        throw new ConflictException(
+          'User credentials conflict with an existing account.',
+        );
       }
-      
+
       // Fallback for unexpected database errors
-      throw new InternalServerErrorException('Something went wrong while creating the user account.');
+      throw new InternalServerErrorException(
+        'Something went wrong while creating the user account.',
+      );
     }
   }
   async findAll(): Promise<Partial<User>[]> {
     const users = await this.usersRepository.find();
-    return users.map(user => {
+    return users.map((user) => {
       const { password, ...result } = user;
       return result;
     });
@@ -111,4 +124,4 @@ async createUser(createUserDto: CreateUserDto): Promise<User> {
   async findOneById(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
-}
+}

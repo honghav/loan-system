@@ -14,7 +14,7 @@ export default function getImagePath(image, path = "") {
     return image;
   }
 
-  return `${config.public.apiUrl}/../${path}/${image}`.replace(
+  return `${config.public.r2PublicUrl}/${path}/${image}`.replace(
     /([^:]\/)\/+/g,
     "$1",
   );

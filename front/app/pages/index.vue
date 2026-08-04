@@ -1,9 +1,18 @@
 <template>
   <article
     class="w-full max-w-7xl mx-auto py-8 text-secondary space-y-10"
-  ></article>
+  >
+      <button @click="connectGoogleCalendar" class="btn-primary">
+      📅 Connect Google Calendar
+    </button>
+  </article>
 </template>
 <script setup lang="ts">
+const connectGoogleCalendar = () => {
+  const currentUserId = '9e65ff47-280e-4e0d-8d1f-7499dfe5c710'; // Replace with logged-in user ID
+  // Points to NestJS backend running on port 8000
+  window.location.href = `http://localhost:8000/api/v1/google-calendar/connect?userId=${currentUserId}`;
+};
 // SEO Meta
 useSeoMeta({
   title: "Loan System",

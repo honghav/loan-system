@@ -6,6 +6,8 @@ import {
   Delete,
   Body,
   Param,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,11 +19,25 @@ import {
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/createCustomer.dto';
 import { UpdateCustomerDto } from './dto/updateCustomer.dto';
+import { StorageService } from '../storage/storage.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Customers') // Group endpoints together in Swagger UI
 @Controller('v1/customers')
 export class CustomerController {
-  constructor(private readonly customerService: CustomerService) {}
+  constructor(private readonly customerService: CustomerService,
+    private readonly storageService: StorageService
+  ) { }
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadDocument(@UploadedFile() file: Express.Multer.File) {
+    const result = await this.storageService.uploadFile(file, 'customer-documents');
+    return {
+      message: 'Uploaded to R2 successfully',
+      fileKey: result.key,
+      fileUrl: result.url,
+    };
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create a new Telegram customer' })

@@ -35,12 +35,7 @@
           icon="i-lucide-plus"
           color="primary"
           size="md"
-          @click="
-            () => {
-              formCustomerIsOpen = true;
-              customerEdit = false;
-            }
-          "
+          @click="openCreateCustomerModal"
         />
       </div>
 
@@ -414,8 +409,9 @@
             @click="
               () => {
                 viewCustomerIsOpen = false;
-                formCustomerIsOpen = true;
-                customerEdit = true;
+                if (customerByIdData) {
+                  openEditCustomerModal(customerByIdData);
+                }
               }
             "
           />
@@ -886,7 +882,7 @@ function openCreateLoanModal(cusId?: string) {
   stateCreateLoanInfor.loanInfoPurposeOfLoan = "";
   stateCreateLoanInfor.loanInfoLoanFee = 0;
   stateCreateLoanInfor.loanInfoPenaltyRate = 0;
-  stateCreateLoanInfor.loanInfoStartDate = new Date().toISOString().split("T")[0];
+  stateCreateLoanInfor.loanInfoStartDate = "";
   stateCreateLoanInfor.loanInfoEndDate = undefined;
   stateCreateLoanInfor.loanInfoStatus = LoanInformationStatus.IN_PAYMENT;
   stateCreateLoanInfor.loanInfoPaymentType = LoanInformationPaymentType.INSTALLMENT_PAYMENT;
@@ -957,10 +953,8 @@ const getItems = (customer: any) => [
     {
       label: "Edit Profile",
       icon: "i-lucide-pencil",
-      onSelect: async () => {
-        formCustomerIsOpen.value = true;
-        await getByIdCustomerService(customer.cusId);
-        customerEdit.value = true;
+      onSelect: () => {
+        openEditCustomerModal(customer);
       },
     },
   ],
@@ -1027,14 +1021,46 @@ function copyText(text: string, label: string) {
     });
 }
 
+// Track active edit customer ID
+const editingCustomerId = ref<string>("");
+
+function openCreateCustomerModal() {
+  customerEdit.value = false;
+  editingCustomerId.value = "";
+  stateCreate.cusName = "";
+  stateCreate.cusPhone = "";
+  stateCreate.cusTelegram = "";
+  stateCreate.cusCitizenId = "";
+  stateCreate.cusImage = "";
+  stateCreate.cusTelegramUsername = "";
+  stateCreate.cusTelegramChatId = "";
+  formCustomerIsOpen.value = true;
+}
+
+function openEditCustomerModal(customer: any) {
+  editingCustomerId.value = customer.cusId || customer.id || "";
+  customerEdit.value = true;
+  stateEdit.cusName = customer.cusName || customer.customerName || "";
+  stateEdit.cusPhone = customer.cusPhone || customer.phoneNumber || "";
+  stateEdit.cusTelegram = customer.cusTelegram || customer.telegramLinked || "";
+  stateEdit.cusCitizenId = customer.cusCitizenId || customer.citizenId || "";
+  stateEdit.cusImage = customer.cusImage || customer.image || "";
+  stateEdit.cusTelegramUsername = customer.cusTelegramUsername || customer.telegramUsername || "";
+  stateEdit.cusTelegramChatId = customer.cusTelegramChatId || customer.telegramChatId || "";
+  formCustomerIsOpen.value = true;
+  if (editingCustomerId.value) {
+    getByIdCustomerService(editingCustomerId.value);
+  }
+}
+
 // Form state DTO mappings
 const stateEdit = reactive<createCustomerDTO>({
-  cusName: customerByIdData.value?.cusName || "",
-  cusPhone: customerByIdData.value?.cusPhone || "",
-  cusTelegram: customerByIdData.value?.cusTelegram || "",
-  cusCitizenId: customerByIdData.value?.cusCitizenId || "",
-  cusImage: customerByIdData.value?.cusImage || "",
-  cusTelegramUsername: customerByIdData.value?.cusTelegramUsername || "",
+  cusName: "",
+  cusPhone: "",
+  cusTelegram: "",
+  cusCitizenId: "",
+  cusImage: "",
+  cusTelegramUsername: "",
   userId: currentUserData.value?.Id,
 });
 
@@ -1098,16 +1124,21 @@ function onFileChange(e: Event) {
 }
 
 async function onSubmit(createLoanAfter: boolean = false) {
-  toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
-  });
-
-  if (customerEdit.value) {
-    await updateCustomerService(stateEdit, customerByIdData.value?.cusId || "");
+  const targetId = editingCustomerId.value || customerByIdData.value?.cusId || "";
+  if (customerEdit.value && targetId) {
+    await updateCustomerService(stateEdit, targetId);
+    toast.add({
+      title: "Success",
+      description: "Customer updated successfully.",
+      color: "success",
+    });
   } else {
     await createCustomerService(stateCreate);
+    toast.add({
+      title: "Success",
+      description: "Customer created successfully.",
+      color: "success",
+    });
   }
 
   formCustomerIsOpen.value = false;
