@@ -24,7 +24,7 @@ export class PaymentTableService {
     @InjectRepository(LoanInformation)
     private loanInfoRepo: Repository<LoanInformation>,
     private readonly telegramService: TelegramService,
-  ) { }
+  ) {}
 
   async getItemAll(
     loanInformationId?: string,
@@ -214,6 +214,7 @@ export class PaymentTableService {
     status: PaymentStatus | string,
     amount?: number | string,
   ) {
+    // Query the payment record by ID, including its associated LoanInformation and Customer
     const record = await this.paymentTableRepo.findOne({
       where: { id },
       relations: {
@@ -222,7 +223,7 @@ export class PaymentTableService {
         },
       },
     });
-
+    // Check if the record exists
     if (!record) {
       throw new NotFoundException('Payment record not found');
     }
@@ -250,12 +251,16 @@ export class PaymentTableService {
       const originalTotal = parseFloat(String(record.totalPayment || 0));
       const originalPrincipal = parseFloat(String(record.principal || 0));
       const originalInterest = parseFloat(String(record.interest || 0));
-      const originalBeginningBalance = parseFloat(String(record.beginningBalance || 0));
+      const originalBeginningBalance = parseFloat(
+        String(record.beginningBalance || 0),
+      );
 
       if (originalTotal > 0 && paidAmount < originalTotal) {
         // Partial payment: recalculate current record for paidAmount
         const ratio = paidAmount / originalTotal;
-        const paidPrincipal = parseFloat((originalPrincipal * ratio).toFixed(2));
+        const paidPrincipal = parseFloat(
+          (originalPrincipal * ratio).toFixed(2),
+        );
         const paidInterest = parseFloat((originalInterest * ratio).toFixed(2));
 
         record.principal = paidPrincipal;
@@ -268,7 +273,9 @@ export class PaymentTableService {
         }
 
         // Calculate remaining unpaid amounts for new payment record
-        const remainingTotal = parseFloat((originalTotal - paidAmount).toFixed(2));
+        const remainingTotal = parseFloat(
+          (originalTotal - paidAmount).toFixed(2),
+        );
         const remainingPrincipal = parseFloat(
           (originalPrincipal - paidPrincipal).toFixed(2),
         );
@@ -299,7 +306,8 @@ export class PaymentTableService {
             interest: remainingInterest,
             remainingBalance: parseFloat(
               (
-                parseFloat(String(record.remainingBalance || 0)) - remainingPrincipal
+                parseFloat(String(record.remainingBalance || 0)) -
+                remainingPrincipal
               ).toFixed(2),
             ),
             status: PaymentStatus.PENDING,
@@ -339,7 +347,9 @@ export class PaymentTableService {
     // Auto-update LoanInformation status to COMPLETED if completion criteria are met
     const loanInfo = record.loanInformation;
     if (loanInfo && loanInfo.id) {
-      if (loanInfo.paymentType === LoanInformationPaymentType.COMPLETED_PAYMENT) {
+      if (
+        loanInfo.paymentType === LoanInformationPaymentType.COMPLETED_PAYMENT
+      ) {
         // If paymentType is completed_payment: check if all payment records for this loan are PAID
         const allPayments = await this.paymentTableRepo.find({
           where: { loanInformationId: loanInfo.id },
@@ -381,12 +391,16 @@ export class PaymentTableService {
         const statusText = targetStatus.toUpperCase();
         const loanNum = record.loanInformation?.loanNumber || 'N/A';
         const periodNo = record.totalPaymentNo ?? 'N/A';
-        const amountStr = savedRecord.totalPayment ? `$${savedRecord.totalPayment}` : 'N/A';
+        const amountStr = savedRecord.totalPayment
+          ? `$${savedRecord.totalPayment}`
+          : 'N/A';
 
         const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
         const frontUrl = rawFrontUrl.replace(/\/+$/, '');
         const targetLoanId = loanInfo?.id || record.loanInformation?.id || '';
-        const loanUrl = targetLoanId ? `${frontUrl}/customer/${targetLoanId}` : `${frontUrl}/customer`;
+        const loanUrl = targetLoanId
+          ? `${frontUrl}/customer/${targetLoanId}`
+          : `${frontUrl}/customer`;
 
         const message =
           `🔔 *Payment Status Notification*\n\n` +

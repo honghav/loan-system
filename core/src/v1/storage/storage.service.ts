@@ -11,7 +11,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 @Injectable()
 export class StorageService {
     private readonly logger = new Logger(StorageService.name);
-    private readonly s3Client: S3Client;
+    private readonly s3Client: any;
     private readonly bucketName: string;
     private readonly publicUrl: string;
 

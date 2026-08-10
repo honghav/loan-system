@@ -110,6 +110,8 @@ export class User {
   })
   role!: UserRole;
 
+  @Column({ name: 'telegram_linked', nullable: true })
+  telegramLinked?: string;
   // @Column({
   //   type: 'enum',
   //   enum: UserPosition,

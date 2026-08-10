@@ -10,6 +10,7 @@ import { User, UserStatus } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { StorageService } from '../storage/storage.service';
+import { CommonService } from '../comon/comon.service';
 
 // Helper to check if a string is a base64 encoded image
 function isBase64Image(str: string): boolean {
@@ -23,38 +24,8 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private readonly storageService: StorageService,
+    private readonly commonService: CommonService,
   ) {}
-
-  /**
-   * Converts base64 image data into a Buffer and uploads directly to Cloudflare R2
-   */
-  private async saveBase64Image(base64Str: string): Promise<string> {
-    const matches = base64Str.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) {
-      return base64Str;
-    }
-
-    const mimeType = matches[1];
-    const base64Data = matches[2];
-    const buffer = Buffer.from(base64Data, 'base64');
-
-    let extension = '.jpg';
-    if (mimeType === 'image/png') extension = '.png';
-    else if (mimeType === 'image/webp') extension = '.webp';
-    else if (mimeType === 'image/gif') extension = '.gif';
-    else if (mimeType === 'image/svg+xml') extension = '.svg';
-
-    const filename = `usr_${Date.now()}_${Math.round(Math.random() * 1e6)}${extension}`;
-
-    const result = await this.storageService.uploadBuffer(
-      buffer,
-      mimeType,
-      'users',
-      filename,
-    );
-
-    return result.key;
-  }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     // 1. Clone the DTO data so we don't mutate the original request object
@@ -62,7 +33,10 @@ export class UsersService {
 
     // 2. Conditionally process base64 image and save to Cloudflare R2
     if (userData.image && isBase64Image(userData.image)) {
-      userData.image = await this.saveBase64Image(userData.image);
+      userData.image = await this.commonService.saveBase64Image(
+        userData.image,
+        'users',
+      );
     }
 
     // 3. Conditionally hash the password only if it's provided

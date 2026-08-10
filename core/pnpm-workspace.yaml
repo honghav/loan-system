@@ -6,3 +6,6 @@ allowBuilds:
   canvas: false
   core-js: false
   unrs-resolver: false
+# pnpm-workspace.yaml
+packages:
+  - 'core'
