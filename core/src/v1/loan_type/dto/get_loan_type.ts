@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { User } from 'src/v1/users/user.entity';
+import { User } from '../../users/user.entity';
 
 export class GetLoanTypeDTO {
   @ApiPropertyOptional({

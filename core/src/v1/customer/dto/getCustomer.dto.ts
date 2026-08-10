@@ -6,8 +6,8 @@ import {
   IsUUID,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { User } from 'src/v1/users/user.entity';
-import { LoanInformation } from 'src/v1/loan_info/loan_infor.entity';
+import { User } from '../../users/user.entity';
+import { LoanInformation } from '../../loan_info/loan_infor.entity';
 
 export class GetCustomerDto {
   @IsOptional()

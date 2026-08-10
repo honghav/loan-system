@@ -8,7 +8,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { LoginType } from 'src/v1/users/user.entity';
+import { LoginType } from '../../users/user.entity';
 export class LoginDto {
   @ApiProperty({
     enum: LoginType,

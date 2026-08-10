@@ -8,12 +8,12 @@ import {
   IsUUID,
   Min,
 } from 'class-validator';
-import { User } from 'src/v1/users/user.entity';
+import { User } from '../../users/user.entity';
 import {
   LoanInformationPaymentType,
   LoanInformationStatus,
 } from '../loan_infor.entity';
-import { Customer } from 'src/v1/customer/customer.enitity';
+import { Customer } from '../../customer/customer.enitity';
 
 export class GetLoanInfoDto {
   @ApiPropertyOptional({

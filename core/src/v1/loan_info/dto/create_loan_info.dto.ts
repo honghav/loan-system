@@ -4,7 +4,7 @@ import {
   LoanInformationPaymentType,
   LoanInformationStatus,
 } from '../loan_infor.entity';
-import { CreatePaymenttable } from 'src/v1/payment_table/dto/create_payment_table.dto';
+import { CreatePaymenttable } from '../../payment_table/dto/create_payment_table.dto';
 
 export class CreateLoanInformation {
   @ApiPropertyOptional({
