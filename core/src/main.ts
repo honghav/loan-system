@@ -15,14 +15,27 @@ async function bootstrap() {
   }));
   
   // Enable CORS
-  app.enableCors(
-       { origin:["http://localhost:3000",
-    "http://localhost:3001",], // your Nuxt app
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+  ];
+  if (process.env.FRONT_API) {
+    allowedOrigins.push(process.env.FRONT_API.replace(/\/$/, ''));
+  }
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow requests in production/cors
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"], }
-  );
-  
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('NestJS Auth API')
@@ -42,8 +55,9 @@ async function bootstrap() {
     limit: '20mb',
     extended: true,
   }));
-  await app.listen(process.env.PORT || 8000);
-  console.log(`Application is running on: ${await app.getUrl()}`);
-  console.log(`Swagger documentation: ${await app.getUrl()}/api`);
+
+  const port = process.env.PORT || 8000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on port ${port}`);
 }
 bootstrap();
