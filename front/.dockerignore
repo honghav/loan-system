@@ -1,0 +1,16 @@
+node_modules
+.nuxt
+.output
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.editorconfig
+eslint.config.mjs
+pnpm-workspace.yaml
+renovate.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
