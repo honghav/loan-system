@@ -547,7 +547,7 @@
                       type="file"
                       accept="image/*"
                       class="hidden"
-                      @change="onFileChange"
+                      @change="(e) => onFileChange(e, (base64) => formState.cusImage = base64)"
                     />
                   </label>
                   <UButton
@@ -828,6 +828,9 @@
 
 <script lang="ts" setup>
 import { computed, ref, reactive, watch, onMounted } from "vue";
+import getAvatarBg from "~/constants/helper/getAvatarBg";
+import getInitials from "~/constants/helper/getInitials";
+import onFileChange from "~/constants/helper/onFileChange";
 import { currentUserData } from "~/model_dto/auth/get_current_user.dto";
 import {
   createCustomerService,
@@ -970,38 +973,9 @@ const getItems = (customer: any) => [
   ],
 ];
 
-// Helper to get name initials for avatar fallback
-function getInitials(name: string) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
-// Helper to assign stable background colors based on name
-function getAvatarBg(name: string) {
-  if (!name) return "bg-neutral-500 text-white";
-  const colors = [
-    "bg-red-500 text-white",
-    "bg-orange-500 text-white",
-    "bg-amber-500 text-white",
-    "bg-emerald-500 text-white",
-    "bg-teal-500 text-white",
-    "bg-blue-500 text-white",
-    "bg-indigo-500 text-white",
-    "bg-violet-500 text-white",
-    "bg-pink-500 text-white",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
-}
+
+
 
 // Copy to Clipboard utility
 const toast = useToast();
@@ -1091,37 +1065,7 @@ watch(customerByIdData, (newVal) => {
   }
 });
 
-// File change handler to convert local images into base64 strings
-function onFileChange(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
 
-  // Validate size (limit to 2MB to avoid huge payload overheads)
-  if (file.size > 2 * 1024 * 1024) {
-    toast.add({
-      title: "File Too Large",
-      description: "Please select an image smaller than 2MB.",
-      color: "error",
-    });
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const base64String = event.target?.result as string;
-    formState.value.cusImage = base64String;
-    toast.add({
-      title: "Image Processed",
-      description: "Image successfully encoded to Base64 format.",
-      color: "success",
-    });
-  };
-  reader.onerror = (error) => {
-    console.error("Error reading file: ", error);
-  };
-  reader.readAsDataURL(file);
-}
 
 async function onSubmit(createLoanAfter: boolean = false) {
   const targetId = editingCustomerId.value || customerByIdData.value?.cusId || "";

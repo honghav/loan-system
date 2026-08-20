@@ -11,10 +11,11 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     let user;
+
 
     if (loginDto.loginType === LoginType.EMAIL) {
       if (!loginDto.email || !loginDto.password) {
@@ -28,6 +29,14 @@ export class AuthService {
         throw new UnauthorizedException(
           'Username and password are required for username login.',
         );
+      }
+      if (loginDto.username) {
+        const checkExitName = await this.usersService.findOneByUsername(loginDto.username)
+        if (!checkExitName) {
+          throw new UnauthorizedException(
+            'Username not found.',
+          );
+        }
       }
       user = await this.usersService.findOneByUsername(loginDto.username);
     } else {
@@ -45,7 +54,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials.');
+      throw new UnauthorizedException('Password Incorrect');
     }
 
     // Return the generated token response mapping
