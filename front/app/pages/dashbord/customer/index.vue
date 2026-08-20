@@ -830,6 +830,8 @@
 import { computed, ref, reactive, watch, onMounted } from "vue";
 import getAvatarBg from "~/constants/helper/getAvatarBg";
 import getInitials from "~/constants/helper/getInitials";
+import { validateNationalID } from "~/constants/helper/idCard";
+import { validatePhoneNumber } from "~/constants/helper/phoneFormat";
 import onFileChange from "~/constants/helper/onFileChange";
 import { currentUserData } from "~/model_dto/auth/get_current_user.dto";
 import {
@@ -858,6 +860,7 @@ import {
   getLoanTypeService,
   loanTypeData,
 } from "~/model_dto/loan/loan_type/get_loan_type.dto";
+import { form } from "#build/ui";
 
 // ==================================//
 // Loan Information Action Control   //
@@ -1065,9 +1068,34 @@ watch(customerByIdData, (newVal) => {
   }
 });
 
-
-
 async function onSubmit(createLoanAfter: boolean = false) {
+  if (!formState.value.cusName){
+    toast.add({
+      title: "Invalid Name oF Customer",
+      description: "Please enter a valid customer name (e.g. jonh doe).",
+      color: "error",
+    });
+    return;
+  }
+  
+  if (formState.value.cusPhone && !validatePhoneNumber(formState.value.cusPhone)) {
+    toast.add({
+      title: "Invalid Phone Number",
+      description: "Please enter a valid phone number (e.g. 012345678 or +85512345678).",
+      color: "error",
+    });
+    return;
+  }
+
+  if (formState.value.cusCitizenId && !validateNationalID(formState.value.cusCitizenId)) {
+    toast.add({
+      title: "Invalid Citizen ID",
+      description: "Please enter a valid Citizen / National ID number (8 to 13 digits).",
+      color: "error",
+    });
+    return;
+  }
+
   const targetId = editingCustomerId.value || customerByIdData.value?.cusId || "";
   if (customerEdit.value && targetId) {
     await updateCustomerService(stateEdit, targetId);
