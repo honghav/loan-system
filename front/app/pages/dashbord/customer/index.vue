@@ -8,7 +8,7 @@
         <h1
           class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white"
         >
-          {{ $t('customer.title') }}
+          {{ $t('customer.title') }} 
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           {{ $t('customer.subtitle') }}
@@ -860,8 +860,9 @@ import {
   getLoanTypeService,
   loanTypeData,
 } from "~/model_dto/loan/loan_type/get_loan_type.dto";
-import { form } from "#build/ui";
+import getToken from "~/constants/helper/getToken";
 
+const token = ref(getToken());
 // ==================================//
 // Loan Information Action Control   //
 // ==================================//
@@ -911,7 +912,7 @@ async function onSubmitLoanInfo() {
 }
 
 onMounted(async () => {
-  await getCustomerService();
+  await getCustomerService(token.value as string);
   await getLoanTypeService();
 });
 
@@ -953,7 +954,7 @@ const getItems = (customer: any) => [
       icon: "i-lucide-eye",
       onSelect: async () => {
         viewCustomerIsOpen.value = true;
-        await getByIdCustomerService(customer.cusId);
+        await getByIdCustomerService(customer.cusId, token.value as string);
       },
     },
     {
@@ -1026,7 +1027,7 @@ function openEditCustomerModal(customer: any) {
   stateEdit.cusTelegramChatId = customer.cusTelegramChatId || customer.telegramChatId || "";
   formCustomerIsOpen.value = true;
   if (editingCustomerId.value) {
-    getByIdCustomerService(editingCustomerId.value);
+    getByIdCustomerService(editingCustomerId.value, token.value as string);
   }
 }
 
@@ -1071,7 +1072,7 @@ watch(customerByIdData, (newVal) => {
 async function onSubmit(createLoanAfter: boolean = false) {
   if (!formState.value.cusName){
     toast.add({
-      title: "Invalid Name oF Customer",
+      title: "Invalid Name of Customer",
       description: "Please enter a valid customer name (e.g. jonh doe).",
       color: "error",
     });

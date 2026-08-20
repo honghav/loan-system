@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class CommonService {
   constructor(private readonly storageService: StorageService) {}
+
   /**
    * Converts base64 image data into a Buffer and uploads directly to Cloudflare R2
    */
@@ -37,6 +39,7 @@ export class CommonService {
 
     return result.key;
   }
+
   /**
    * Helper to extract R2 object key from stored URL or key
    */
@@ -54,5 +57,30 @@ export class CommonService {
       return clean;
     }
     return null;
+  }
+
+  /**
+   * Get UserId by Access Token
+   */
+  public getUserIdFromToken(token: string, secret?: string): string | null {
+    if (!token) return null;
+    try {
+      const cleanToken = token.startsWith('Bearer ')
+        ? token.slice(7).trim()
+        : token.trim();
+
+      const jwtService = new JwtService();
+      let decoded: any;
+      if (secret) {
+        decoded = jwtService.verify(cleanToken, { secret });
+      } else {
+        decoded = jwtService.decode(cleanToken);
+      }
+
+      return decoded?.sub || decoded?.id || null;
+    } catch (error) {
+      console.error('Error extracting userId from token:', error);
+      return null;
+    }
   }
 }

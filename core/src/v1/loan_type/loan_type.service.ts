@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoanType } from './loan_type.entity';
 import { Repository } from 'typeorm';
@@ -25,5 +25,22 @@ export class LoanTypeService {
     } catch (error: any) {
       throw new Error(`DB Error: ${error.message}-> Code: ${error.code}`);
     }
+  }
+
+  async update(id: string, dto: Partial<CreateLoanTypeDTO>) {
+    const existing = await this.laonTypeRepo.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Loan Type with ID ${id} not found`);
+    }
+    await this.laonTypeRepo.update(id, dto);
+    return await this.laonTypeRepo.findOne({ where: { id } });
+  }
+
+  async delete(id: string) {
+    const existing = await this.laonTypeRepo.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Loan Type with ID ${id} not found`);
+    }
+    return await this.laonTypeRepo.delete(id);
   }
 }

@@ -490,7 +490,7 @@
                   <span
                     :class="[
                       'inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full border uppercase tracking-wider',
-                      getPaymentStatusBadge(payment.payStatus),
+                      getPaymentStatusBadges(payment.payStatus),
                     ]"
                   >
                     {{ $t(`status.${(payment.payStatus || 'PENDING').toLowerCase()}`) }}
@@ -539,6 +539,10 @@ import {
 import { updateStatusPaymentService } from "~/model_dto/payment/update_payment";
 import { PaymentStatus } from "~/model_dto/payment/enum_payment";
 import { LoanInformationPaymentType } from "~/model_dto/loan/loan_list/enum_loan_lnformation";
+import { kanbanColumns, statusTabs } from "~/model_dto/payment/kanban_columns_payment";
+import formatCurrency from "~/constants/helper/formatCurrency";
+import getPaymentStatusBadges from "~/constants/helper/getPaymentStatusBadge";
+import formatDate from "~/constants/helper/formatDate";
 
 const currentView = ref<"kanban" | "table">("table");
 const searchQuery = ref("");
@@ -656,53 +660,9 @@ async function onDrop(event: DragEvent, targetStatus: PaymentStatus) {
   }
 }
 
-const kanbanColumns = [
-  {
-    status: PaymentStatus.PENDING,
-    title: "Pending",
-    headerClass: "bg-amber-50/60 dark:bg-amber-950/20 border-t-amber-500",
-    badgeClass:
-      "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800",
-    icon: "i-lucide-clock",
-    iconColor: "text-amber-500",
-  },
-  {
-    status: PaymentStatus.PAID,
-    title: "Paid / Settled",
-    headerClass: "bg-emerald-50/60 dark:bg-emerald-950/20 border-t-emerald-500",
-    badgeClass:
-      "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800",
-    icon: "i-lucide-check-circle-2",
-    iconColor: "text-emerald-500",
-  },
-  {
-    status: PaymentStatus.OVERDUE,
-    title: "Overdue",
-    headerClass: "bg-rose-50/60 dark:bg-rose-950/20 border-t-rose-500",
-    badgeClass:
-      "bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800",
-    icon: "i-lucide-alert-triangle",
-    iconColor: "text-rose-500",
-  },
-  {
-    status: PaymentStatus.CANCELLED,
-    title: "Cancelled",
-    headerClass:
-      "bg-neutral-100/60 dark:bg-neutral-800/40 border-t-neutral-400",
-    badgeClass:
-      "bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700",
-    icon: "i-lucide-ban",
-    iconColor: "text-neutral-400",
-  },
-];
 
-const statusTabs = [
-  { label: "All Schedules", value: "ALL" },
-  { label: "Pending", value: "PENDING" },
-  { label: "Paid", value: "PAID" },
-  { label: "Overdue", value: "OVERDUE" },
-  { label: "Cancelled", value: "CANCELLED" },
-];
+
+
 
 function getKanbanCards(status: PaymentStatus) {
   let list = paymentTableData.value.filter(
@@ -779,7 +739,7 @@ const filteredPaymentData = computed(() => {
 
 const totalReceivable = computed(() =>
   paymentTableData.value.reduce(
-    (acc, item) => acc + (item.payTotalPayment || 0),
+    (acc, item) => acc + (Number(item.payTotalPayment) || 0),
     0,
   ),
 );
@@ -791,7 +751,7 @@ const totalCollected = computed(() =>
         item.payStatus?.toUpperCase() === "PAID" ||
         item.payStatus?.toUpperCase() === "COMPLETED",
     )
-    .reduce((acc, item) => acc + (item.payTotalPayment || 0), 0),
+    .reduce((acc, item) => acc + (Number(item.payTotalPayment) || 0), 0),
 );
 
 const totalOutstanding = computed(() =>
@@ -801,7 +761,7 @@ const totalOutstanding = computed(() =>
         item.payStatus?.toUpperCase() !== "PAID" &&
         item.payStatus?.toUpperCase() !== "COMPLETED",
     )
-    .reduce((acc, item) => acc + (item.payTotalPayment || 0), 0),
+    .reduce((acc, item) => acc + (Number(item.payTotalPayment) || 0), 0),
 );
 
 const paidCount = computed(
@@ -864,41 +824,6 @@ const getItemsPayment = (payment: GetPaymentTableDTO) => [
   ],
 ];
 
-function formatCurrency(val?: number): string {
-  if (val === undefined || val === null) return "$0.00";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(val);
-}
-
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return "N/A";
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function getPaymentStatusBadge(status?: string) {
-  switch (status?.toUpperCase()) {
-    case "PAID":
-    case "COMPLETED":
-      return "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800";
-    case "PENDING":
-      return "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800";
-    case "OVERDUE":
-      return "bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800";
-    case "CANCELLED":
-      return "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-300 dark:border-neutral-700 line-through opacity-75";
-    default:
-      return "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700";
-  }
-}
 
 onMounted(async () => {
   await getPaymentTableService();
