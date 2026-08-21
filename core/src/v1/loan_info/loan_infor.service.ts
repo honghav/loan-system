@@ -182,7 +182,7 @@ export class LoanInformationService {
     };
   }
 
-  async getAll() {
+  async getAll(userId: string) {
     try {
       const loanInfo = await this.loanInfoRepo.find({
         relations: {
@@ -192,6 +192,7 @@ export class LoanInformationService {
           paymentTables: true,
         },
         order: { createdAt: 'DESC' },
+        where: { user: { id: userId } }
       });
       const result = loanInfo.map((loan) => {
         const frequencyDay = loan.loanType?.frequency_day;

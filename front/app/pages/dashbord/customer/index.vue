@@ -783,7 +783,7 @@
               <UFormField
                 v-if="
                   stateCreateLoanInfor.loanInfoPaymentType === 'completed_payment' ||
-                  stateCreateLoanInfor.loanInfoPaymentType === 'COMPLETED_PAYMENT' ||
+                  // stateCreateLoanInfor.loanInfoPaymentType === 'COMPLETED_PAYMENT' ||
                   stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() === 'completed_payment'
                 "
                 :label="$t('loan.end_date')"
@@ -913,7 +913,7 @@ async function onSubmitLoanInfo() {
 
 onMounted(async () => {
   await getCustomerService(token.value as string);
-  await getLoanTypeService();
+  await getLoanTypeService(token.value as string);
 });
 
 //=======================//

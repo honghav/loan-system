@@ -1,13 +1,20 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-} from '@nestjs/swagger';
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { PaymentTableService } from './payment_table.service';
 import { CreatePaymenttable } from './dto/create_payment_table.dto';
 import { GetPaymenttable } from './dto/get_payment_table.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RequestUserId } from '../users/dto/request-id.dto';
 
 @ApiTags('Payment Table')
 @Controller('v1/payment_table')
@@ -35,8 +42,12 @@ export class PaymentLoanController {
     status: 200,
     description: 'Successfully fetched payment table records.',
   })
-  async getAll(@Query() query?: GetPaymenttable) {
-    return await this.paymentTableService.getAll(query);
+  @UseGuards(JwtAuthGuard)
+  async getAll(
+    @Request() req: RequestUserId,
+    @Query() query?: GetPaymenttable,
+  ) {
+    return await this.paymentTableService.getAll(query, req.user.id);
   }
 
   @Patch(':id/status')
@@ -57,4 +68,3 @@ export class PaymentLoanController {
     return await this.paymentTableService.updateStatus(id, status, amount);
   }
 }
-

@@ -243,12 +243,14 @@
       </UForm>
 </template>
 <script setup lang="ts">
+import getToken from '~/constants/helper/getToken';
 import { currentUserData } from '~/model_dto/auth/get_current_user.dto';
 import { customerData } from '~/model_dto/customer/getCustomer.dto';
 import { createLoanInformationService, type CreateLoanInformationDTO } from '~/model_dto/loan/loan_list/create_loan_list.dto';
 import { LoanInformationPaymentType, LoanInformationStatus } from '~/model_dto/loan/loan_list/enum_loan_lnformation';
 import { getLoanInformationService } from '~/model_dto/loan/loan_list/get_loan_list.dto';
 import { loanTypeData } from '~/model_dto/loan/loan_type/get_loan_type.dto';
+const token = ref(getToken());
 
 const stateCreateLoanInfor = reactive<CreateLoanInformationDTO>({
   loanInfoAmount: 0,
@@ -272,7 +274,7 @@ async function onSubmitLoanInfo() {
       stateCreateLoanInfor.loanInfoUserId = currentUserData.value.Id;
     }
     await createLoanInformationService(stateCreateLoanInfor);
-    await getLoanInformationService();
+    await getLoanInformationService(token.value as string);
     formLoanInfoIsOpen.value = false;
   } catch (error) {
     console.error("Error creating loan information:", error);

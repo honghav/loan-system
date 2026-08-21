@@ -76,6 +76,7 @@
 
 <script setup lang="ts">
 import { reactive, watch, onMounted } from "vue";
+import getToken from "~/constants/helper/getToken";
 import { currentUserData } from "~/model_dto/auth/get_current_user.dto";
 import {
   createLoanTypeService,
@@ -85,6 +86,7 @@ import {
 import { getLoanTypeService, type GetLoanTypeDTO } from "~/model_dto/loan/loan_type/get_loan_type.dto";
 
 const emit = defineEmits(["close", "submit"]);
+const token = ref(getToken());
 
 const props = withDefaults(
   defineProps<{
@@ -139,12 +141,12 @@ async function onSubmitLoanType() {
     }
 
     if (props.loanTypeEditIsOpen && props.editingLoanType?.loanTypeId) {
-      await updateLoanTypeService(props.editingLoanType.loanTypeId, stateCreateLoanType);
+      await updateLoanTypeService(props.editingLoanType.loanTypeId, stateCreateLoanType, token.value as string);
     } else {
-      await createLoanTypeService(stateCreateLoanType);
+      await createLoanTypeService(stateCreateLoanType, token.value as string);
     }
 
-    await getLoanTypeService();
+    await getLoanTypeService(token.value as string);
     emit("close");
   } catch (error) {
     console.error("Error submitting loan type:", error);

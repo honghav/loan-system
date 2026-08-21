@@ -334,12 +334,14 @@ import { currentUserData } from "~/model_dto/auth/get_current_user.dto";
 import LoanInformationFormComponent from "~/components/LoanInformationFormComponent.vue";
 import LoanTypeFormComponent from "~/components/LoanTypeFormComponent.vue";
 import LoanInformationDetailComponent from "~/components/LoanInformationDetailComponent.vue";
+import getToken from "~/constants/helper/getToken";
 // ==================================//
 // Loan Information Action Control   //
 // ==================================//
 const formLoanInfoIsOpen = ref(false);
 const loanInfoEditIsOpen = ref(false);
 const viewLoandetailIsOpen = ref(false);
+const token = ref(getToken());
 
 
 
@@ -370,7 +372,7 @@ window.open(`../customer/${loanInfor.loanInfoId}`, '_blank');      },
       color: "error" as const,
       onSelect: async () => {
         if (loanInfor.loanInfoId) {
-          await deleteLoanInformationService(loanInfor.loanInfoId);
+          await deleteLoanInformationService(loanInfor.loanInfoId, token.value as string);
         }
       },
     },
@@ -444,9 +446,9 @@ const getItems = (loanType: GetLoanTypeDTO) => [
 
 onMounted(async () => {
   await Promise.all([
-    getLoanInformationService(),
-    getLoanTypeService(),
-    getCustomerService(),
+    getLoanInformationService(token.value as string),
+    getLoanTypeService(token.value as string),
+    getCustomerService(token.value as string),
   ]);
 });
 </script>

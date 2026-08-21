@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoanInformationService } from './loan_infor.service';
 import { CreateLoanInformation } from './dto/create_loan_info.dto';
 import { GetLoanInfoDto } from './dto/get_loan_info.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RequestUserId } from '../users/dto/request-id.dto';
 
 @ApiTags('Loan Information')
 @Controller('v1/loan_information')
 export class LoanInformationController {
-  constructor(private readonly loaniInfoService: LoanInformationService) {}
+  constructor(private readonly loaniInfoService: LoanInformationService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new loan information record' })
@@ -30,8 +32,9 @@ export class LoanInformationController {
     status: 200,
     description: 'Successfully fetched loan information records.',
   })
-  async getAll() {
-    return await this.loaniInfoService.getAll();
+  @UseGuards(JwtAuthGuard)
+  async getAll(@Request() req: RequestUserId) {
+    return await this.loaniInfoService.getAll(req.user.id);
   }
   @Get(':id')
   @ApiOperation({ summary: 'Get a loan information record by ID' })
@@ -62,4 +65,4 @@ export class LoanInformationController {
   }
 }
 
-  
+

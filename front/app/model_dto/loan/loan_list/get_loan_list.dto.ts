@@ -97,20 +97,20 @@ export async function getLoanInformationByIdService(id: string): Promise<void> {
     console.error("Error fetching loan information by ID:", error);
   }
 }
-export async function getLoanInformationService(): Promise<void> {
+export async function getLoanInformationService(token: string): Promise<void> {
   // Store raw API data directly without mapping here
   try {
-    const res: any = await apiFetch("GET", "loan_information");
+    const res: any = await apiFetch("GET", "loan_information", undefined, token);
     loanInfomationResponse.value = res.data;
   } catch (error) {
     console.error("Error fetching loan type data:", error);
   }
 }
 
-export async function deleteLoanInformationService(id: string): Promise<void> {
+export async function deleteLoanInformationService(id: string, token: string): Promise<void> {
   try {
     await apiFetch("DELETE", `loan_information/${id}`);
-    await getLoanInformationService();
+    await getLoanInformationService(token);
   } catch (error) {
     console.error("Error deleting loan information record:", error);
   }

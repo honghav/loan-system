@@ -9,18 +9,19 @@ export class LoanTypeService {
   constructor(
     @InjectRepository(LoanType)
     private laonTypeRepo: Repository<LoanType>,
-  ) {}
+  ) { }
 
   async create(dto: CreateLoanTypeDTO) {
     const laonType = this.laonTypeRepo.create({ ...dto });
     return await this.laonTypeRepo.save(laonType);
   }
 
-  async getAll() {
+  async getAll(userId: string) {
     try {
       return await this.laonTypeRepo.find({
         relations: { user: true },
         order: { createdAt: 'DESC' },
+        where: { user: { id: userId } }
       });
     } catch (error: any) {
       throw new Error(`DB Error: ${error.message}-> Code: ${error.code}`);

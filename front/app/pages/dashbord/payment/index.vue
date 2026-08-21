@@ -8,10 +8,10 @@
         <h1
           class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white"
         >
-          {{ $t('payment.title') }}
+          {{ $t("payment.title") }}
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-          {{ $t('payment.subtitle') }}
+          {{ $t("payment.subtitle") }}
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3">
@@ -217,8 +217,13 @@
                 <div
                   class="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400 font-medium"
                 >
-                <img :src="getImagePath (payment.payCustomerImage)" alt="" class="h-10 w-10 rounded-full">
-                 {{ payment.payNumber }} - Due: {{ formatDate(payment.payPaymentRequiredDate) }}
+                  <img
+                    :src="getImagePath(payment.payCustomerImage)"
+                    alt=""
+                    class="h-10 w-10 rounded-full"
+                  />
+                  {{ payment.payNumber }} - Due:
+                  {{ formatDate(payment.payPaymentRequiredDate) }}
                 </div>
                 <UDropdownMenu :items="getItemsPayment(payment)">
                   <UButton
@@ -307,9 +312,7 @@
 
                   <button
                     v-if="payment.payStatus !== PaymentStatus.PENDING"
-                    @click="
-                      handleStatusUpdate(payment, PaymentStatus.PENDING)
-                    "
+                    @click="handleStatusUpdate(payment, PaymentStatus.PENDING)"
                     title="Mark as Pending"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 transition-colors flex items-center gap-1"
                   >
@@ -318,9 +321,7 @@
 
                   <button
                     v-if="payment.payStatus !== PaymentStatus.OVERDUE"
-                    @click="
-                      handleStatusUpdate(payment, PaymentStatus.OVERDUE)
-                    "
+                    @click="handleStatusUpdate(payment, PaymentStatus.OVERDUE)"
                     title="Mark as Overdue"
                     class="px-2 py-1 text-[11px] font-semibold rounded bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors flex items-center gap-1"
                   >
@@ -402,18 +403,36 @@
               <tr
                 class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
               >
-                <th class="px-4 py-3.5 text-center w-16">{{ $t('common.actions') }}</th>
+                <th class="px-4 py-3.5 text-center w-16">
+                  {{ $t("common.actions") }}
+                </th>
                 <th class="px-4 py-3.5 text-center w-12">#</th>
-                <th class="px-4 py-3.5 text-center w-12">{{ $t('customer.profile_image') }}</th>
-                <th class="px-4 py-3.5 text-center w-12">{{ $t('loan.loan_number') }}</th>
-                <th class="px-4 py-3.5">{{ $t('payment.required_date') }}</th>
-                <th class="px-4 py-3.5">{{ $t('payment.pay_date') }}</th>
-                <th class="px-4 py-3.5 text-right">{{ $t('payment.total_payment') }}</th>
-                <th class="px-4 py-3.5 text-right">{{ $t('payment.beginning_balance') }}</th>
-                <th class="px-4 py-3.5 text-right">{{ $t('payment.principal') }}</th>
-                <th class="px-4 py-3.5 text-right">{{ $t('payment.interest') }}</th>
-                <th class="px-4 py-3.5 text-right">{{ $t('payment.remaining_balance') }}</th>
-                <th class="px-4 py-3.5 text-center">{{ $t('common.status') }}</th>
+                <th class="px-4 py-3.5 text-center w-12">
+                  {{ $t("customer.profile_image") }}
+                </th>
+                <th class="px-4 py-3.5 text-center w-12">
+                  {{ $t("loan.loan_number") }}
+                </th>
+                <th class="px-4 py-3.5">{{ $t("payment.required_date") }}</th>
+                <th class="px-4 py-3.5">{{ $t("payment.pay_date") }}</th>
+                <th class="px-4 py-3.5 text-right">
+                  {{ $t("payment.total_payment") }}
+                </th>
+                <th class="px-4 py-3.5 text-right">
+                  {{ $t("payment.beginning_balance") }}
+                </th>
+                <th class="px-4 py-3.5 text-right">
+                  {{ $t("payment.principal") }}
+                </th>
+                <th class="px-4 py-3.5 text-right">
+                  {{ $t("payment.interest") }}
+                </th>
+                <th class="px-4 py-3.5 text-right">
+                  {{ $t("payment.remaining_balance") }}
+                </th>
+                <th class="px-4 py-3.5 text-center">
+                  {{ $t("common.status") }}
+                </th>
               </tr>
             </thead>
             <tbody
@@ -440,16 +459,20 @@
                 >
                   {{ payment.payNumber }}
                 </td>
-         
+
                 <td
                   class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
                 >
-                  <img :src="getImagePath (payment.payCustomerImage)" alt="" class="h-10 w-10 rounded-full">
+                  <img
+                    :src="getImagePath(payment.payCustomerImage)"
+                    alt=""
+                    class="h-10 w-10 rounded-full"
+                  />
                 </td>
                 <td class="px-4 py-3.5 font-medium text-xs">
                   {{ formatDate(payment.payPaymentRequiredDate) }}
                 </td>
-                       <td
+                <td
                   class="px-4 py-3.5 text-center font-mono text-xs text-neutral-400"
                 >
                   {{ payment.payLoanNumber }}
@@ -493,7 +516,11 @@
                       getPaymentStatusBadges(payment.payStatus),
                     ]"
                   >
-                    {{ $t(`status.${(payment.payStatus || 'PENDING').toLowerCase()}`) }}
+                    {{
+                      $t(
+                        `status.${(payment.payStatus || "PENDING").toLowerCase()}`,
+                      )
+                    }}
                   </span>
                 </td>
               </tr>
@@ -539,10 +566,15 @@ import {
 import { updateStatusPaymentService } from "~/model_dto/payment/update_payment";
 import { PaymentStatus } from "~/model_dto/payment/enum_payment";
 import { LoanInformationPaymentType } from "~/model_dto/loan/loan_list/enum_loan_lnformation";
-import { kanbanColumns, statusTabs } from "~/model_dto/payment/kanban_columns_payment";
+import {
+  kanbanColumns,
+  statusTabs,
+} from "~/model_dto/payment/kanban_columns_payment";
 import formatCurrency from "~/constants/helper/formatCurrency";
 import getPaymentStatusBadges from "~/constants/helper/getPaymentStatusBadge";
 import formatDate from "~/constants/helper/formatDate";
+import getToken from "~/constants/helper/getToken";
+const token = ref(getToken());
 
 const currentView = ref<"kanban" | "table">("table");
 const searchQuery = ref("");
@@ -659,10 +691,6 @@ async function onDrop(event: DragEvent, targetStatus: PaymentStatus) {
     await handleStatusUpdate(payment, targetStatus);
   }
 }
-
-
-
-
 
 function getKanbanCards(status: PaymentStatus) {
   let list = paymentTableData.value.filter(
@@ -824,8 +852,7 @@ const getItemsPayment = (payment: GetPaymentTableDTO) => [
   ],
 ];
 
-
 onMounted(async () => {
-  await getPaymentTableService();
+  await getPaymentTableService(token.value as string);
 });
 </script>

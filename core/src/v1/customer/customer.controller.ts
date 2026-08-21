@@ -25,6 +25,7 @@ import { UpdateCustomerDto } from './dto/updateCustomer.dto';
 import { StorageService } from '../storage/storage.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RequestUserId } from '../users/dto/request-id.dto';
 
 @ApiTags('Customers')
 @Controller('v1/customers')
@@ -32,7 +33,7 @@ export class CustomerController {
   constructor(
     private readonly customerService: CustomerService,
     private readonly storageService: StorageService,
-  ) {}
+  ) { }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -66,8 +67,8 @@ export class CustomerController {
     description: 'Return list of all customers for the authenticated user.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized - Access token required.' })
-  async getAll(@Request() req: any) {
-    return await this.customerService.getAll(req.user?.id);
+  async getAll(@Request() req: RequestUserId) {
+    return await this.customerService.getAll(req.user.id);
   }
 
   @Get(':id')
