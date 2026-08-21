@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseInterceptors,
   UploadedFile,
   UseGuards,
@@ -37,10 +38,17 @@ export class CustomerController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadDocument(@UploadedFile() file: Express.Multer.File) {
+  async uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @Query('folder') folder?: string,
+    @Query('entity') entity?: string,
+    @Query('path') path?: string,
+  ) {
+    const rawFolder = folder || entity || path || 'customers';
+    const targetFolder = rawFolder.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '_');
     const result = await this.storageService.uploadFile(
       file,
-      'customer-documents',
+      targetFolder,
     );
     return {
       message: 'Uploaded to R2 successfully',

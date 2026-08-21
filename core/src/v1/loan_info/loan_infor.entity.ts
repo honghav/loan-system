@@ -16,6 +16,7 @@ import { User } from '../users/user.entity';
 import { LoanType } from '../loan_type/loan_type.entity';
 import { Customer } from '../customer/customer.enitity';
 import { PaymentTable } from '../payment_table/payment_table.entity';
+import { ProofLoan } from '../proof_loan/proof_loan.entity';
 
 export enum LoanInformationStatus {
   IN_PAYMENT = 'in_payment',
@@ -180,6 +181,9 @@ export class LoanInformation {
     nullable: true,
   })
   customerId?: string | null;
+
+  @OneToMany(() => ProofLoan, (proofLoan) => proofLoan.loanInformation)
+  proofLoans?: ProofLoan[];
 
   @CreateDateColumn({
     name: 'created_at',

@@ -296,6 +296,48 @@
           </div>
         </div>
 
+        <!-- Image Grid -->
+          <div
+            v-if="loanInfomationByIdData?.loanInfoproofs && loanInfomationByIdData.loanInfoproofs.length > 0"
+            class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4"
+          >
+            <div
+              v-for="(imgProof, index) in loanInfomationByIdData.loanInfoproofs"
+              :key="imgProof.proofId || index"
+              class="group relative aspect-square rounded-xl overflow-hidden border border-neutral-200/80 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
+             
+            >
+              <img
+                :src="getImagePath(imgProof.proofPath)"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                :alt="imgProof.proofName || `Proof ${index + 1}`"
+              />
+
+              <!-- Hover Overlay with Action Buttons -->
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-3"
+              >
+                <!-- Top Badge/Name -->
+                <span class="text-[11px] font-medium text-white/90 truncate drop-shadow-sm">
+                  {{ imgProof.proofName || `Attachment #${index + 1}` }}
+                </span>
+
+               
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            v-else
+            class="p-6 text-center rounded-xl border border-dashed border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30"
+          >
+            <div class="flex flex-col items-center justify-center space-y-1 text-neutral-400 dark:text-neutral-500">
+              <span class="i-lucide-image-off w-7 h-7" />
+              <p class="text-xs font-medium">No proof images attached to this loan</p>
+            </div>
+          </div>
+
         <!-- Footer Action -->
         <div
           class="flex justify-end pt-2 border-t border-neutral-100 dark:border-neutral-800"

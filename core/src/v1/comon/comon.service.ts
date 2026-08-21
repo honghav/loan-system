@@ -4,7 +4,7 @@ import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class CommonService {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly storageService: StorageService) { }
 
   /**
    * Converts base64 image data into a Buffer and uploads directly to Cloudflare R2
@@ -28,7 +28,8 @@ export class CommonService {
     else if (mimeType === 'image/gif') extension = '.gif';
     else if (mimeType === 'image/svg+xml') extension = '.svg';
 
-    const filename = `cus_${Date.now()}_${Math.round(Math.random() * 1e6)}${extension}`;
+    const prefix = path === 'proofs' || path.includes('proof') ? 'proof' : 'cus';
+    const filename = `${prefix}_${Date.now()}_${Math.round(Math.random() * 1e6)}${extension}`;
 
     const result = await this.storageService.uploadBuffer(
       buffer,
@@ -43,20 +44,19 @@ export class CommonService {
   /**
    * Helper to extract R2 object key from stored URL or key
    */
-  public getStorageKeyFromUrl(urlOrKey: string, path: string): string | null {
+  public getStorageKeyFromUrl(urlOrKey: string, path?: string): string | null {
     if (!urlOrKey) return null;
-    const clean = urlOrKey.startsWith('/') ? urlOrKey.slice(1) : urlOrKey;
+    let clean = urlOrKey.trim();
+    if (clean.startsWith('/')) {
+      clean = clean.slice(1);
+    }
     if (clean.startsWith('http://') || clean.startsWith('https://')) {
       const parts = clean.split('/');
-      const folderIndex = parts.findIndex((p) => p === 'customers');
-      if (folderIndex !== -1) {
-        return parts.slice(folderIndex).join('/');
+      if (parts.length > 3) {
+        return parts.slice(3).join('/');
       }
     }
-    if (clean.startsWith(path + '/')) {
-      return clean;
-    }
-    return null;
+    return clean;
   }
 
   /**

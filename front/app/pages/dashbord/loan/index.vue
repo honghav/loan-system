@@ -267,7 +267,6 @@
     </template>
   </UModal>
 
-  <!-- Modal 2: Loan Information Form -->
   <!-- Modal 2: Loan Information Form (Modern Horizontal Style) -->
   <UModal
     :dismissible="false"

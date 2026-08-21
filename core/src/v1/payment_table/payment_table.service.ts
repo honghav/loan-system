@@ -174,9 +174,7 @@ export class PaymentTableService {
           groupedByLoan.set(record.loanInformationId, list);
         }
       }
-
       const result: PaymentTable[] = [...nullLoanRecords];
-
       for (const [, loanRecords] of groupedByLoan) {
         const nonPending = loanRecords.filter(
           (r) => r.status !== PaymentStatus.PENDING,

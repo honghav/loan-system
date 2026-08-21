@@ -12,6 +12,7 @@ import { PaymentTableModule } from './v1/payment_table/payment_table.module';
 import { LoggerModule } from './v1/logger/logger.module';
 import { SizeDataModule } from './v1/size_data/size_data.module';
 import { DashboardModule } from './v1/dashboard/dashboard.module';
+import { ProofLoanModule } from './v1/proof_loan/proof_loan.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { DashboardModule } from './v1/dashboard/dashboard.module';
     LoggerModule,
     SizeDataModule,
     DashboardModule,
+    ProofLoanModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

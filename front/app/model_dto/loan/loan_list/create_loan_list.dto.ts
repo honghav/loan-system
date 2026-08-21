@@ -2,6 +2,7 @@ import type {
   LoanInformationPaymentType,
   LoanInformationStatus,
 } from "./enum_loan_lnformation";
+import type { CreateProofDTO } from "./proof_loan.dto";
 
 export interface CreateLoanInformationDTO {
   loanInfoAmount: number;
@@ -15,7 +16,9 @@ export interface CreateLoanInformationDTO {
   loanInfoLoanerId: string;
   loanInfoTypeId: string;
   loanInfoUserId: string;
+  proofs?: CreateProofDTO[];
 }
+
 export interface CreateLoanInformationRequestDTO {
   amount: string;
   purposeOfLoan: string;
@@ -28,6 +31,7 @@ export interface CreateLoanInformationRequestDTO {
   userId: string;
   loanTypeId: string;
   customerId: string;
+  proofs?: CreateProofDTO[];
 }
 
 export const mapperCreateLoanInformation = (
@@ -45,6 +49,7 @@ export const mapperCreateLoanInformation = (
     userId: data.loanInfoUserId,
     loanTypeId: data.loanInfoTypeId,
     customerId: data.loanInfoLoanerId,
+    proofs: data.proofs || [],
   };
 };
 
