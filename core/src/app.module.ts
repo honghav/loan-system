@@ -13,6 +13,7 @@ import { LoggerModule } from './v1/logger/logger.module';
 import { SizeDataModule } from './v1/size_data/size_data.module';
 import { DashboardModule } from './v1/dashboard/dashboard.module';
 import { ProofLoanModule } from './v1/proof_loan/proof_loan.module';
+import { CloudflareModule } from './v1/cloudflare/cloudflare.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ProofLoanModule } from './v1/proof_loan/proof_loan.module';
     SizeDataModule,
     DashboardModule,
     ProofLoanModule,
+    CloudflareModule,
   ],
 })
 export class AppModule { }
