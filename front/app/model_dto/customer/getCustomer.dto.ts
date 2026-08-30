@@ -49,19 +49,20 @@ export const customerByIdData = computed<GetCustomerDTO | null>(() => {
   return mapperCustomer(customerByIdResponse.value);
 });
 
-export async function getCustomerService(): Promise<void> {
+export async function getCustomerService(token: string): Promise<void> {
   // Store raw API data directly without mapping here
   try {
-    const res: any = await apiFetch("GET", "customers");
+    const res: any = await apiFetch("GET", "customers", undefined, token);
     customerResponse.value = res.data.customer;
   } catch (error) {
     console.error("Error fetching customer data:", error);
   }
 }
-export async function getByIdCustomerService(id: string): Promise<void> {
+export async function getByIdCustomerService(id: string, token: string): Promise<void> {
   // Store raw API data directly without mapping here
+  console.log("Check Token", token)
   try {
-    const res: any = await apiFetch("GET", `customers/${id}`);
+    const res: any = await apiFetch("GET", `customers/${id}`, undefined, token);
     customerByIdResponse.value = res.data?.customer || res.data;
   } catch (error) {
     console.error("Error fetching customer data:", error);

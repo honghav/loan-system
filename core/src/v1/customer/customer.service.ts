@@ -61,16 +61,28 @@ export class CustomerService {
     }
   }
 
-  async getAll() {
+  async getAll(userIdOrToken?: string) {
     try {
+      let userId: string | null = null;
+      if (userIdOrToken) {
+        if (userIdOrToken.includes('.') || userIdOrToken.startsWith('Bearer ')) {
+          userId = this.commonService.getUserIdFromToken(userIdOrToken);
+        } else {
+          userId = userIdOrToken;
+        }
+      }
+
+      const whereCondition = userId ? { userId } : {};
+
       const customer = await this.customerRepo.find({
+        where: whereCondition,
         relations: {
           user: true,
           loanInformation: true,
         },
         order: { createdAt: 'DESC' },
       });
-      // countActiveLoansByCustomerId(customer.id)
+
       const data = customer.map(async (customer) => {
         const activeLoansCount = await this.countActiveLoansByCustomerId(
           customer.id,

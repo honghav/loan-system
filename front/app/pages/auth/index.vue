@@ -224,6 +224,7 @@
         >
           Sign In
         </UButton>
+        <p v-if="messageErrorAuth" class="bg-red-100 w-full p-2 border border-red-600 rounded-md text-center text-red-600 text-xs" >{{ messageErrorAuth }}</p>
       </UForm>
 
       <!-- Footer Toggle Link -->
@@ -251,6 +252,7 @@
 import {
   loadingAuth,
   loginService,
+  messageErrorAuth,
   registerService,
   type LoginDTO,
   type RegisterDTO,
@@ -301,11 +303,16 @@ const startLogin = reactive<LoginDTO>({
   loginLoginType: LoginType.USERNAME,
 });
 
-function onSubmit() {
-  if (authForm.value) {
-    registerService(startRegister);
-  } else {
-    loginService(startLogin);
-  }
+ function onSubmit() {
+
+    if (authForm.value) {
+       registerService(startRegister);
+    } else {
+       loginService(startLogin);
+    }
 }
+
+onMounted(() => {
+  messageErrorAuth.value = "";
+})
 </script>

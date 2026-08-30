@@ -18,25 +18,25 @@ export interface GetLoanTypeResponseDTO {
 
 export const mapperLoanType = (data: GetLoanTypeResponseDTO): GetLoanTypeDTO => ({
   loanTypeId: data.id,
-    loanTypeFrequency: data.frequency,
-    loanTypeFrequencyDay: data.frequency_day,
-    loanTypeDescription: data.description,
-    loanTypeUserId: data.userId,
+  loanTypeFrequency: data.frequency,
+  loanTypeFrequencyDay: data.frequency_day,
+  loanTypeDescription: data.description,
+  loanTypeUserId: data.userId,
 });
 
 
 const loanTypeResponse = ref<GetLoanTypeResponseDTO[]>([]);
 
 // Automatically updates whenever loanTypeResponse changes
-export const loanTypeData = computed<GetLoanTypeDTO[]>(() => 
+export const loanTypeData = computed<GetLoanTypeDTO[]>(() =>
   loanTypeResponse.value.map(mapperLoanType)
 );
-export async function getLoanTypeService(): Promise<void> {
+export async function getLoanTypeService(token: string): Promise<void> {
   // Store raw API data directly without mapping here
-  try{
-    const res:any = await apiFetch("GET", "laon_type")
+  try {
+    const res: any = await apiFetch("GET", "laon_type", undefined, token)
     loanTypeResponse.value = res;
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching loan type data:", error);
   }
 }

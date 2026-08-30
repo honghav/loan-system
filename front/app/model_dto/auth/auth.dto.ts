@@ -59,6 +59,7 @@ export const mapperLogin = (data: LoginDTO): LoginRequestDTO => {
   };
 };
 export const loadingAuth = ref(false);
+export const messageErrorAuth = ref("")
 export async function registerService(payload: RegisterDTO) {
   try {
     loadingAuth.value = true;
@@ -72,9 +73,11 @@ export async function registerService(payload: RegisterDTO) {
     }
     navigateTo("dashbord");
     return res;
-  } catch (error) {
-    loadingAuth.value = true;
-    console.error("Register Error", error);
+  } catch (error: any) {
+    const errorResponse = error?.data || error?.response?._data || error;
+    console.error("Register Error Message", errorResponse?.message[0] || error?.message);
+    messageErrorAuth.value = errorResponse?.message[0]
+    return messageErrorAuth;
   } finally {
     loadingAuth.value = false;
   }
@@ -93,9 +96,11 @@ export async function loginService(payload: LoginDTO) {
     navigateTo("dashbord");
 
     return res;
-  } catch (error) {
-    loadingAuth.value = true;
-    console.error("Login Error", error);
+  } catch (error: any) {
+    const errorResponse = error?.data || error?.response?._data || error;
+    console.error("Login Error Message", errorResponse?.message[0] || error?.message);
+    messageErrorAuth.value = errorResponse?.message[0]
+    return messageErrorAuth;
   } finally {
     loadingAuth.value = false;
   }

@@ -21,12 +21,32 @@ export const mapperCreateLoanType = (data: CreateLoanTypeDTO): CreateLoanTypeRes
   userId: data.loanTypeUserId,
 });
 
-export const createLoanTypeService = async (requestData: CreateLoanTypeDTO): Promise<void> => {
+export const createLoanTypeService = async (requestData: CreateLoanTypeDTO, token: string): Promise<void> => {
   try {
     await apiFetch("POST", "laon_type", mapperCreateLoanType(requestData));
   } catch (error) {
     console.error("Error creating loan type:", error);
   } finally {
-    await getLoanTypeService();
+    await getLoanTypeService(token);
   }
-}
+};
+
+export const updateLoanTypeService = async (id: string, requestData: CreateLoanTypeDTO, token: string): Promise<void> => {
+  try {
+    await apiFetch("PATCH", `laon_type/${id}`, mapperCreateLoanType(requestData));
+  } catch (error) {
+    console.error("Error updating loan type:", error);
+  } finally {
+    await getLoanTypeService(token);
+  }
+};
+
+export const deleteLoanTypeService = async (id: string): Promise<void> => {
+  try {
+    await apiFetch("DELETE", `laon_type/${id}`);
+  } catch (error) {
+    console.error("Error deleting loan type:", error);
+  } finally {
+    await getLoanTypeService(token);
+  }
+};

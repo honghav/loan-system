@@ -10,6 +10,9 @@ import { generatePaymentSchedule } from './dto/generate_payment_table.dto';
 import { Customer } from '../customer/customer.enitity';
 import { TelegramService } from '../telegram/telegram.service';
 import { LoanType } from '../loan_type/loan_type.entity';
+import { ProofLoanService } from '../proof_loan/proof_loan.service';
+import { UploadProofDTO } from '../proof_loan/dto/upload_proof.dto';
+import { ProofLoan } from '../proof_loan/proof_loan.entity';
 
 @Injectable()
 export class LoanInformationService {
@@ -23,6 +26,7 @@ export class LoanInformationService {
     @InjectRepository(Customer)
     private customerRepo: Repository<Customer>,
     private readonly telegramService: TelegramService,
+    private readonly proofLoanService: ProofLoanService,
   ) { }
 
   private getTotalTable(
@@ -81,7 +85,7 @@ export class LoanInformationService {
     return loanNum;
   }
 
-  async create(dto: CreateLoanInformation) {
+  async create(dto: CreateLoanInformation, proof?: UploadProofDTO[]) {
     if (dto.customerId == null) {
       throw new Error('The Customer Id is required');
     }
@@ -90,8 +94,11 @@ export class LoanInformationService {
       dto.loanNumber = await this.generateUniqueLoanNumber();
     }
 
+    // Extract proofs list from DTO or optional parameter
+    const { proofs: dtoProofs, ...loanInfoData } = dto;
+
     // 1. Create and save the loan information in database
-    const newLoanInfo = this.loanInfoRepo.create({ ...dto });
+    const newLoanInfo = this.loanInfoRepo.create({ ...loanInfoData });
     const savedLoan = await this.loanInfoRepo.save(newLoanInfo);
 
     // 2. Retrieve frequency_day from LoanType if loanTypeId exists
@@ -134,12 +141,22 @@ export class LoanInformationService {
     );
     await this.paymentTableRepo.save(paymentRecords);
 
-    // 6. Build front loan URL
+    // 6. Upload multiple proof images if provided
+    const proofItems = dtoProofs || proof || [];
+    let savedProofs: ProofLoan[] = [];
+    if (proofItems.length > 0) {
+      savedProofs = await this.proofLoanService.uploadMultipleImages(
+        savedLoan.id,
+        proofItems,
+      );
+    }
+
+    // 7. Build front loan URL
     const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
     const frontUrl = rawFrontUrl.replace(/\/+$/, '');
     const loanUrl = `${frontUrl}/customer/${savedLoan.id}`;
 
-    // 7. Send Telegram notification to customer if linked
+    // 8. Send Telegram notification to customer if linked
     if (dto.customerId) {
       try {
         const customer = await this.customerRepo.findOne({
@@ -170,19 +187,20 @@ export class LoanInformationService {
       }
     }
 
-    // 8. Return success payload
+    // 9. Return success payload
     return {
       success: true,
       url: loanUrl,
       data: {
         ...savedLoan,
+        proofs: savedProofs,
         totalTable,
         tableList,
       },
     };
   }
 
-  async getAll() {
+  async getAll(userId: string) {
     try {
       const loanInfo = await this.loanInfoRepo.find({
         relations: {
@@ -190,8 +208,10 @@ export class LoanInformationService {
           customer: true,
           loanType: true,
           paymentTables: true,
+          proofLoans: true,
         },
         order: { createdAt: 'DESC' },
+        where: { user: { id: userId } },
       });
       const result = loanInfo.map((loan) => {
         const frequencyDay = loan.loanType?.frequency_day;
@@ -204,13 +224,6 @@ export class LoanInformationService {
         return {
           totalMonth,
           ...loan,
-          // tableMonth: generatePaymentSchedule({
-          //   amount: Number(loan.amount),
-          //   durationMonths: totalMonth,
-          //   monthlyRate: Number(loan.loanFee || 0),
-          //   startDate: loan.startDate,
-          //   frequencyDay,
-          // }),
         };
       });
       return {
@@ -230,6 +243,7 @@ export class LoanInformationService {
         customer: true,
         loanType: true,
         paymentTables: true,
+        proofLoans: true,
       };
 
       const isUuid =
@@ -267,11 +281,12 @@ export class LoanInformationService {
         loanInfo.endDate ?? null,
         frequencyDay,
       );
-
+      const proofList = await this.proofLoanService.getByLoanId(loanInfo.id);
       return {
         success: true,
         data: {
           totalMonth,
+          proofList,
           ...loanInfo,
         },
       };

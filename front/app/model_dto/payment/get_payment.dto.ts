@@ -18,11 +18,10 @@ export interface GetPaymentTableDTO {
     paymentType?: LoanInformationPaymentType | string;
     [key: string]: any;
   };
-  payCustomerName: string
-  payCustomerImage: string
+  payCustomerName: string;
+  payCustomerImage: string;
   paymentType?: LoanInformationPaymentType | string;
-  payLoanNumber: string
-
+  payLoanNumber: string;
 }
 
 export interface GetPaymentTableResponeDTO {
@@ -36,7 +35,7 @@ export interface GetPaymentTableResponeDTO {
   interest: number;
   remainingBalance: number;
   status: PaymentStatus;
-  loanInformation?: GetLoanInformationResponeDTO
+  loanInformation?: GetLoanInformationResponeDTO;
   paymentType?: LoanInformationPaymentType | string;
 }
 
@@ -68,9 +67,9 @@ export const paymentTableData = computed<GetPaymentTableDTO[]>(() =>
   paymentTableResponse.value.map(mapperPaymentTable),
 );
 
-export async function getPaymentTableService(): Promise<void> {
+export async function getPaymentTableService(token: string): Promise<void> {
   try {
-    const res: any = await apiFetch("GET", "payment_table");
+    const res: any = await apiFetch("GET", "payment_table", undefined, token);
     paymentTableResponse.value = res.data;
   } catch (error) {
     console.error("Error fetching payment table data:", error);
@@ -80,10 +79,11 @@ export async function getPaymentTableService(): Promise<void> {
 export async function updatePaymentStatusService(
   id: string,
   status: string,
+  token: string,
 ): Promise<void> {
   try {
     await apiFetch("PATCH", `payment_table/${id}/status`, { status });
-    await getPaymentTableService();
+    await getPaymentTableService(token);
   } catch (error) {
     console.error("Error updating payment status:", error);
   }

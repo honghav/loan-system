@@ -1,10 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 import {
   LoanInformationPaymentType,
   LoanInformationStatus,
 } from '../loan_infor.entity';
-import { CreatePaymenttable } from '../../payment_table/dto/create_payment_table.dto';
+import { UploadProofDTO } from '../../proof_loan/dto/upload_proof.dto';
 
 export class CreateLoanInformation {
   @ApiPropertyOptional({
@@ -115,4 +123,13 @@ export class CreateLoanInformation {
   @IsOptional()
   customerId?: string | null;
 
+  @ApiPropertyOptional({
+    description: 'Array of proof images/documents associated with the loan',
+    type: [UploadProofDTO],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UploadProofDTO)
+  @IsOptional()
+  proofs?: UploadProofDTO[];
 }

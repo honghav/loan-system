@@ -14,6 +14,7 @@ import {
   LoanInformationStatus,
 } from '../loan_infor.entity';
 import { Customer } from '../../customer/customer.enitity';
+import { ProofLoan } from 'src/v1/proof_loan/proof_loan.entity';
 
 export class GetLoanInfoDto {
   @ApiPropertyOptional({
@@ -81,6 +82,12 @@ export class GetLoanInfoDto {
   @IsString()
   @IsUUID('4', { message: 'loanTypeId must be a valid UUID' })
   loanTypeId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Proof of loan information ID',
+    example: 'b1ffbc88-8b0a-3ef7-aa5c-5aa8ac270a22',
+  })
+
 
   @ApiPropertyOptional({
     description: 'Filter by Customer UUID',

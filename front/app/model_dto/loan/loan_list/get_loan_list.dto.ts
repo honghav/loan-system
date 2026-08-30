@@ -13,6 +13,7 @@ import {
   type GetPaymentTableDTO,
   type GetPaymentTableResponeDTO,
 } from "~/model_dto/payment/get_payment.dto";
+import { mapperProofImage, type GetProofDTO, type GetProofResDTO } from "./proof_loan.dto";
 
 export interface GetLoanInformationResponeDTO {
   id: string;
@@ -29,6 +30,7 @@ export interface GetLoanInformationResponeDTO {
   customer: GetCustomerResponseDTO;
   loanType: GetLoanTypeResponseDTO;
   paymentTables?: GetPaymentTableResponeDTO[];
+  proofLoans?: GetProofResDTO[];
 }
 export interface GetLoanInformationDTO {
   loanInfoId: string;
@@ -47,6 +49,9 @@ export interface GetLoanInformationDTO {
   loanInfoTypeName: string;
   loanInfoTypeDay?: number;
   loanInfoPayment?: GetPaymentTableDTO[];
+  loanInfoproofs?: GetProofDTO[]
+
+
 }
 
 export const mapperLoanInformation = (
@@ -69,10 +74,12 @@ export const mapperLoanInformation = (
     loanInfoTypeName: data.loanType.frequency,
     loanInfoTypeDay: data.loanType.frequency_day,
     loanInfoPayment: data.paymentTables?.map(mapperPaymentTable),
+    loanInfoproofs: data.proofLoans?.map(mapperProofImage),
   };
 };
 
 const loanInfomationResponse = ref<GetLoanInformationResponeDTO[]>([]);
+const loanProofResponse = ref<GetProofResDTO[]>([]);
 const loanInfomationByIdResponse = ref<GetLoanInformationResponeDTO | null>(
   null,
 );
@@ -80,6 +87,9 @@ const loanInfomationByIdResponse = ref<GetLoanInformationResponeDTO | null>(
 export const loanInfomationData = computed<GetLoanInformationDTO[]>(() =>
   loanInfomationResponse.value.map(mapperLoanInformation),
 );
+// export const loanProofData = computed<GetProofDTO[]>(() =>
+//   loanProofResponse.value.map(mapperProofImage),
+// );
 // Automatically updates whenever loanInfomationByIdResponse changes
 export const loanInfomationByIdData = computed<GetLoanInformationDTO | null>(
   () => {
@@ -97,20 +107,22 @@ export async function getLoanInformationByIdService(id: string): Promise<void> {
     console.error("Error fetching loan information by ID:", error);
   }
 }
-export async function getLoanInformationService(): Promise<void> {
+export async function getLoanInformationService(token: string): Promise<void> {
   // Store raw API data directly without mapping here
   try {
-    const res: any = await apiFetch("GET", "loan_information");
+    const res: any = await apiFetch("GET", "loan_information", undefined, token);
     loanInfomationResponse.value = res.data;
+    loanProofResponse.value = res.data.proofs;
+
   } catch (error) {
     console.error("Error fetching loan type data:", error);
   }
 }
 
-export async function deleteLoanInformationService(id: string): Promise<void> {
+export async function deleteLoanInformationService(id: string, token: string): Promise<void> {
   try {
     await apiFetch("DELETE", `loan_information/${id}`);
-    await getLoanInformationService();
+    await getLoanInformationService(token);
   } catch (error) {
     console.error("Error deleting loan information record:", error);
   }

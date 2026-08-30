@@ -24,14 +24,16 @@ export class PaymentTableService {
     @InjectRepository(LoanInformation)
     private loanInfoRepo: Repository<LoanInformation>,
     private readonly telegramService: TelegramService,
-  ) {}
+  ) { }
 
   async getItemAll(
     loanInformationId?: string,
     status?: PaymentStatus | string,
+    userId?: string,
   ) {
     try {
       const targetStatus = status as PaymentStatus | undefined;
+      const loanInfoWhere = userId ? { userId } : undefined;
 
       if (loanInformationId) {
         // If status filter is explicitly provided
@@ -42,6 +44,7 @@ export class PaymentTableService {
               where: {
                 loanInformationId,
                 status: PaymentStatus.PENDING,
+                ...(loanInfoWhere ? { loanInformation: loanInfoWhere } : {}),
               },
               relations: {
                 loanInformation: {
@@ -64,6 +67,7 @@ export class PaymentTableService {
               where: {
                 loanInformationId,
                 status: targetStatus,
+                ...(loanInfoWhere ? { loanInformation: loanInfoWhere } : {}),
               },
               relations: {
                 loanInformation: {
@@ -86,7 +90,10 @@ export class PaymentTableService {
         // Default when no status filter is explicitly provided for this loanInformationId:
         // Fetch ALL payment items for this loan
         const records = await this.paymentTableRepo.find({
-          where: { loanInformationId },
+          where: {
+            loanInformationId,
+            ...(loanInfoWhere ? { loanInformation: loanInfoWhere } : {}),
+          },
           relations: {
             loanInformation: {
               customer: true,
@@ -128,7 +135,11 @@ export class PaymentTableService {
       }
 
       // If no loanInformationId is provided:
-      const whereCondition = targetStatus ? { status: targetStatus } : {};
+      const whereCondition: any = {
+        ...(targetStatus ? { status: targetStatus } : {}),
+        ...(loanInfoWhere ? { loanInformation: loanInfoWhere } : {}),
+      };
+
       const records = await this.paymentTableRepo.find({
         where: whereCondition,
         relations: {
@@ -163,9 +174,7 @@ export class PaymentTableService {
           groupedByLoan.set(record.loanInformationId, list);
         }
       }
-
       const result: PaymentTable[] = [...nullLoanRecords];
-
       for (const [, loanRecords] of groupedByLoan) {
         const nonPending = loanRecords.filter(
           (r) => r.status !== PaymentStatus.PENDING,
@@ -197,8 +206,12 @@ export class PaymentTableService {
     }
   }
 
-  async getAll(query?: GetPaymenttable) {
-    return await this.getItemAll(query?.loanInformationId, query?.status);
+  async getAll(query?: GetPaymenttable, userId?: string) {
+    return await this.getItemAll(
+      query?.loanInformationId,
+      query?.status,
+      userId,
+    );
   }
 
   async create(dto: CreatePaymenttable) {

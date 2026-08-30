@@ -6,8 +6,11 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,23 +18,38 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/createCustomer.dto';
 import { UpdateCustomerDto } from './dto/updateCustomer.dto';
 import { StorageService } from '../storage/storage.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RequestUserId } from '../users/dto/request-id.dto';
 
-@ApiTags('Customers') // Group endpoints together in Swagger UI
+@ApiTags('Customers')
 @Controller('v1/customers')
 export class CustomerController {
-  constructor(private readonly customerService: CustomerService,
-    private readonly storageService: StorageService
+  constructor(
+    private readonly customerService: CustomerService,
+    private readonly storageService: StorageService,
   ) { }
+
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadDocument(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.storageService.uploadFile(file, 'customer-documents');
+  async uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @Query('folder') folder?: string,
+    @Query('entity') entity?: string,
+    @Query('path') path?: string,
+  ) {
+    const rawFolder = folder || entity || path || 'customers';
+    const targetFolder = rawFolder.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '_');
+    const result = await this.storageService.uploadFile(
+      file,
+      targetFolder,
+    );
     return {
       message: 'Uploaded to R2 successfully',
       fileKey: result.key,
@@ -49,13 +67,16 @@ export class CustomerController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all customers' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all customers for authenticated user (Requires JWT Token)' })
   @ApiResponse({
     status: 200,
-    description: 'Return list of all customers ordered by creation date.',
+    description: 'Return list of all customers for the authenticated user.',
   })
-  async getAll() {
-    return await this.customerService.getAll();
+  @ApiResponse({ status: 401, description: 'Unauthorized - Access token required.' })
+  async getAll(@Request() req: RequestUserId) {
+    return await this.customerService.getAll(req.user.id);
   }
 
   @Get(':id')

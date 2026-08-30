@@ -8,7 +8,7 @@
         <h1
           class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white"
         >
-          {{ $t('customer.title') }}
+          {{ $t('customer.title') }} 
         </h1>
         <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           {{ $t('customer.subtitle') }}
@@ -547,7 +547,7 @@
                       type="file"
                       accept="image/*"
                       class="hidden"
-                      @change="onFileChange"
+                      @change="(e) => onFileChange(e, (base64) => formState.cusImage = base64)"
                     />
                   </label>
                   <UButton
@@ -783,7 +783,7 @@
               <UFormField
                 v-if="
                   stateCreateLoanInfor.loanInfoPaymentType === 'completed_payment' ||
-                  stateCreateLoanInfor.loanInfoPaymentType === 'COMPLETED_PAYMENT' ||
+                  // stateCreateLoanInfor.loanInfoPaymentType === 'COMPLETED_PAYMENT' ||
                   stateCreateLoanInfor.loanInfoPaymentType?.toLowerCase() === 'completed_payment'
                 "
                 :label="$t('loan.end_date')"
@@ -828,6 +828,11 @@
 
 <script lang="ts" setup>
 import { computed, ref, reactive, watch, onMounted } from "vue";
+import getAvatarBg from "~/constants/helper/getAvatarBg";
+import getInitials from "~/constants/helper/getInitials";
+import { validateNationalID } from "~/constants/helper/idCard";
+import { validatePhoneNumber } from "~/constants/helper/phoneFormat";
+import onFileChange from "~/constants/helper/onFileChange";
 import { currentUserData } from "~/model_dto/auth/get_current_user.dto";
 import {
   createCustomerService,
@@ -855,7 +860,9 @@ import {
   getLoanTypeService,
   loanTypeData,
 } from "~/model_dto/loan/loan_type/get_loan_type.dto";
+import getToken from "~/constants/helper/getToken";
 
+const token = ref(getToken());
 // ==================================//
 // Loan Information Action Control   //
 // ==================================//
@@ -905,8 +912,8 @@ async function onSubmitLoanInfo() {
 }
 
 onMounted(async () => {
-  await getCustomerService();
-  await getLoanTypeService();
+  await getCustomerService(token.value as string);
+  await getLoanTypeService(token.value as string);
 });
 
 //=======================//
@@ -947,7 +954,7 @@ const getItems = (customer: any) => [
       icon: "i-lucide-eye",
       onSelect: async () => {
         viewCustomerIsOpen.value = true;
-        await getByIdCustomerService(customer.cusId);
+        await getByIdCustomerService(customer.cusId, token.value as string);
       },
     },
     {
@@ -970,38 +977,9 @@ const getItems = (customer: any) => [
   ],
 ];
 
-// Helper to get name initials for avatar fallback
-function getInitials(name: string) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
-// Helper to assign stable background colors based on name
-function getAvatarBg(name: string) {
-  if (!name) return "bg-neutral-500 text-white";
-  const colors = [
-    "bg-red-500 text-white",
-    "bg-orange-500 text-white",
-    "bg-amber-500 text-white",
-    "bg-emerald-500 text-white",
-    "bg-teal-500 text-white",
-    "bg-blue-500 text-white",
-    "bg-indigo-500 text-white",
-    "bg-violet-500 text-white",
-    "bg-pink-500 text-white",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
-}
+
+
 
 // Copy to Clipboard utility
 const toast = useToast();
@@ -1049,7 +1027,7 @@ function openEditCustomerModal(customer: any) {
   stateEdit.cusTelegramChatId = customer.cusTelegramChatId || customer.telegramChatId || "";
   formCustomerIsOpen.value = true;
   if (editingCustomerId.value) {
-    getByIdCustomerService(editingCustomerId.value);
+    getByIdCustomerService(editingCustomerId.value, token.value as string);
   }
 }
 
@@ -1091,39 +1069,34 @@ watch(customerByIdData, (newVal) => {
   }
 });
 
-// File change handler to convert local images into base64 strings
-function onFileChange(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  // Validate size (limit to 2MB to avoid huge payload overheads)
-  if (file.size > 2 * 1024 * 1024) {
+async function onSubmit(createLoanAfter: boolean = false) {
+  if (!formState.value.cusName){
     toast.add({
-      title: "File Too Large",
-      description: "Please select an image smaller than 2MB.",
+      title: "Invalid Name of Customer",
+      description: "Please enter a valid customer name (e.g. jonh doe).",
+      color: "error",
+    });
+    return;
+  }
+  
+  if (formState.value.cusPhone && !validatePhoneNumber(formState.value.cusPhone)) {
+    toast.add({
+      title: "Invalid Phone Number",
+      description: "Please enter a valid phone number (e.g. 012345678 or +85512345678).",
       color: "error",
     });
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const base64String = event.target?.result as string;
-    formState.value.cusImage = base64String;
+  if (formState.value.cusCitizenId && !validateNationalID(formState.value.cusCitizenId)) {
     toast.add({
-      title: "Image Processed",
-      description: "Image successfully encoded to Base64 format.",
-      color: "success",
+      title: "Invalid Citizen ID",
+      description: "Please enter a valid Citizen / National ID number (8 to 13 digits).",
+      color: "error",
     });
-  };
-  reader.onerror = (error) => {
-    console.error("Error reading file: ", error);
-  };
-  reader.readAsDataURL(file);
-}
+    return;
+  }
 
-async function onSubmit(createLoanAfter: boolean = false) {
   const targetId = editingCustomerId.value || customerByIdData.value?.cusId || "";
   if (customerEdit.value && targetId) {
     await updateCustomerService(stateEdit, targetId);

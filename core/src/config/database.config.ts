@@ -7,6 +7,7 @@ import { LoanInformation } from '../v1/loan_info/loan_infor.entity';
 import { PaymentTable } from '../v1/payment_table/payment_table.entity';
 import { AuditLog } from '../v1/logger/logger.entity';
 import { CustomTypeOrmLogger } from '../v1/logger/typeorm-custom.logger';
+import { ProofLoan } from '../v1/proof_loan/proof_loan.entity';
 // import { Revenue } from '../v1/accounting/accounting.enitity';
 // import { Attendance } from '../v1/attendance/attendance.entity';
 // import { UserFace } from '../v1/face/entities/face.entity';
@@ -27,6 +28,7 @@ export const getDatabaseConfig = (
       LoanInformation,
       PaymentTable,
       AuditLog,
+      ProofLoan
     ],
     synchronize: true,
     logging: true,

@@ -52,7 +52,7 @@ export class User {
   id!: string;
 
   // Changed to standard name, keeping it unique if that's your business logic (like a nickname/handle)
-  @Column({ unique: true })
+  @Column()
   name!: string;
 
   // Added Indexes to nullable unique fields for optimized login lookups
