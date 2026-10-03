@@ -236,7 +236,7 @@
                     {{ table.payNumber }}
                   </td>
                   <td class="px-4 py-3 font-mono text-neutral-600 dark:text-neutral-400">
-                    {{ table.payLoanNumber }}
+                    {{ loanInfomationByIdData.loanInfoNumber }}
                   </td>
                   <td class="px-4 py-3 text-center">
                     <span
@@ -270,7 +270,7 @@
                     <button
                       v-if="table.payStatus !== 'PAID'"
                       @click="openPayModal(table)"
-                      class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-medium text-xs transition-all shadow-sm"
+                      class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-black font-medium text-xs transition-all shadow-sm"
                     >
                       Pay
                     </button>
@@ -295,7 +295,6 @@
             No schedule matches your current filter criteria or search query.
           </p>
         </div>
-
               <!-- KPI Summary Metrics Grid -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Total Loan Amount Card -->
@@ -357,9 +356,250 @@
     <!-- Payment Modal -->
       <UModal v-model:open="paymentModalOpen">
     <template #content>
-      <Placeholder class="h-48 m-4" />
+      <div class="h-full p-4 bg-neutral-50 dark:bg-neutral-900">
+        <div class="flex justify-between items-center mb-4 border-b-2 py-4 border-black">
+          <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">Payment Method</h1>
+          <button @click="paymentModalOpen = false" class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-black font-medium text-xs transition-all shadow-sm">
+            Close
+          </button>
+        </div>
+        <div class="mb-4 p-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl text-center">
+          <p class="text-xs text-neutral-500 font-semibold uppercase">Amount to Pay</p>
+          <p class="text-2xl font-extrabold text-neutral-900 dark:text-white mt-0.5">
+            {{ formatCurrency(payAmountInput) }}
+          </p>
+        </div>
+        <div class="grid grid-cols-1 gap-4">
+            <UButton
+              v-for="item in paymentMethodData"
+              :key="item.value"
+              :label="item.label"
+              @click="selectedPaymentMethod = item.value"
+              class="p-4 border border-neutral-200/80 transition-all cursor-pointer justify-center"
+              :class="selectedPaymentMethod === item.value 
+                ? 'bg-primary-600 text-black font-bold shadow-sm border-2 border-black' 
+                : 'bg-white text-black hover:bg-neutral-100'"
+            />
+          </div>
+          <UButton
+            label="PayNow"
+            @click="payNow()"
+            class="my-5 py-4 w-full  border border-neutral-200/80 transition-all cursor-pointer justify-center bg-black text-white hover:text-white"
+            
+            />
+          <!-- <div v-if="comingSoonMessage = true" class="p-4 bg-red-200 rounded-lg border border-red-600 w-full">
+            <p class="text-red-500 font-bold" >
+              Comming Soon...................................
+            </p>
+          </div>
+          <div v-if="paymentRequiredMessage = true" class="p-4 bg-red-200 rounded-lg border border-red-600 w-full">
+            <p class="text-red-500 font-bold" >
+              Payment Method Is Required...................................
+            </p>
+          </div> -->
+      </div>
     </template>
   </UModal>
+<!-- Bakong Modal -->
+        <UModal v-model:open="bakongQrModal">
+    <template #content>
+         <div class="h-full p-4 bg-neutral-50 dark:bg-neutral-900">
+        <div class="flex justify-between items-center mb-4 border-b-2 py-4 border-black">
+          <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">Bakong QR</h1>
+          <button @click="bakongQrModal = false" class="px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 text-black font-medium text-xs transition-all shadow-sm">
+            Close
+          </button>
+        </div></div>
+    </template></UModal>
+        
+    <!-- Cutluy Modal -->
+    <UModal v-model:open="cutluyModal">
+      <template #content>
+        <div class="h-full p-6 bg-white dark:bg-neutral-900 rounded-2xl max-w-md w-full mx-auto">
+          <!-- Modal Header -->
+          <div class="flex justify-between items-center pb-4 border-b border-neutral-200 dark:border-neutral-800">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+                C
+              </div>
+              <h2 class="text-xl font-bold text-neutral-900 dark:text-white">Cutluy Payment</h2>
+            </div>
+            <button 
+              @click="cutluyModal = false" 
+              class="px-3 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-white font-medium text-xs transition-all shadow-sm"
+            >
+              Close
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div v-if="cutluyLoading" class="py-12 flex flex-col items-center justify-center gap-3">
+            <span class="i-lucide-loader-2 w-10 h-10 animate-spin text-primary-600" />
+            <p class="text-sm text-neutral-500 font-medium">Generating Cutluy QR Code...</p>
+          </div>
+
+          <!-- Error State -->
+          <div v-else-if="cutluyError" class="py-8 flex flex-col items-center justify-center text-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center">
+              <span class="i-lucide-alert-circle w-6 h-6" />
+            </div>
+            <div>
+              <h3 class="font-semibold text-neutral-900 dark:text-white">Failed to generate QR</h3>
+              <p class="text-xs text-neutral-500 mt-1 max-w-xs break-words">{{ cutluyError }}</p>
+            </div>
+            <button 
+              @click="handleCutluyCheckout" 
+              class="mt-2 px-4 py-2 text-xs font-semibold bg-neutral-900 text-white dark:bg-white dark:text-black rounded-xl hover:opacity-90 transition-all"
+            >
+              Try Again
+            </button>
+          </div>
+
+          <!-- QR Display Content -->
+          <div v-else-if="cutLuyResponse" class="py-4 flex flex-col items-center">
+            <!-- Amount & Status -->
+            <div class="text-center mb-4">
+              <p class="text-xs text-neutral-500 uppercase tracking-wider font-semibold">Total Amount</p>
+              <p class="text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5">
+                {{ cutLuyResponse.currency === 'KHR' ? '៛' : '$' }}{{ Number(cutLuyResponse.amount || payAmountInput || 0).toLocaleString() }}
+              </p>
+              <span class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                Scan to Pay
+              </span>
+            </div>
+
+            <!-- QR Code Container Card -->
+            <div class="bg-white p-4 rounded-2xl border border-neutral-200 shadow-md flex flex-col items-center justify-center">
+              <img 
+                v-if="generatedQrDataUrl" 
+                :src="generatedQrDataUrl" 
+                alt="Scan Cutluy QR" 
+                class="w-56 h-56 object-contain rounded-lg"
+              />
+              <div v-else class="w-56 h-56 flex items-center justify-center bg-neutral-50 text-neutral-400 text-xs">
+                No QR Code Image
+              </div>
+              
+              <p v-if="cutLuyResponse.reference_id || cutLuyResponse.id" class="text-[11px] text-neutral-400 mt-2 font-mono text-center">
+                Ref: {{ cutLuyResponse.reference_id || cutLuyResponse.id }}
+              </p>
+            </div>
+
+            <!-- Actions -->
+            <!-- <div class="w-full mt-5 space-y-2">
+              <a 
+                v-if="cutLuyResponse.checkout_url"
+                :href="cutLuyResponse.checkout_url"
+                target="_blank"
+                class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm"
+              >
+                <span>Open Checkout Link</span>
+                <span class="i-lucide-external-link w-4 h-4" />
+              </a>
+
+              <button 
+              @click="handleCutluyCheckStatus(cutLuyResponse?.id)"
+                class="w-full py-2.5 px-4 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-semibold text-xs rounded-xl transition-all"
+              >
+                Done
+              </button>
+              <span 
+              v-if="cutLuyCheckStatusResponse"
+                class="w-full py-2.5 px-4 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-semibold text-xs rounded-xl transition-all"
+              >
+                Payment Status: {{cutLuyCheckStatusResponse.status}}
+            </span>
+            </div> -->
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Custom Payment Amount Modal -->
+    <UModal v-model:open="paymentAmountModalOpen">
+      <template #content>
+        <div class="h-full p-6 bg-white dark:bg-neutral-900 rounded-2xl max-w-md w-full mx-auto">
+          <!-- Modal Header -->
+          <div class="flex justify-between items-center pb-4 border-b border-neutral-200 dark:border-neutral-800">
+            <h2 class="text-xl font-bold text-neutral-900 dark:text-white">Payment Amount</h2>
+            <button 
+              @click="paymentAmountModalOpen = false" 
+              class="px-3 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-white font-medium text-xs transition-all shadow-sm"
+            >
+              Close
+            </button>
+          </div>
+
+          <div class="py-4 space-y-4">
+            <!-- Payment Info Breakdown -->
+            <div v-if="selectedPayment" class="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl space-y-2 text-xs">
+              <div class="flex justify-between text-neutral-500">
+                <span>Total Repayment:</span>
+                <span class="font-bold text-neutral-900 dark:text-white">{{ formatCurrency(selectedPayment.payTotalPayment) }}</span>
+              </div>
+              <div class="flex justify-between text-neutral-500">
+                <span>Interest Amount:</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(selectedPayment.payInterest) }}</span>
+              </div>
+              <div class="flex justify-between text-neutral-500">
+                <span>Principal Amount:</span>
+                <span class="font-bold text-neutral-900 dark:text-white">{{ formatCurrency(selectedPayment.payPrincipal) }}</span>
+              </div>
+            </div>
+
+            <!-- Quick Selection Preset Buttons -->
+            <div v-if="selectedPayment" class="flex gap-2">
+              <button 
+                type="button"
+                @click="payAmountInput = selectedPayment.payInterest" 
+                class="flex-1 py-2 px-3 text-xs font-semibold rounded-lg border transition-all"
+                :class="Number(payAmountInput) === Number(selectedPayment.payInterest)
+                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/40 dark:text-emerald-400 font-bold' 
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-transparent hover:bg-neutral-200'"
+              >
+                Interest Only ({{ formatCurrency(selectedPayment.payInterest) }})
+              </button>
+              <button 
+                type="button"
+                @click="payAmountInput = selectedPayment.payTotalPayment" 
+                class="flex-1 py-2 px-3 text-xs font-semibold rounded-lg border transition-all"
+                :class="Number(payAmountInput) === Number(selectedPayment.payTotalPayment)
+                  ? 'bg-primary-500/10 text-primary-600 border-primary-500/40 dark:text-primary-400 font-bold' 
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-transparent hover:bg-neutral-200'"
+              >
+                Full Payment ({{ formatCurrency(selectedPayment.payTotalPayment) }})
+              </button>
+            </div>
+
+            <!-- Payment Amount Input Field -->
+            <div>
+              <label class="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                Enter Payment Amount ($)
+              </label>
+              <UInput 
+                v-model="payAmountInput" 
+                type="number" 
+                min="0.01"
+                step="0.01"
+                placeholder="Enter amount to pay" 
+                class="w-full"
+              />
+            </div>
+
+            <!-- Action Button -->
+            <button 
+              @click="proceedToPaymentMethod"
+              class="w-full py-3 px-4 bg-black dark:bg-white text-white dark:text-black font-bold text-sm rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-sm"
+            >
+              <span>Choose Payment Method</span>
+              <span class="i-lucide-arrow-right w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </template>
+    </UModal>
+    
   </div>
 </template>
 
@@ -370,7 +610,11 @@ import {
 } from '~/model_dto/loan/loan_list/get_loan_list.dto';
 import { updateStatusPaymentService } from '~/model_dto/payment/update_payment';
 import { PaymentStatus } from '~/model_dto/payment/enum_payment';
+import { LoanInformationPaymentType } from '~/model_dto/loan/loan_list/enum_loan_lnformation';
 import type { GetPaymentTableDTO } from '~/model_dto/payment/get_payment.dto';
+import { paymentMethodData } from '~/model_dto/payment_method/payment_method.data';
+import type { CutLuyCheckStatusResDTO, CutLuyResDTO } from '~/model_dto/payment_method/cutluy/cutluy.dto';
+import QRCode from 'qrcode';
 
 definePageMeta({
   layout: 'customer',
@@ -387,9 +631,22 @@ const isSubmitting = ref(false);
 const activeFilter = ref<string>('ALL');
 const viewMode = ref<'grid' | 'table'>('grid');
 const selectedPayment = ref<GetPaymentTableDTO | null>(null);
+const paymentAmountModalOpen = ref(false);
 const paymentModalOpen = ref(false);
 const payAmountInput = ref<number | string>('');
 const openModal = ref(false);
+const selectedPaymentMethod = ref<string>('');
+
+const bakongQrModal = ref(false);
+const cutluyModal = ref(false);
+const deeplinkModal = ref(false);
+const comingSoonMessage = ref(false)
+const paymentRequiredMessage = ref(false)
+const cutLuyResponse = ref<CutLuyResDTO | null>(null);
+const cutLuyCheckStatusResponse = ref<CutLuyCheckStatusResDTO | null>(null);
+const cutluyLoading = ref(false);
+const cutluyError = ref<string | null>(null);
+const generatedQrDataUrl = ref<string>('');
 // Fetch Data on mount or slug change
 const fetchData = async () => {
   if (!slug.value) return;
@@ -405,6 +662,8 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData();
+  comingSoonMessage.value = false;
+  paymentRequiredMessage.value = false;
 });
 
 watch(slug, () => {
@@ -413,7 +672,7 @@ watch(slug, () => {
 
 // Computed Filtered Payments
 const filteredPayments = computed(() => {
-  const list = loanInfomationByIdData.value?.loanInfoPayment || [];
+  const list = loanInfomationByIdData.value?.loanInfoPayment?.sort((a, b) => b.payNumber - a.payNumber) || [];
   if (activeFilter.value === 'ALL') return list;
 
   return list.filter(
@@ -490,6 +749,207 @@ const getStatusBadge = (status?: string) => {
   }
 };
 
+
+const payNow = () => {
+  switch (selectedPaymentMethod.value) {
+    case 'bakong':
+      // payWithCash()
+      bakongQrModal.value = true;
+      paymentModalOpen.value = false
+      console.log("Payment Method Value Cash:")
+      break;
+      
+      case 'cutluy':
+        cutluyModal.value = true;
+        handleCutluyCheckout()
+        console.log("Payment Method Value: Bank")
+      
+
+      // payWithBank()
+      break;
+      
+      case 'deeplink':
+        comingSoonMessage.value = true
+      console.log("Payment Method Value: QR Code")
+
+      // payWithQr()
+      break;
+      
+      default:
+        paymentRequiredMessage.value = true
+      console.log("Payment Method Is Required")
+
+      break;
+  }
+
+}
+
+
+// Cutluy Handle
+let cutluySocket: WebSocket | null = null;
+let cutluyPollingInterval: ReturnType<typeof setInterval> | null = null;
+
+function isCutluyPaid(status: string | number | undefined | null): boolean {
+  if (status === undefined || status === null) return false;
+  if (typeof status === 'number') return status === 1 || status === 200;
+  const s = String(status).trim().toLowerCase();
+  return s === 'paid' || s === 'success' || s === 'approved' || s === 'completed' || s === '1';
+}
+
+function stopCutluyStatusListener() {
+  if (cutluySocket) {
+    cutluySocket.close();
+    cutluySocket = null;
+  }
+  if (cutluyPollingInterval) {
+    clearInterval(cutluyPollingInterval);
+    cutluyPollingInterval = null;
+  }
+}
+
+async function handleCutluyPaidSuccess() {
+  stopCutluyStatusListener();
+  cutluyModal.value = false;
+  toastAlert.showTaost(
+    'Payment processed successfully!',
+    'i-lucide-check-circle-2',
+    3000,
+    'success'
+  );
+  if (selectedPayment.value) {
+    await confirmPayment();
+  }
+}
+
+function initCutluyWebSocket(id: string) {
+  stopCutluyStatusListener();
+  if (!id) return;
+
+  // Try WebSocket connection to Cutluy Payment Gateway
+  try {
+    const wsUrl = `wss://cutluy.com/ws/${id}`;
+    cutluySocket = new WebSocket(wsUrl);
+
+    cutluySocket.onopen = () => {
+      console.log("Cutluy WebSocket connected for ID:", id);
+      cutluySocket?.send(JSON.stringify({ action: "subscribe", id }));
+    };
+
+    cutluySocket.onmessage = async (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("Cutluy WebSocket message:", data);
+        if (data) {
+          cutLuyCheckStatusResponse.value = data;
+          if (isCutluyPaid(data.status)) {
+            await handleCutluyPaidSuccess();
+          }
+        }
+      } catch (err) {
+        console.error("Cutluy WS message parse error:", err);
+      }
+    };
+
+    cutluySocket.onerror = (err) => {
+      console.warn("Cutluy WS error, using status check polling fallback:", err);
+    };
+
+    cutluySocket.onclose = () => {
+      console.log("Cutluy WS connection closed");
+    };
+  } catch (err) {
+    console.warn("Cutluy WebSocket init error:", err);
+  }
+
+  // Fallback status check polling every 3 seconds
+  cutluyPollingInterval = setInterval(() => {
+    if (cutluyModal.value && id) {
+      handleCutluyCheckStatus(id);
+    } else {
+      stopCutluyStatusListener();
+    }
+  }, 3000);
+}
+
+async function handleCutluyCheckout() {
+  cutluyLoading.value = true;
+  cutluyError.value = null;
+  generatedQrDataUrl.value = '';
+  cutLuyResponse.value = null;
+  cutLuyCheckStatusResponse.value = null;
+
+  const amountToPay = Number(payAmountInput.value || selectedPayment.value?.payTotalPayment || 0.1);
+  // const payload = { amount: amountToPay, reference_id: `order_${Date.now()}` };
+  const payload = { amount: 0.1, reference_id: `order_${Date.now()}` };
+
+  try {
+    const response: CutLuyResDTO = await $fetch("/api/cutluy-checkout", {
+      method: "POST",
+      body: payload,
+    });
+
+    cutLuyResponse.value = response;
+    console.log("Cutluy response:", cutLuyResponse.value);
+
+    if (response?.qrImage) {
+      if (response.qrImage.startsWith('data:') || response.qrImage.startsWith('http')) {
+        generatedQrDataUrl.value = response.qrImage;
+      } else {
+        generatedQrDataUrl.value = `data:image/png;base64,${response.qrImage}`;
+      }
+    } else if (response?.qr_string) {
+      generatedQrDataUrl.value = await QRCode.toDataURL(response.qr_string, { width: 300, margin: 2 });
+    }
+
+    if (response?.id) {
+      initCutluyWebSocket(response.id);
+    }
+  } catch (error: any) {
+    console.error("Cutluy checkout error:", error);
+    cutluyError.value = error?.data?.statusMessage || error?.message || "Failed to connect to Cutluy Payment Gateway";
+  } finally {
+    cutluyLoading.value = false;
+  }
+}
+
+// Cutluy Check Status Handle
+async function handleCutluyCheckStatus(id?: string) {
+  if (!id) {
+    console.warn("Cutluy payment ID is required to check status");
+    return;
+  }
+
+  try {
+    const response: CutLuyCheckStatusResDTO = await $fetch("/api/cutluy-checkout", {
+      method: "GET",
+      query: { id },
+    });
+
+    if (response) {
+      cutLuyCheckStatusResponse.value = response;
+      if (isCutluyPaid(response.status)) {
+        await handleCutluyPaidSuccess();
+      }
+    }
+    console.log("Cutluy response Check Status:", response);
+  } catch (error: any) {
+    console.error("Cutluy check status error:", error);
+    cutluyError.value = error?.data?.statusMessage || error?.message || "Failed to check status from Cutluy Payment Gateway";
+  } 
+}
+
+watch(cutluyModal, (isOpen) => {
+  if (!isOpen) {
+    stopCutluyStatusListener();
+  }
+});
+
+onUnmounted(() => {
+  stopCutluyStatusListener();
+});
+
+
+
 // Loan Overall Status Badge
 const getLoanStatusBadge = (status?: string) => {
   const s = String(status || '').toLowerCase();
@@ -507,10 +967,43 @@ const getLoanStatusBadge = (status?: string) => {
   };
 };
 
-// Open Pay Modal
+// Open Pay Modal based on Payment Type
 const openPayModal = (table: GetPaymentTableDTO) => {
   selectedPayment.value = table;
-  payAmountInput.value = table.payTotalPayment || 0;
+
+  const paymentType = String(
+    table?.paymentType || 
+    table?.loanInformation?.paymentType || 
+    loanInfomationByIdData.value?.loanInfoPaymentType || 
+    ''
+  ).toLowerCase();
+
+  // If installment_payment: show custom amount input modal (defaulting to interest amount)
+  if (
+    paymentType === 'installment_payment' || 
+    paymentType === LoanInformationPaymentType.INSTALLMENT_PAYMENT
+  ) {
+    payAmountInput.value = table.payInterest || table.payTotalPayment || 0;
+    paymentAmountModalOpen.value = true;
+  } else {
+    // For another type: value is Total Repayment, proceed directly to payment methods
+    payAmountInput.value = table.payTotalPayment || 0;
+    paymentModalOpen.value = true;
+  }
+};
+
+// Proceed from Custom Amount Modal to Payment Methods Modal
+const proceedToPaymentMethod = () => {
+  if (!payAmountInput.value || Number(payAmountInput.value) <= 0) {
+    toastAlert.showTaost(
+      'Please enter a valid payment amount',
+      'i-lucide-alert-circle',
+      3000,
+      'error'
+    );
+    return;
+  }
+  paymentAmountModalOpen.value = false;
   paymentModalOpen.value = true;
 };
 

@@ -6,38 +6,27 @@ import * as express from 'express';
 import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Global validation pipe
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,
   }));
-  
+
   // Enable CORS
   const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
-<<<<<<< HEAD
-  ];
-  if (process.env.FRONT_API) {
-    allowedOrigins.push(process.env.FRONT_API.replace(/\/$/, ''));
-  }
-=======
     ...(process.env.FRONT_API ? [process.env.FRONT_API, process.env.FRONT_API.replace(/\/$/, '')] : []),
   ];
->>>>>>> 5993dfa62a82c9262f3af398084a9017c57d6e37
 
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
         callback(null, true);
       } else {
-<<<<<<< HEAD
-        callback(null, true); // Allow requests in production/cors
-=======
         callback(null, true);
->>>>>>> 5993dfa62a82c9262f3af398084a9017c57d6e37
       }
     },
     credentials: true,
@@ -64,16 +53,9 @@ async function bootstrap() {
     limit: '20mb',
     extended: true,
   }));
-<<<<<<< HEAD
-
-  const port = process.env.PORT || 8000;
-  await app.listen(port, '0.0.0.0');
-  console.log(`Application is running on port ${port}`);
-=======
   const port = process.env.PORT || 8000;
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on port: ${port}`);
   console.log(`Swagger documentation: http://localhost:${port}/api`);
->>>>>>> 5993dfa62a82c9262f3af398084a9017c57d6e37
 }
 bootstrap();

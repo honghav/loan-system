@@ -357,7 +357,7 @@ const getItemsInfo = (loanInfor: GetLoanInformationDTO) => [
       },
     },
     {
-      label: "Loan Payment",
+      label: "Payment Information",
       icon: "i-lucide-eye",
       onSelect: async () => {
         if (!loanInfor?.loanInfoId) return;

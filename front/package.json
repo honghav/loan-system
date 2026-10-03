@@ -29,6 +29,7 @@
     "aos": "^2.3.4",
     "axios": "^1.13.5",
     "bakong-khqr": "^1.0.20",
+    "chart.js": "^4.5.1",
     "crypto-js": "^4.2.0",
     "firebase": "^12.7.0",
     "gsap": "^3.13.0",
@@ -43,6 +44,7 @@
     "pinia": "^3.0.4",
     "qrcode": "^1.5.4",
     "sweetalert2": "^11.26.10",
+    "vue-chartjs": "^5.3.4",
     "vue3-google-map": "^0.26.0",
     "zod": "^4.3.5"
   },

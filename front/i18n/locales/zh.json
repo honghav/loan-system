@@ -44,7 +44,8 @@
     "report": "统计报告",
     "navigation": "导航菜单",
     "management": "系统管理",
-    "size_data": "数据容量"
+    "size_data": "数据容量",
+    "cloudflear_storage": "Cloudflear Storage"
   },
   "customer": {
     "title": "客户目录",

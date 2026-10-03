@@ -44,7 +44,8 @@
     "report": "Reports",
     "navigation": "Navigation",
     "management": "Management",
-    "size_data": "Size Data"
+    "size_data": "Size Data",
+    "cloudflear_storage": "Cloudflear Storage"
   },
   "customer": {
     "title": "Customer Directory",

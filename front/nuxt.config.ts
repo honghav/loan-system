@@ -74,6 +74,12 @@ export default defineNuxtConfig({
       firebaseVapidKey: process.env.PAPA_FOOD_FIREBASE_VAPID_KEY,
       // image r2
       r2PublicUrl: process.env.R2_PUBLIC_URL,
+      // paymentMethod
+      bakongToken: process.env.BAKONG_TOKEN,
+      bakongAccountId: process.env.BAKONG_ACCOUNT_ID,
+      bakongAccountName: process.env.BAKONG_ACCOUNT_NAME,
+      cutluyToken: process.env.CUTLUY_TOKEN,
+      cutluyUrl: process.env.CUTLUY_URL,
     },
   },
   routeRules: {

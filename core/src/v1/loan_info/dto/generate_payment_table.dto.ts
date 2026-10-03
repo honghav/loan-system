@@ -39,6 +39,7 @@ export function generatePaymentSchedule({
 
     // Calculate interest for current balance
     const interest = Number((beginningBalance * rateFraction).toFixed(2));
+    const beginningBalanceFinal = Number(beginningBalance.toFixed(2)) + Number(interest.toFixed(2));
 
     let principal: number;
     let totalPayment: number;
@@ -70,7 +71,7 @@ export function generatePaymentSchedule({
 
     schedule.push({
       paymentRequiredDate,
-      beginningBalance,
+      beginningBalance: beginningBalanceFinal,
       totalPayment,
       principal,
       interest,

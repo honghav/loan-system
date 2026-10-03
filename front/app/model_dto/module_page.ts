@@ -69,4 +69,12 @@ export const moduleData: ModulePage[] = [
     under_page: "dashbord",
     type: MouldeEnum.PAGE,
   },
+  {
+    value: "cloudflear_storage",
+    name: "Cloudflear Storage",
+    icon: "",
+    route: "cloudflear_storage",
+    under_page: "dashbord",
+    type: MouldeEnum.PAGE,
+  },
 ];
