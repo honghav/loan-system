@@ -249,148 +249,116 @@ export class PaymentTableService {
     }
 
     const targetStatus = status as PaymentStatus;
+    const paymentType = record.loanInformation?.paymentType;
 
-    // If marking as PAID and amount is provided, recalculate principal, interest, and remaining balance
+    if (paymentType === LoanInformationPaymentType.INSTALLMENT_PAYMENT) {
+      return await this.handleInstallmentPayment(record, targetStatus, amount);
+    } else {
+      return await this.handleCompletedPayment(record, targetStatus, amount);
+    }
+  }
+
+  /**
+   * Handles payment status update for INSTALLMENT_PAYMENT type loans.
+   */
+  async handleInstallmentPayment(
+    record: PaymentTable,
+    targetStatus: PaymentStatus,
+    amount?: number | string,
+  ) {
+    let type = 'INSTALLMENT';
+    let data: any = null;
+    const paymentAmount = Number(amount);
+    const totalPayment = Number(record.totalPayment ?? 0);
+
     if (
       targetStatus === PaymentStatus.PAID &&
       amount !== undefined &&
       amount !== null
     ) {
-      const paidAmount = parseFloat(String(amount));
-      if (isNaN(paidAmount) || paidAmount <= 0) {
-        throw new BadRequestException('Amount must be a valid positive number');
+      if (paymentAmount <= 0 || !paymentAmount) {
+        throw new NotFoundException('Amount must be greater than 0');
       }
 
-      const originalTotal = parseFloat(String(record.totalPayment || 0));
-      const originalPrincipal = parseFloat(String(record.principal || 0));
-      const originalInterest = parseFloat(String(record.interest || 0));
-      const originalBeginningBalance = parseFloat(
-        String(record.beginningBalance || 0),
-      );
+      if (Number(paymentAmount) - Number(record.totalPayment) === 0) {
+        type = 'this table is paied';
+        data = 'No Table Create More';
+      } else {
+        type = 'New Table is Create';
 
-      if (originalTotal > 0 && paidAmount < originalTotal) {
-        // Partial payment: recalculate current record for paidAmount
-        const ratio = paidAmount / originalTotal;
-        const paidPrincipal = parseFloat(
-          (originalPrincipal * ratio).toFixed(2),
-        );
-        const paidInterest = parseFloat((originalInterest * ratio).toFixed(2));
-
-        record.principal = paidPrincipal;
-        record.interest = paidInterest;
-        record.totalPayment = paidAmount;
-        if (record.beginningBalance != null) {
-          record.remainingBalance = parseFloat(
-            (originalBeginningBalance - paidPrincipal).toFixed(2),
-          );
+        let nextPaymentNo = (record.totalPaymentNo || 0) + 1;
+        if (record.loanInformationId) {
+          const lastRecord = await this.paymentTableRepo.findOne({
+            where: { loanInformationId: record.loanInformationId },
+            order: { totalPaymentNo: 'DESC' },
+          });
+          if (lastRecord && lastRecord.totalPaymentNo != null) {
+            nextPaymentNo = lastRecord.totalPaymentNo + 1;
+          }
         }
 
-        // Calculate remaining unpaid amounts for new payment record
-        const remainingTotal = parseFloat(
-          (originalTotal - paidAmount).toFixed(2),
-        );
-        const remainingPrincipal = parseFloat(
-          (originalPrincipal - paidPrincipal).toFixed(2),
-        );
-        const remainingInterest = parseFloat(
-          (originalInterest - paidInterest).toFixed(2),
-        );
-
-        if (remainingTotal > 0) {
-          // Generate next table number (totalPaymentNo index + 1)
-          let nextPaymentNo = (record.totalPaymentNo || 0) + 1;
-          if (record.loanInformationId) {
-            const lastRecord = await this.paymentTableRepo.findOne({
-              where: { loanInformationId: record.loanInformationId },
-              order: { totalPaymentNo: 'DESC' },
-            });
-            if (lastRecord && lastRecord.totalPaymentNo != null) {
-              nextPaymentNo = lastRecord.totalPaymentNo + 1;
-            }
-          }
-
-          const newPaymentRecord = this.paymentTableRepo.create({
+        if (Number(paymentAmount) === Number(record.interest)) {
+          data = {
             loanInformationId: record.loanInformationId,
             paymentRequiredDate: record.paymentRequiredDate,
             totalPaymentNo: nextPaymentNo,
-            beginningBalance: record.remainingBalance,
-            totalPayment: remainingTotal,
-            principal: remainingPrincipal,
-            interest: remainingInterest,
-            remainingBalance: parseFloat(
-              (
-                parseFloat(String(record.remainingBalance || 0)) -
-                remainingPrincipal
-              ).toFixed(2),
-            ),
+            beginningBalance: record.beginningBalance,
+            totalPayment: Number(record.principal) + Number(record.interest),
+            principal: record.principal,
+            interest: record.interest,
+            remainingBalance: 0,
             status: PaymentStatus.PENDING,
             payDate: null,
-          });
-
-          await this.paymentTableRepo.save(newPaymentRecord);
-        }
-      } else {
-        // Full payment or amount >= originalTotal
-        if (originalTotal > 0) {
-          const ratio = paidAmount / originalTotal;
-          record.principal = parseFloat((originalPrincipal * ratio).toFixed(2));
-          record.interest = parseFloat((originalInterest * ratio).toFixed(2));
-          record.totalPayment = paidAmount;
-          if (record.beginningBalance != null) {
-            record.remainingBalance = parseFloat(
-              (originalBeginningBalance - record.principal).toFixed(2),
-            );
-          }
+          };
         } else {
-          record.totalPayment = paidAmount;
+          const newTotal =
+            Number(record.totalPayment) -
+            (Number(paymentAmount) - Number(record.interest));
+          const principalNum = Number(record.principal);
+          const interestNum = Number(record.interest);
+          const newInterest =
+            principalNum > 0 ? newTotal * (interestNum / principalNum) : 0;
+          data = {
+            loanInformationId: record.loanInformationId,
+            paymentRequiredDate: record.paymentRequiredDate,
+            totalPaymentNo: nextPaymentNo,
+            beginningBalance: record.beginningBalance,
+            totalPayment: newTotal + Number(newInterest),
+            principal: newTotal,
+            interest: newInterest,
+            remainingBalance: 0,
+            status: PaymentStatus.PENDING,
+            payDate: null,
+          };
+        }
+
+        if (typeof data === 'object' && data !== null) {
+          const newPaymentRecord = this.paymentTableRepo.create(data);
+          await this.paymentTableRepo.save(newPaymentRecord);
         }
       }
     }
 
     record.status = targetStatus;
-
-    if (targetStatus === PaymentStatus.PAID) {
-      record.payDate = new Date();
-    } else {
-      record.payDate = null;
-    }
+    record.payDate = targetStatus === PaymentStatus.PAID ? new Date() : null;
 
     const savedRecord = await this.paymentTableRepo.save(record);
 
     // Auto-update LoanInformation status to COMPLETED if completion criteria are met
     const loanInfo = record.loanInformation;
     if (loanInfo && loanInfo.id) {
-      if (
-        loanInfo.paymentType === LoanInformationPaymentType.COMPLETED_PAYMENT
-      ) {
-        // If paymentType is completed_payment: check if all payment records for this loan are PAID
+      if (data === 'No Table Create More') {
+        loanInfo.status = LoanInformationStatus.COMPLETED;
+        await this.loanInfoRepo.save(loanInfo);
+      } else {
         const allPayments = await this.paymentTableRepo.find({
           where: { loanInformationId: loanInfo.id },
         });
         const allPaid =
           allPayments.length > 0 &&
           allPayments.every((p) => p.status === PaymentStatus.PAID);
+
         if (allPaid) {
-          loanInfo.status = LoanInformationStatus.COMPLETED;
-          await this.loanInfoRepo.save(loanInfo);
-        }
-      } else if (
-        loanInfo.paymentType === LoanInformationPaymentType.INSTALLMENT_PAYMENT
-      ) {
-        // If paymentType is installment_payment: check if next total/remaining balance is 0 or all records are PAID
-        const remBalance =
-          savedRecord.remainingBalance != null
-            ? Number(savedRecord.remainingBalance)
-            : null;
-
-        const allPayments = await this.paymentTableRepo.find({
-          where: { loanInformationId: loanInfo.id },
-        });
-        const allPaid =
-          allPayments.length > 0 &&
-          allPayments.every((p) => p.status === PaymentStatus.PAID);
-
-        if ((remBalance !== null && remBalance <= 0) || allPaid) {
           loanInfo.status = LoanInformationStatus.COMPLETED;
           await this.loanInfoRepo.save(loanInfo);
         }
@@ -398,6 +366,83 @@ export class PaymentTableService {
     }
 
     // Trigger Telegram notification to customer if linked
+    await this.sendTelegramNotification(record, savedRecord, targetStatus);
+
+    return {
+      success: true,
+      status: targetStatus,
+      total: savedRecord.totalPayment,
+      result_total: totalPayment,
+      amount: amount ?? 0,
+      type: type,
+      data: data,
+      recordLoanInformation: savedRecord,
+    };
+  }
+
+  /**
+   * Handles payment status update for COMPLETED_PAYMENT type loans.
+   */
+  async handleCompletedPayment(
+    record: PaymentTable,
+    targetStatus: PaymentStatus,
+    amount?: number | string,
+  ) {
+    let type = 'INSTALLMENT';
+    let data: any = null;
+    const totalPayment = Number(record.totalPayment ?? 0);
+
+    if (
+      targetStatus === PaymentStatus.PAID &&
+      amount !== undefined &&
+      amount !== null
+    ) {
+      type = 'this table is paied';
+    }
+
+    record.status = targetStatus;
+    record.payDate = targetStatus === PaymentStatus.PAID ? new Date() : null;
+
+    const savedRecord = await this.paymentTableRepo.save(record);
+
+    // Auto-update LoanInformation status to COMPLETED if all payment records are PAID
+    const loanInfo = record.loanInformation;
+    if (loanInfo && loanInfo.id) {
+      const allPayments = await this.paymentTableRepo.find({
+        where: { loanInformationId: loanInfo.id },
+      });
+      const allPaid =
+        allPayments.length > 0 &&
+        allPayments.every((p) => p.status === PaymentStatus.PAID);
+      if (allPaid) {
+        loanInfo.status = LoanInformationStatus.COMPLETED;
+        await this.loanInfoRepo.save(loanInfo);
+      }
+    }
+
+    // Trigger Telegram notification to customer if linked
+    await this.sendTelegramNotification(record, savedRecord, targetStatus);
+
+    return {
+      success: true,
+      status: targetStatus,
+      total: savedRecord.totalPayment,
+      result_total: totalPayment,
+      amount: amount ?? 0,
+      type: type,
+      data: data,
+      recordLoanInformation: savedRecord,
+    };
+  }
+
+  /**
+   * Helper method to send Telegram notification to customer if linked.
+   */
+  private async sendTelegramNotification(
+    record: PaymentTable,
+    savedRecord: PaymentTable,
+    targetStatus: PaymentStatus,
+  ) {
     const customer = record.loanInformation?.customer;
     if (customer && customer.id && customer.telegramChatId) {
       try {
@@ -410,7 +455,8 @@ export class PaymentTableService {
 
         const rawFrontUrl = process.env.FRONT_API || 'http://localhost:3001';
         const frontUrl = rawFrontUrl.replace(/\/+$/, '');
-        const targetLoanId = loanInfo?.id || record.loanInformation?.id || '';
+        const targetLoanId =
+          record.loanInformationId || record.loanInformation?.id || '';
         const loanUrl = targetLoanId
           ? `${frontUrl}/customer/${targetLoanId}`
           : `${frontUrl}/customer`;
@@ -434,96 +480,6 @@ export class PaymentTableService {
         );
       }
     }
-
-    return {
-      success: true,
-      data: savedRecord,
-    };
-  }
-  async updateStatus2(
-    id: string,
-    status: PaymentStatus | string,
-    amount?: number | string,
-  ) {
-    // Query the payment record by ID, including its associated LoanInformation and Customer
-    const record = await this.paymentTableRepo.findOne({
-      where: { id },
-      relations: {
-        loanInformation: {
-          customer: true,
-        },
-      },
-    });
-    // Check if the record exists
-    if (!record) {
-      throw new NotFoundException('Payment record not found');
-    }
-
-    // Prevent updating a record that is already PAID
-    if (record.status === PaymentStatus.PAID) {
-      throw new BadRequestException(
-        'This payment record has already been paid and cannot be updated.',
-      );
-    }
-
-    let type = 'INSTALLMENT';
-    let data: any = null;
-    const paymentAmount = Number(amount ?? 0);
-    let totalPayment = Number(record.totalPayment ?? 0);
-    const originalTotalPayment = Number(record.principal ?? 0);
-    let nextPaymentNo = (record.totalPaymentNo || 0) + 1;
-
-    if (record.loanInformation?.paymentType === 'installment_payment') {
-      if (Number(paymentAmount) - Number(record.totalPayment) === 0) {
-        type = 'this table is paied';
-        data = {
-          loanInformationId: record.loanInformationId,
-          paymentRequiredDate: record.paymentRequiredDate,
-          totalPaymentNo: nextPaymentNo,
-          beginningBalance: record.beginningBalance,
-          totalPayment: Number(record.principal) + Number(record.interest),
-          principal: record.principal,
-          interest: record.interest,
-          remainingBalance: 0,
-          status: PaymentStatus.PAID,
-          payDate: null,
-        }
-      } else {
-        type = 'New Table is Create';
-
-        data = {
-          loanInformationId: record.loanInformationId,
-          paymentRequiredDate: record.paymentRequiredDate,
-          totalPaymentNo: nextPaymentNo,
-          beginningBalance: record.beginningBalance,
-          totalPayment: Number(record.principal) + Number(record.interest),
-          principal: record.principal,
-          interest: record.interest,
-          remainingBalance: 0,
-          status: PaymentStatus.PENDING,
-          payDate: null,
-        }
-
-
-
-      }
-    } else if (record.loanInformation?.paymentType === 'completed_payment') {
-      type = 'this table is paied';
-    }
-
-    const targetStatus = status as PaymentStatus;
-
-
-    return {
-      success: true,
-      status: targetStatus,
-      total: record.totalPayment,
-      result_total: totalPayment,
-      amount: amount,
-      type: type,
-      data: data,
-      recordLoanInformation: record
-    };
   }
 
   async deleteByLoanId(loanInformationId: string) {

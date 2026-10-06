@@ -65,6 +65,6 @@ export class PaymentLoanController {
     @Body('status') status: string,
     @Body('amount') amount?: number | string,
   ) {
-    return await this.paymentTableService.updateStatus2(id, status, amount);
+    return await this.paymentTableService.updateStatus(id, status, amount);
   }
 }
