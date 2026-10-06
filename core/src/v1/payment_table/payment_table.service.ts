@@ -440,6 +440,91 @@ export class PaymentTableService {
       data: savedRecord,
     };
   }
+  async updateStatus2(
+    id: string,
+    status: PaymentStatus | string,
+    amount?: number | string,
+  ) {
+    // Query the payment record by ID, including its associated LoanInformation and Customer
+    const record = await this.paymentTableRepo.findOne({
+      where: { id },
+      relations: {
+        loanInformation: {
+          customer: true,
+        },
+      },
+    });
+    // Check if the record exists
+    if (!record) {
+      throw new NotFoundException('Payment record not found');
+    }
+
+    // Prevent updating a record that is already PAID
+    if (record.status === PaymentStatus.PAID) {
+      throw new BadRequestException(
+        'This payment record has already been paid and cannot be updated.',
+      );
+    }
+
+    let type = 'INSTALLMENT';
+    let data: any = null;
+    const paymentAmount = Number(amount ?? 0);
+    let totalPayment = Number(record.totalPayment ?? 0);
+    const originalTotalPayment = Number(record.principal ?? 0);
+    let nextPaymentNo = (record.totalPaymentNo || 0) + 1;
+
+    if (record.loanInformation?.paymentType === 'installment_payment') {
+      if (Number(paymentAmount) - Number(record.totalPayment) === 0) {
+        type = 'this table is paied';
+        data = {
+          loanInformationId: record.loanInformationId,
+          paymentRequiredDate: record.paymentRequiredDate,
+          totalPaymentNo: nextPaymentNo,
+          beginningBalance: record.beginningBalance,
+          totalPayment: Number(record.principal) + Number(record.interest),
+          principal: record.principal,
+          interest: record.interest,
+          remainingBalance: 0,
+          status: PaymentStatus.PAID,
+          payDate: null,
+        }
+      } else {
+        type = 'New Table is Create';
+
+        data = {
+          loanInformationId: record.loanInformationId,
+          paymentRequiredDate: record.paymentRequiredDate,
+          totalPaymentNo: nextPaymentNo,
+          beginningBalance: record.beginningBalance,
+          totalPayment: Number(record.principal) + Number(record.interest),
+          principal: record.principal,
+          interest: record.interest,
+          remainingBalance: 0,
+          status: PaymentStatus.PENDING,
+          payDate: null,
+        }
+
+
+
+      }
+    } else if (record.loanInformation?.paymentType === 'completed_payment') {
+      type = 'this table is paied';
+    }
+
+    const targetStatus = status as PaymentStatus;
+
+
+    return {
+      success: true,
+      status: targetStatus,
+      total: record.totalPayment,
+      result_total: totalPayment,
+      amount: amount,
+      type: type,
+      data: data,
+      recordLoanInformation: record
+    };
+  }
 
   async deleteByLoanId(loanInformationId: string) {
     return await this.paymentTableRepo.delete({
