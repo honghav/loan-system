@@ -34,14 +34,23 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Swagger documentation
+  // Swagger documentation for Personal Project Manager API v2
   const config = new DocumentBuilder()
-    .setTitle('NestJS Auth API')
-    .setDescription('Authentication API with JWT and Role Management')
-    .setVersion('1.0')
-    .addBearerAuth()
+    .setTitle('Personal Project Manager API')
+    .setDescription(
+      'Backend REST API for managing personal software projects, features, tasks, activity logs, and dashboard statistics.',
+    )
+    .setVersion('2.0')
+    .addTag('Projects', 'Project management endpoints')
+    .addTag('Features', 'Feature breakdown endpoints')
+    .addTag('Tasks', 'Task management & status tracking endpoints')
+    .addTag('Activities', 'Project activity audit history')
+    .addTag('Dashboard', 'Overview statistics & overdue tracking')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+  // Also keep /api path alias for backward compatibility
   SwaggerModule.setup('api', app, document);
 
   app.use(
@@ -56,6 +65,6 @@ async function bootstrap() {
   const port = process.env.PORT || 8000;
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on port: ${port}`);
-  console.log(`Swagger documentation: http://localhost:${port}/api`);
+  console.log(`Swagger documentation (v2): http://localhost:${port}/api/docs`);
 }
 bootstrap();

@@ -15,6 +15,7 @@ import {
   LoanInformationPaymentType,
 } from '../loan_info/loan_infor.entity';
 import { TelegramService } from '../telegram/telegram.service';
+import { LoanType } from '../loan_type/loan_type.entity';
 
 @Injectable()
 export class PaymentTableService {
@@ -23,6 +24,8 @@ export class PaymentTableService {
     private paymentTableRepo: Repository<PaymentTable>,
     @InjectRepository(LoanInformation)
     private loanInfoRepo: Repository<LoanInformation>,
+    @InjectRepository(LoanType)
+    private loanTypeRepo: Repository<LoanType>,
     private readonly telegramService: TelegramService,
   ) { }
 
@@ -270,6 +273,25 @@ export class PaymentTableService {
     let data: any = null;
     const paymentAmount = Number(amount);
     const totalPayment = Number(record.totalPayment ?? 0);
+    record.status = targetStatus;
+    record.payDate = targetStatus === PaymentStatus.PAID ? new Date() : null;
+    let loanTypeDetail: LoanType | null = null;
+    if (record.loanInformation?.loanTypeId) {
+      loanTypeDetail = await this.loanTypeRepo.findOne({
+        where: { id: record.loanInformation.loanTypeId }
+      });
+
+    }
+    // 2. Calculate newpaymentRequiredDate without mutating record.paymentRequiredDate
+    let newpaymentRequiredDate: string | null = null;
+
+    if (record.paymentRequiredDate) {
+      const nextDate = new Date(record.paymentRequiredDate);
+      nextDate.setDate(
+        nextDate.getDate() + Number(loanTypeDetail?.frequency_day ?? 0),
+      );
+      newpaymentRequiredDate = nextDate.toISOString().split('T')[0];
+    }
 
     if (
       targetStatus === PaymentStatus.PAID &&
@@ -300,7 +322,7 @@ export class PaymentTableService {
         if (Number(paymentAmount) === Number(record.interest)) {
           data = {
             loanInformationId: record.loanInformationId,
-            paymentRequiredDate: record.paymentRequiredDate,
+            paymentRequiredDate: newpaymentRequiredDate ?? record.paymentRequiredDate,
             totalPaymentNo: nextPaymentNo,
             beginningBalance: record.beginningBalance,
             totalPayment: Number(record.principal) + Number(record.interest),
@@ -320,7 +342,7 @@ export class PaymentTableService {
             principalNum > 0 ? newTotal * (interestNum / principalNum) : 0;
           data = {
             loanInformationId: record.loanInformationId,
-            paymentRequiredDate: record.paymentRequiredDate,
+            paymentRequiredDate: newpaymentRequiredDate ?? record.paymentRequiredDate,
             totalPaymentNo: nextPaymentNo,
             beginningBalance: record.beginningBalance,
             totalPayment: newTotal + Number(newInterest),
@@ -338,10 +360,6 @@ export class PaymentTableService {
         }
       }
     }
-
-    record.status = targetStatus;
-    record.payDate = targetStatus === PaymentStatus.PAID ? new Date() : null;
-
     const savedRecord = await this.paymentTableRepo.save(record);
 
     // Auto-update LoanInformation status to COMPLETED if completion criteria are met
@@ -367,7 +385,6 @@ export class PaymentTableService {
 
     // Trigger Telegram notification to customer if linked
     await this.sendTelegramNotification(record, savedRecord, targetStatus);
-
     return {
       success: true,
       status: targetStatus,

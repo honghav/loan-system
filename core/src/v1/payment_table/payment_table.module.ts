@@ -6,14 +6,15 @@ import { PaymentLoanController } from './payment_table.controller';
 import { PaymentTableService } from './payment_table.service';
 
 import { TelegramModule } from '../telegram/telegram.module';
+import { LoanType } from '../loan_type/loan_type.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([LoanInformation, PaymentTable]),
+    TypeOrmModule.forFeature([LoanInformation, PaymentTable, LoanType]),
     TelegramModule,
   ],
   controllers: [PaymentLoanController],
   providers: [PaymentTableService],
   exports: [PaymentTableService],
 })
-export class PaymentTableModule {}
+export class PaymentTableModule { }
