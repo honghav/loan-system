@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 140" width="480" height="140" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c1322"/>
+      <stop offset="100%" stop-color="#060e1d"/>
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="accentStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.3"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="subtleShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Container Card -->
+  <rect x="2" y="2" width="476" height="136" rx="20" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="1.5" filter="url(#subtleShadow)"/>
+
+  <!-- Subtle glow orb behind icon -->
+  <circle cx="70" cy="70" r="38" fill="#6366f1" opacity="0.18" filter="url(#glow)"/>
+
+  <!-- Logo Mark: Isometric / Hexagonal Connected Node Prisms -->
+  <g transform="translate(24, 24)">
+    <!-- Outer Hex Prism Shield -->
+    <rect x="6" y="6" width="80" height="80" rx="20" fill="#141c2e" stroke="url(#accentStroke)" stroke-width="1.5"/>
+    
+    <!-- Geometric Tech Icon Core -->
+    <path d="M46 22 L68 34.5 V59.5 L46 72 L24 59.5 V34.5 Z" fill="#0c1322" stroke="#31394d" stroke-width="1.5"/>
+    <!-- Top Facet -->
+    <path d="M46 23 L67 35 L46 47 L25 35 Z" fill="url(#cyanGrad)" opacity="0.95"/>
+    <!-- Left Facet -->
+    <path d="M25 35 L46 47 V71 L25 59 Z" fill="url(#primaryGrad)" opacity="0.95"/>
+    <!-- Right Facet -->
+    <path d="M46 47 L67 35 V59 L46 71 Z" fill="#4338ca"/>
+    
+    <!-- Central Glowing Core Node & Coordinate Vectors -->
+    <circle cx="46" cy="47" r="4.5" fill="#ffffff" filter="url(#glow)"/>
+    <circle cx="46" cy="47" r="2.5" fill="#38bdf8"/>
+    
+    <circle cx="46" cy="23" r="2.5" fill="#ffffff" opacity="0.9"/>
+    <circle cx="67" cy="35" r="2.5" fill="#38bdf8" opacity="0.9"/>
+    <circle cx="67" cy="59" r="2.5" fill="#818cf8" opacity="0.9"/>
+    <circle cx="46" cy="71" r="2.5" fill="#6366f1" opacity="0.9"/>
+    <circle cx="25" cy="59" r="2.5" fill="#818cf8" opacity="0.9"/>
+    <circle cx="25" cy="35" r="2.5" fill="#38bdf8" opacity="0.9"/>
+  </g>
+
+  <!-- Brand Typography -->
+  <g transform="translate(132, 42)">
+    <!-- Primary Wordmark -->
+    <text x="0" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Geist', 'Segoe UI', sans-serif" font-weight="900" font-size="36" letter-spacing="2.5" fill="#ffffff">PPM</text>
+    
+    <!-- Status / V2 Chip -->
+    <g transform="translate(108, 10)">
+      <rect x="0" y="0" width="46" height="22" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
+      <text x="23" y="15" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="1" fill="#a5b4fc">v2.0</text>
+    </g>
+
+    <!-- Subtitle / Tagline -->
+    <text x="1" y="56" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="600" font-size="11.5" letter-spacing="3.2" fill="#94a3b8">PERSONAL PROJECT MANAGER</text>
+    
+    <!-- Micro System Indicator -->
+    <g transform="translate(1, 68)">
+      <circle cx="4" cy="4" r="3" fill="#10b981"/>
+      <text x="13" y="7" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Geist Mono', monospace" font-size="9.5" font-weight="500" letter-spacing="0.8" fill="#64748b">MODULAR ENGINE • ARCHITECTURE SUITE</text>
+    </g>
+  </g>
+</svg>

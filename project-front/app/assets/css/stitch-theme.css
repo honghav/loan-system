@@ -1,0 +1,46 @@
+/* Stitch AI - Obsidian Slate Theme Variables & Utility Classes */
+:root, .dark {
+  --ppm-bg: #0c1322;
+  --ppm-surface: #0c1322;
+  --ppm-surface-lowest: #070e1d;
+  --ppm-surface-low: #141b2b;
+  --ppm-surface-container: #191f2f;
+  --ppm-surface-high: #232a3a;
+  --ppm-surface-highest: #2e3545;
+  --ppm-primary: #c0c1ff;
+  --ppm-primary-container: #8083ff;
+  --ppm-on-primary-container: #0d0096;
+  --ppm-secondary: #4cd7f6;
+  --ppm-tertiary: #4edea3;
+  --ppm-tertiary-container: #00885d;
+  --ppm-outline: #908fa0;
+  --ppm-outline-variant: #464554;
+  --ppm-on-surface: #dce2f7;
+  --ppm-on-surface-variant: #c7c4d7;
+}
+
+body {
+  background-color: var(--ppm-bg) !important;
+  color: var(--ppm-on-surface) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Scrollbar trimming */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(12, 19, 34, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(144, 143, 160, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(192, 193, 255, 0.5);
+}

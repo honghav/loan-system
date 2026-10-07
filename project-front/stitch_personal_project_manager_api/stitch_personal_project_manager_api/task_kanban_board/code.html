@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"outline":"#908fa0","tertiary":"#4edea3","surface-container-low":"#141b2b","secondary-fixed-dim":"#4cd7f6","secondary-container":"#03b5d3","surface-variant":"#2e3545","on-surface-variant":"#c7c4d7","on-tertiary":"#003824","primary-fixed":"#e1e0ff","on-tertiary-fixed":"#002113","primary-container":"#8083ff","tertiary-fixed":"#6ffbbe","on-tertiary-container":"#000703","tertiary-container":"#00885d","outline-variant":"#464554","primary-fixed-dim":"#c0c1ff","surface-bright":"#323949","secondary-fixed":"#acedff","inverse-primary":"#494bd6","surface-dim":"#0c1322","on-error-container":"#ffdad6","on-secondary-container":"#00424e","secondary":"#4cd7f6","error":"#ffb4ab","surface-container-highest":"#2e3545","on-primary":"#1000a9","on-background":"#dce2f7","on-tertiary-fixed-variant":"#005236","surface-container":"#191f2f","error-container":"#93000a","surface-tint":"#c0c1ff","inverse-on-surface":"#293040","surface-container-lowest":"#070e1d","on-error":"#690005","surface":"#0c1322","on-primary-fixed":"#07006c","on-primary-fixed-variant":"#2f2ebe","on-surface":"#dce2f7","on-primary-container":"#0d0096","on-secondary-fixed":"#001f26","on-secondary":"#003640","on-secondary-fixed-variant":"#004e5c","primary":"#c0c1ff","inverse-surface":"#dce2f7","surface-container-high":"#232a3a","background":"#0c1322","tertiary-fixed-dim":"#4edea3"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-lg":"1.5rem","space-sm":"0.5rem","margin":"1.5rem","margin-mobile":"1rem","space-md":"1rem","gutter":"1rem","gutter-mobile":"0.75rem","space-xl":"2rem","space-xs":"0.25rem"},fontFamily:{"headline-sm":["Inter"],"label-sm":["Geist"],"label-lg":["Geist"],"headline-md":["Inter"],"body-sm":["Inter"],"headline-lg":["Inter"],"headline-xl":["Inter"],"body-lg":["Inter"],"headline-xl-mobile":["Inter"],"label-md":["Geist"],"headline-lg-mobile":["Inter"],"body-md":["Inter"]},fontSize:{"headline-sm":["18px",{"lineHeight":"26px","letterSpacing":"-0.005em","fontWeight":"600"}],"label-sm":["10px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"500"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-xl":["40px",{"lineHeight":"48px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"headline-xl-mobile":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen"><header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.35)]"><div class="w-full h-16 px-gutter flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md min-w-[240px]"><img alt="PPM Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU5Yq1vNbhR890SHhUF9fm5DzTO1Q8ZiRR3Dev6iWz0IDRjMV6TFSNOxvRalnBfZDeBZ5KodWTdRQZTY2o_iXpK2mW9Luh58blZTeN0rvP_EVzms1z-hg6Hd4TLNi5apxUPvY3-47TomA3wOS5UCbGfKxcjjZodHnZxoASfdY0X40bf31BvbymvWI3OhabgshAfEEOpMzcLQY8TaTQywTSoWHnJN2LrxBoxNfMLNII"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none">PPM</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Personal Project Manager</span></div></div><div class="flex-1 max-w-xl hidden md:flex items-center"><div class="relative w-full flex items-center"><span class="material-symbols-outlined absolute left-space-md text-outline pointer-events-none text-[18px]">search</span><input class="w-full h-10 pl-10 pr-16 bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-sm text-body-sm rounded-lg border-0 ring-0 focus:outline-none focus:ring-1 focus:ring-primary shadow-inner" placeholder="Search tasks, projects, telemetry..." type="text"/><kbd class="absolute right-space-sm top-1/2 -translate-y-1/2 px-space-xs py-0.5 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">⌘K</kbd></div></div><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-low text-tertiary font-label-sm text-label-sm"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span><span>API v2.0 Connected (Localhost:3000)</span></div><div class="hidden lg:flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm"><span class="material-symbols-outlined text-[14px]">speed</span><span>12 Active / 4 Staged</span></div><button class="flex items-center gap-space-xs h-9 px-space-md rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-fixed-dim hover:text-on-primary transition-all shadow-[0_0_12px_rgba(99,102,241,0.25)] active:scale-[0.98]" type="button"><span class="material-symbols-outlined text-[16px]">add</span><span>New Project</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex flex-col justify-between py-space-md shadow-[0_1px_8px_rgba(0,0,0,0.3)]"><div class="flex flex-col gap-space-md px-space-md"><div class="px-space-sm pt-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Navigation</span></div><nav class="flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-headline-sm"><a class="flex items-center px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-3 text-[20px]">dashboard</span><span>Dashboard</span></a><a class="flex items-center px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="projects" href="#"><span class="material-symbols-outlined mr-3 text-[20px]">folder</span><span>Projects</span></a><a class="flex items-center px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="feature-breakdown" href="#"><span class="material-symbols-outlined mr-3 text-[20px]">account_tree</span><span>Feature Breakdown</span></a><a aria-current="page" class="flex items-center px-space-md py-space-sm rounded-lg transition-colors bg-primary-container text-on-primary-container font-headline-sm" data-path="task-kanban" href="#"><span class="material-symbols-outlined mr-3 text-[20px]">view_kanban</span><span>Task Kanban</span></a><a class="flex items-center px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-lg text-label-lg" data-path="activity-audit" href="#"><span class="material-symbols-outlined mr-3 text-[20px]">history_toggle_off</span><span>Activity Audit</span></a></nav></div><div class="px-space-md flex flex-col gap-space-xs"><div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><span>Memory Usage</span><span class="text-tertiary">64%</span></div><div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-tertiary rounded-full w-[64%]"></div></div></div><div class="flex items-center justify-between px-space-sm py-space-xs text-outline font-label-sm text-label-sm"><span>PPM Core v2.4</span><span class="text-outline-variant">Stable</span></div></div></aside><div class="pl-64"><main class="relative pt-16 w-full min-h-screen bg-background"><div class="flex flex-col w-full">
+<!-- Subtle Ambient Glow Orbs (Contained) -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 left-1/4 w-96 h-96 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-1/2 right-12 w-80 h-80 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-20 left-1/3 w-96 h-96 bg-tertiary/5 rounded-full blur-3xl pointer-events-none"></div>
+<!-- MAIN WRAPPER WITH INNER PADDING -->
+<div class="relative z-10 flex flex-col gap-space-lg p-margin lg:p-space-xl">
+<!-- SUB-HEADER & STAT METRICS OVERVIEW STRIP -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="px-space-sm py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm uppercase tracking-wider">Sprint Cycle 42</span>
+<span class="text-outline font-label-sm text-label-sm">•</span>
+<span class="text-secondary font-label-sm text-label-sm font-semibold tracking-wide">Iteration Velocity: 84.6%</span>
+</div>
+<div class="flex items-center gap-space-md">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Active Workstream Tasks</h1>
+<span class="px-space-sm py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md">23 Tasks Total</span>
+</div>
+</div>
+<!-- Telemetry Pill Indicators -->
+<div class="flex items-center gap-space-sm overflow-x-auto pb-1 lg:pb-0">
+<div class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_currentColor]"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Sprint Burndown</span>
+<span class="font-label-lg text-label-lg text-on-surface">36.5h / 52h</span>
+</div>
+<!-- Inline Mini Burndown SVG -->
+<svg class="w-12 h-6 text-tertiary ml-2" fill="none" viewbox="0 0 48 24">
+<path d="M2 4 L14 8 L24 6 L34 16 L46 19" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<circle cx="46" cy="19" fill="currentColor" r="2.5"></circle>
+</svg>
+</div>
+<div class="flex items-center gap-space-sm px-space-md py-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="w-2 h-2 rounded-full bg-error shadow-[0_0_8px_currentColor]"></div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">Critical / Stalled</span>
+<span class="font-label-lg text-label-lg text-error">2 Blocked</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TOP CONTROL & FILTER TOOLBAR -->
+<div class="w-full p-space-md rounded-xl bg-surface-container-low shadow-md flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md">
+<!-- Left Dropdowns & Search -->
+<div class="flex flex-wrap items-center gap-space-sm flex-1">
+<!-- Project Selector -->
+<div class="relative">
+<select class="appearance-none h-10 pl-space-md pr-9 bg-surface-container text-on-surface font-label-lg text-label-lg rounded-lg focus:outline-none focus:bg-surface-container-high cursor-pointer transition-colors shadow-inner">
+<option value="ppm-api">PPM API v2.0 (Active)</option>
+<option value="ppm-web">PPM Web Dashboard v1.8</option>
+<option value="ppm-worker">Telemetry Ingest Daemon</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
+</div>
+<div class="w-px h-6 bg-surface-variant hidden sm:block"></div>
+<!-- Feature Filter -->
+<div class="relative">
+<select class="appearance-none h-10 pl-space-md pr-9 bg-surface-container text-on-surface-variant font-label-md text-label-md rounded-lg focus:outline-none focus:text-on-surface cursor-pointer transition-colors">
+<option value="all">All Features</option>
+<option value="progress">#ProgressEngine</option>
+<option value="audit">#AuditLog</option>
+<option value="core">#CoreCRUD</option>
+<option value="kernel">#ModularKernel</option>
+<option value="devops">#DevOps</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
+</div>
+<!-- Priority Filter -->
+<div class="relative">
+<select class="appearance-none h-10 pl-space-md pr-9 bg-surface-container text-on-surface-variant font-label-md text-label-md rounded-lg focus:outline-none focus:text-on-surface cursor-pointer transition-colors">
+<option value="all">All Priorities</option>
+<option value="urgent">Urgent</option>
+<option value="high">High</option>
+<option value="medium">Medium</option>
+<option value="low">Low</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
+</div>
+<!-- Quick Search -->
+<div class="relative min-w-[200px] flex-1 max-w-xs">
+<span class="material-symbols-outlined absolute left-space-md top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">search</span>
+<input class="w-full h-10 pl-10 pr-space-md bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-sm text-body-sm rounded-lg focus:outline-none focus:bg-surface-container transition-all" placeholder="Search tasks, tags..." type="text"/>
+</div>
+</div>
+<!-- Right View Toggles & Primary Action -->
+<div class="flex items-center justify-between sm:justify-end gap-space-md shrink-0">
+<!-- View Segmented Switch -->
+<div class="flex items-center p-1 bg-surface-container-lowest rounded-lg">
+<button class="flex items-center gap-space-xs px-space-md py-1.5 rounded-md bg-surface-variant text-on-surface font-label-md text-label-md shadow-sm transition-all" id="viewKanbanBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">view_kanban</span>
+<span>Kanban</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1.5 rounded-md text-outline hover:text-on-surface font-label-md text-label-md transition-all" id="viewTableBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">table_rows</span>
+<span>Table</span>
+</button>
+</div>
+<!-- + New Task Primary Action -->
+<button class="flex items-center gap-space-xs h-10 px-space-lg rounded-lg bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-fixed-dim hover:text-on-primary transition-all shadow-[0_0_16px_rgba(192,193,255,0.2)] active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>New Task</span>
+</button>
+</div>
+</div>
+<!-- KANBAN BOARD CONTAINER -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-lg items-start" id="kanbanBoardView">
+<!-- ============================================== -->
+<!-- COLUMN 1: TO DO -->
+<!-- ============================================== -->
+<div class="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest/80 p-space-md backdrop-blur-md shadow-lg" data-column="todo">
+<!-- Column Glowing Header -->
+<div class="flex items-center justify-between px-space-sm py-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-outline shadow-[0_0_8px_rgba(144,143,160,0.6)]"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase">To Do</h2>
+<span class="px-space-xs py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">5</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="w-7 h-7 rounded flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container transition-colors" title="Column settings">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Column Tasks Flow -->
+<div class="flex flex-col gap-space-md min-h-[460px]">
+<!-- Card 1: QueryBuilder aggregation -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#ProgressEngine</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-error/15 text-error">HIGH</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-primary transition-colors">QueryBuilder dynamic aggregation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Construct nested AST visitor to dynamically sum story point estimates and pipeline actuals.</p>
+<!-- Metrics & Time -->
+<div class="flex items-center justify-between pt-space-xs mt-space-xs border-t-0">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Est: 6h / Act: 0h</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">event</span>
+<span>Nov 16</span>
+</div>
+</div>
+<!-- Quick Progress Action Strip -->
+<div class="flex items-center justify-between pt-space-xs opacity-80 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-label-sm text-label-sm">AM</span>
+<span class="text-outline font-label-sm text-label-sm">@alex</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-secondary hover:text-on-secondary-container text-secondary font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span>Start</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 2: Centralized ActivityService logger -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-secondary/15 text-secondary font-label-sm text-label-sm">#AuditLog</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-variant text-on-surface font-semibold">MEDIUM</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors">Centralized ActivityService logger</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Standardize structural JSON envelope for mutation interceptors across all project microservices.</p>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Est: 4h / Act: 0h</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">event</span>
+<span>Nov 18</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-80 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-secondary font-label-sm text-label-sm">EL</span>
+<span class="text-outline font-label-sm text-label-sm">@elena</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-secondary hover:text-on-secondary-container text-secondary font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span>Start</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 3: Unit tests for TypeORM Cascade -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#CoreCRUD</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-container-high text-outline">LOW</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-primary transition-colors">Unit tests for TypeORM Cascade</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Test orphan entity cleanup on bulk task deletion within high concurrency transaction locks.</p>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Est: 5h / Act: 0h</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">event</span>
+<span>Nov 20</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-80 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-outline font-label-sm text-label-sm">JD</span>
+<span class="text-outline font-label-sm text-label-sm">@dev_jd</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-secondary hover:text-on-secondary-container text-secondary font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span>Start</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Add Card Trigger -->
+<button class="w-full flex items-center justify-center gap-space-xs py-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface font-label-md text-label-md transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add card</span>
+</button>
+</div>
+<!-- ============================================== -->
+<!-- COLUMN 2: IN PROGRESS -->
+<!-- ============================================== -->
+<div class="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest/80 p-space-md backdrop-blur-md shadow-lg" data-column="inprogress">
+<!-- Column Glowing Header (Cyan Aura) -->
+<div class="flex items-center justify-between px-space-sm py-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_10px_rgba(76,215,246,0.8)] animate-pulse"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase">In Progress</h2>
+<span class="px-space-xs py-0.5 rounded bg-secondary/15 text-secondary font-label-sm text-label-sm font-semibold">4</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="text-outline font-label-sm text-label-sm">7.5h Logged</span>
+</div>
+</div>
+<!-- Column Tasks Flow -->
+<div class="flex flex-col gap-space-md min-h-[460px]">
+<!-- Card 4: FeaturesController CRUD endpoints -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#CoreCRUD</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-error/15 text-error">HIGH</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<!-- Interactive Quick Complete Checkbox -->
+<button class="complete-toggle w-5 h-5 rounded-md bg-surface-container-highest hover:bg-tertiary flex items-center justify-center text-surface transition-colors" title="Mark done" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors leading-tight">FeaturesController CRUD endpoints</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Complete OpenAPI decorators, parameter validation pipes, and transactional guards.</p>
+<!-- Live Progress Bar -->
+<div class="flex flex-col gap-1 my-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-secondary font-medium">68% Complete</span>
+<span class="text-outline">Est: 8h / Act: 5.5h</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-secondary rounded-full w-[68%] transition-all duration-500"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs text-tertiary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">event</span>
+<span>Nov 14 (Tomorrow)</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-error hover:text-on-error text-outline font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="blocked" type="button">
+<span class="material-symbols-outlined text-[14px]">block</span>
+<span>Block</span>
+</button>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-tertiary/20 text-tertiary hover:bg-tertiary hover:text-on-tertiary font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="done" type="button">
+<span class="material-symbols-outlined text-[14px]">check</span>
+<span>Done</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 5: Overdue task SQL Query filter (Animated pulsing border / URGENT) -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-[0_0_24px_rgba(255,180,171,0.15)] hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing ring-1 ring-error/50 animate-pulse">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#ProgressEngine</span>
+<span class="px-space-xs py-0.5 rounded-full font-label-sm text-label-sm bg-error text-on-error font-bold flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[12px]">priority_high</span>
+<span>URGENT</span>
+</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface font-semibold group-hover:text-error transition-colors">Overdue task SQL Query filter</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Fix time zone offset calculation preventing UTC midnight boundary queries from returning expired tasks.</p>
+<!-- Metric -->
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-error font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[15px]">timer</span>
+<span>Due: Today (Late)</span>
+</div>
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span>Est: 3h / Act: 2h</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-90 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-error/20 flex items-center justify-center text-error font-label-sm text-label-sm">KR</span>
+<span class="text-error font-label-sm text-label-sm font-medium">@kai</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-tertiary/20 text-tertiary hover:bg-tertiary hover:text-on-tertiary font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="done" type="button">
+<span class="material-symbols-outlined text-[14px]">check</span>
+<span>Resolve</span>
+</button>
+</div>
+</div>
+<!-- Card 6: Global HttpExceptionFilter edge cases -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary-container/20 text-primary-fixed-dim font-label-sm text-label-sm">#ModularKernel</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-variant text-on-surface font-semibold">MEDIUM</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-primary transition-colors">Global HttpExceptionFilter edge cases</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Ensure custom schema validation errors propagate correct RFC 7807 problem details format.</p>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Est: 4h / Act: 3h</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">event</span>
+<span>Nov 15</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-80 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-label-sm text-label-sm">SM</span>
+<span class="text-outline font-label-sm text-label-sm">@sara</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-tertiary hover:text-on-tertiary text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="done" type="button">
+<span>Complete</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Add Card Trigger -->
+<button class="w-full flex items-center justify-center gap-space-xs py-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface font-label-md text-label-md transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add card</span>
+</button>
+</div>
+<!-- ============================================== -->
+<!-- COLUMN 3: BLOCKED -->
+<!-- ============================================== -->
+<div class="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest/80 p-space-md backdrop-blur-md shadow-lg" data-column="blocked">
+<!-- Column Glowing Header (Amber/Error Aura) -->
+<div class="flex items-center justify-between px-space-sm py-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-error shadow-[0_0_12px_rgba(255,180,171,0.9)] animate-ping"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase">Blocked</h2>
+<span class="px-space-xs py-0.5 rounded bg-error/15 text-error font-label-sm text-label-sm font-semibold">2</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-error text-[18px]">warning</span>
+</div>
+</div>
+<!-- Column Tasks Flow -->
+<div class="flex flex-col gap-space-md min-h-[460px]">
+<!-- Card 7: Decimal precision TypeORM transformer (OVERDUE + BLOCKER) -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#CoreCRUD</span>
+<div class="flex items-center gap-1">
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-error/20 text-error font-semibold uppercase">1d overdue</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-error text-on-error font-bold">URGENT</span>
+</div>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-error transition-colors">Decimal precision TypeORM transformer</h3>
+<!-- Blocker Diagnostic Box -->
+<div class="p-space-sm rounded-lg bg-error-container/30 text-on-error-container font-body-sm text-body-sm flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-error shrink-0 mt-0.5">report_problem</span>
+<span class="leading-tight">Blocked on PostgreSQL pg driver float parsing in downstream staging.</span>
+</div>
+<!-- Time Stats -->
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-error font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">running_with_errors</span>
+<span>Est: 3h / Act: 4h (Exceeded)</span>
+</div>
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface font-label-sm text-label-sm">AM</span>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<button class="text-error font-label-sm text-label-sm hover:underline flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">link</span>
+<span>View GitHub Issue #88</span>
+</button>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-secondary hover:text-on-secondary text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span>Resume</span>
+<span class="material-symbols-outlined text-[14px]">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Card 8: Docker Compose test runner container -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-secondary-container/20 text-secondary-fixed font-label-sm text-label-sm">#DevOps</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm bg-surface-variant text-on-surface font-semibold">MEDIUM</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors">Docker Compose test runner container</h3>
+<!-- Blocker Diagnostic Box -->
+<div class="p-space-sm rounded-lg bg-surface-container-high text-on-surface-variant font-body-sm text-body-sm flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-outline shrink-0 mt-0.5">lock_clock</span>
+<span class="leading-tight">Awaiting Docker socket permission fix from Ops infrastructure squad.</span>
+</div>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Est: 2h / Act: 0.5h</span>
+</div>
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-outline font-label-sm text-label-sm">EL</span>
+</div>
+<div class="flex items-center justify-end pt-space-xs">
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-secondary hover:text-on-secondary text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span>Unblock</span>
+<span class="material-symbols-outlined text-[14px]">lock_open</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Add Card Trigger -->
+<button class="w-full flex items-center justify-center gap-space-xs py-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-outline hover:text-on-surface font-label-md text-label-md transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add card</span>
+</button>
+</div>
+<!-- ============================================== -->
+<!-- COLUMN 4: DONE -->
+<!-- ============================================== -->
+<div class="flex flex-col gap-space-md rounded-xl bg-surface-container-lowest/80 p-space-md backdrop-blur-md shadow-lg" data-column="done">
+<!-- Column Glowing Header (Emerald Aura) -->
+<div class="flex items-center justify-between px-space-sm py-space-xs">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-2.5 rounded-full bg-tertiary shadow-[0_0_10px_rgba(78,222,163,0.8)]"></div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase">Done</h2>
+<span class="px-space-xs py-0.5 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm font-semibold">12</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[18px]">task_alt</span>
+</div>
+</div>
+<!-- Column Tasks Flow -->
+<div class="flex flex-col gap-space-md min-h-[460px]">
+<!-- Card 9: Bootstrap v2.module.ts root module -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container/60 shadow-md hover:bg-surface-container hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary-container/20 text-primary-fixed-dim font-label-sm text-label-sm">#ModularKernel</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm text-tertiary bg-tertiary/15 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Closed</span>
+</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="w-5 h-5 rounded-full bg-tertiary/20 text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[14px]">done</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant line-through group-hover:text-on-surface transition-colors">Bootstrap v2.module.ts root module</h3>
+</div>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">history</span>
+<span>Completed 2h ago</span>
+</div>
+<div class="flex items-center gap-space-xs text-tertiary font-label-sm text-label-sm font-mono">
+<span>Est: 4h / Act: 3.5h</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-70 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-tertiary font-label-sm text-label-sm">AM</span>
+<span class="text-outline font-label-sm text-label-sm">@alex</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-variant text-outline hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span class="material-symbols-outlined text-[14px]">replay</span>
+<span>Reopen</span>
+</button>
+</div>
+</div>
+<!-- Card 10: Configure Swagger UI at /api/docs -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container/60 shadow-md hover:bg-surface-container hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary-container/20 text-primary-fixed-dim font-label-sm text-label-sm">#ModularKernel</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm text-tertiary bg-tertiary/15 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Closed</span>
+</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="w-5 h-5 rounded-full bg-tertiary/20 text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[14px]">done</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant line-through group-hover:text-on-surface transition-colors">Configure Swagger UI at /api/docs</h3>
+</div>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">history</span>
+<span>Completed 4h ago</span>
+</div>
+<div class="flex items-center gap-space-xs text-tertiary font-label-sm text-label-sm font-mono">
+<span>Est: 3h / Act: 2h</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-70 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-tertiary font-label-sm text-label-sm">EL</span>
+<span class="text-outline font-label-sm text-label-sm">@elena</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-variant text-outline hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span class="material-symbols-outlined text-[14px]">replay</span>
+<span>Reopen</span>
+</button>
+</div>
+</div>
+<!-- Card 11: Setup TypeORM pooled connection -->
+<div class="group relative flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container/60 shadow-md hover:bg-surface-container hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing">
+<div class="flex items-start justify-between gap-space-sm">
+<span class="px-space-xs py-0.5 rounded-full bg-primary-container/20 text-primary-fixed-dim font-label-sm text-label-sm">#ModularKernel</span>
+<span class="px-space-xs py-0.5 rounded font-label-sm text-label-sm text-tertiary bg-tertiary/15 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Closed</span>
+</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="w-5 h-5 rounded-full bg-tertiary/20 text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[14px]">done</span>
+</div>
+<h3 class="font-label-lg text-label-lg text-on-surface-variant line-through group-hover:text-on-surface transition-colors">Setup TypeORM pooled connection</h3>
+</div>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<div class="flex items-center gap-space-xs text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px]">history</span>
+<span>Completed yesterday</span>
+</div>
+<div class="flex items-center gap-space-xs text-tertiary font-label-sm text-label-sm font-mono">
+<span>Est: 5h / Act: 5h</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs opacity-70 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-1">
+<span class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-tertiary font-label-sm text-label-sm">SM</span>
+<span class="text-outline font-label-sm text-label-sm">@sara</span>
+</div>
+<button class="task-transition-btn px-space-sm py-1 rounded bg-surface-container-high hover:bg-surface-variant text-outline hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-colors" data-target="inprogress" type="button">
+<span class="material-symbols-outlined text-[14px]">replay</span>
+<span>Reopen</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Archived items footer count -->
+<div class="w-full flex items-center justify-center py-space-sm text-outline font-label-sm text-label-sm">
+<span>+ 9 older completed tasks archived</span>
+</div>
+</div>
+</div>
+<!-- ALTERNATIVE VIEW: TABLE VIEW (HIDDEN INITIALLY) -->
+<div class="hidden w-full overflow-x-auto rounded-xl bg-surface-container-lowest shadow-xl" id="tableViewContainer">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-space-md px-space-lg">Task Title</th>
+<th class="py-space-md px-space-md">Feature Tag</th>
+<th class="py-space-md px-space-md">Status</th>
+<th class="py-space-md px-space-md">Priority</th>
+<th class="py-space-md px-space-md">Assignee</th>
+<th class="py-space-md px-space-md">Estimate vs Actual</th>
+<th class="py-space-md px-space-lg">Due Date</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 text-on-surface font-body-sm text-body-sm">
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-lg font-label-lg text-label-lg font-medium">QueryBuilder dynamic aggregation</td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#ProgressEngine</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface font-label-sm text-label-sm">TO DO</span></td>
+<td class="py-space-md px-space-md"><span class="text-error font-semibold font-label-sm text-label-sm">HIGH</span></td>
+<td class="py-space-md px-space-md text-outline">@alex</td>
+<td class="py-space-md px-space-md text-outline">6h / 0h</td>
+<td class="py-space-md px-space-lg text-on-surface-variant">Nov 16</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-lg font-label-lg text-label-lg font-medium">FeaturesController CRUD endpoints</td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#CoreCRUD</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-secondary/15 text-secondary font-label-sm text-label-sm">IN PROGRESS</span></td>
+<td class="py-space-md px-space-md"><span class="text-error font-semibold font-label-sm text-label-sm">HIGH</span></td>
+<td class="py-space-md px-space-md text-outline">@alex</td>
+<td class="py-space-md px-space-md text-secondary">8h / 5.5h</td>
+<td class="py-space-md px-space-lg text-tertiary">Nov 14 (Tomorrow)</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-lg font-label-lg text-label-lg font-medium">Overdue task SQL Query filter</td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#ProgressEngine</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-secondary/15 text-secondary font-label-sm text-label-sm">IN PROGRESS</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-error text-on-error font-bold font-label-sm text-label-sm">URGENT</span></td>
+<td class="py-space-md px-space-md text-error">@kai</td>
+<td class="py-space-md px-space-md text-outline">3h / 2h</td>
+<td class="py-space-md px-space-lg text-error font-semibold">Today (Late)</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-lg font-label-lg text-label-lg font-medium">Decimal precision TypeORM transformer</td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">#CoreCRUD</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-error/20 text-error font-label-sm text-label-sm">BLOCKED</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-error text-on-error font-bold font-label-sm text-label-sm">URGENT</span></td>
+<td class="py-space-md px-space-md text-outline">@alex</td>
+<td class="py-space-md px-space-md text-error">3h / 4h</td>
+<td class="py-space-md px-space-lg text-error">1d Overdue</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="py-space-md px-space-lg font-label-lg text-label-lg text-on-surface-variant line-through">Bootstrap v2.module.ts root module</td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded-full bg-primary-container/20 text-primary-fixed-dim font-label-sm text-label-sm">#ModularKernel</span></td>
+<td class="py-space-md px-space-md"><span class="px-2 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm">DONE</span></td>
+<td class="py-space-md px-space-md"><span class="text-outline font-label-sm text-label-sm">HIGH</span></td>
+<td class="py-space-md px-space-md text-outline">@alex</td>
+<td class="py-space-md px-space-md text-tertiary">4h / 3.5h</td>
+<td class="py-space-md px-space-lg text-outline">Closed 2h ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple View Switcher micro-interaction
+  const kanbanBtn = document.getElementById('viewKanbanBtn');
+  const tableBtn = document.getElementById('viewTableBtn');
+  const kanbanView = document.getElementById('kanbanBoardView');
+  const tableView = document.getElementById('tableViewContainer');
+
+  if (kanbanBtn && tableBtn && kanbanView && tableView) {
+    kanbanBtn.addEventListener('click', () => {
+      kanbanView.classList.remove('hidden');
+      tableView.classList.add('hidden');
+      kanbanBtn.classList.add('bg-surface-variant', 'text-on-surface');
+      kanbanBtn.classList.remove('text-outline');
+      tableBtn.classList.remove('bg-surface-variant', 'text-on-surface');
+      tableBtn.classList.add('text-outline');
+    });
+
+    tableBtn.addEventListener('click', () => {
+      kanbanView.classList.add('hidden');
+      tableView.classList.remove('hidden');
+      tableBtn.classList.add('bg-surface-variant', 'text-on-surface');
+      tableBtn.classList.remove('text-outline');
+      kanbanBtn.classList.remove('bg-surface-variant', 'text-on-surface');
+      kanbanBtn.classList.add('text-outline');
+    });
+  }
+
+  // Interactive one-click status transitions
+  document.querySelectorAll('.task-transition-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const card = this.closest('.group');
+      const targetColumnType = this.getAttribute('data-target');
+      const targetCol = document.querySelector(`[data-column="${targetColumnType}"] .flex.flex-col.gap-space-md`);
+      if (card && targetCol) {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          targetCol.prepend(card);
+          card.style.opacity = '1';
+          card.style.transform = 'scale(1)';
+        }, 150);
+      }
+    });
+  });
+
+  // Complete toggle
+  document.querySelectorAll('.complete-toggle').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const card = this.closest('.group');
+      const doneCol = document.querySelector('[data-column="done"] .flex.flex-col.gap-space-md');
+      if (card && doneCol) {
+        doneCol.prepend(card);
+      }
+    });
+  });
+</script></main></div></body></html>

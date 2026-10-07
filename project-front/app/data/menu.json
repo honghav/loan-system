@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "path": "/",
+      "title": "dashboard",
+      "key": "dashboard",
+      "icon": "solar:widget-4-line-duotone",
+      "iconf": "fill-home",
+      "type": "link",
+      "active": false
+    }
+  ]
+}
