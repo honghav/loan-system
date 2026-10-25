@@ -68,10 +68,10 @@ export async function registerService(payload: RegisterDTO) {
       "auth/register",
       mapperRegister(payload),
     );
-    if (res?.access_token) {
-      storeTokenUserId(res.access_token);
-    }
-    navigateTo("dashbord");
+    // if (res?.access_token) {
+    //   storeTokenUserId(res.access_token);
+    // }
+    // navigateTo("dashbord");
     return res;
   } catch (error: any) {
     const errorResponse = error?.data || error?.response?._data || error;

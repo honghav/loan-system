@@ -4,88 +4,109 @@
   >
     <!-- Sidebar -->
     <aside
-      class="sticky top-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 shadow-sm transition-all duration-300"
+      class="sticky top-0 h-screen bg-white dark:bg-slate-900 flex flex-col justify-between shrink-0 shadow-sm transition-all duration-300 ease-in-out overflow-hidden z-40"
+      :class="[
+        isSidebarOpen
+          ? 'w-64 border-r border-slate-200 dark:border-slate-800 opacity-100'
+          : 'w-0 border-r-0 opacity-0 pointer-events-none'
+      ]"
     >
-      <!-- Sidebar Header & Logo -->
-      <div>
-        <div
-          class="h-16 flex items-center gap-3 px-6 border-b border-slate-100 dark:border-slate-800"
-        >
+      <div class="w-64 h-full flex flex-col justify-between shrink-0">
+        <!-- Sidebar Header & Logo -->
+        <div class="flex-1 flex flex-col min-h-0">
           <div
-            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center text-white shadow-md shadow-primary/20"
+            class="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800 shrink-0"
           >
-            <UIcon name="i-lucide-landmark" class="w-6 h-6" />
+            <div class="flex items-center gap-3 min-w-0">
+              <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center text-white shadow-md shadow-primary/20 shrink-0"
+              >
+                <UIcon name="i-lucide-landmark" class="w-6 h-6" />
+              </div>
+              <div class="min-w-0">
+                <h2
+                  class="font-bold text-lg leading-tight text-slate-900 dark:text-white tracking-tight truncate"
+                >
+                  Loan<span class="text-primary">System </span>
+                </h2>
+                <p
+                  class="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate"
+                >
+                  Management
+                </p>
+              </div>
+            </div>
+
+            <!-- Hide Button in Sidebar Header -->
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-panel-left-close"
+              size="sm"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer shrink-0"
+              title="Hide sidebar"
+              aria-label="Hide sidebar"
+              @click="toggleSidebar"
+            />
           </div>
-          <div>
-            <h2
-              class="font-bold text-lg leading-tight text-slate-900 dark:text-white tracking-tight"
-            >
-              Loan<span class="text-primary">System</span>
-            </h2>
+
+          <!-- Navigation Section -->
+          <nav class="p-4 space-y-1.5 overflow-y-auto flex-1">
             <p
-              class="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-widest"
+              class="px-3 pb-2 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
             >
-              Management
+              Navigation
             </p>
-          </div>
+            <NuxtLink
+              v-for="module in modulePage"
+              :key="module.value"
+              :to="
+                module.under_page === '..'
+                  ? `/${module.route}`
+                  : `/${module.under_page}/${module.route}`
+              "
+              class="group flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
+              exact-active-class="!bg-primary/10 !text-primary dark:!text-primary font-semibold shadow-xs"
+            >
+              <UIcon
+                :name="getModuleIcon(module.value)"
+                class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+              />
+              <span class="whitespace-nowrap">{{ $t(`nav.${module.value?.toLowerCase()}`, module.name) }}</span>
+            </NuxtLink>
+          </nav>
         </div>
 
-        <!-- Navigation Section -->
-        <nav class="p-4 space-y-1.5">
-          <p
-            class="px-3 pb-2 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider"
-          >
-            Navigation
-          </p>
-          <NuxtLink
-            v-for="module in modulePage"
-            :key="module.value"
-            :to="
-              module.under_page === '..'
-                ? `/${module.route}`
-                : `/${module.under_page}/${module.route}`
-            "
-            class="group flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
-            exact-active-class="!bg-primary/10 !text-primary dark:!text-primary font-semibold shadow-xs"
-          >
-            <UIcon
-              :name="getModuleIcon(module.value)"
-              class="w-5 h-5 transition-transform duration-200 group-hover:scale-110"
-            />
-            <span>{{ $t(`nav.${module.value?.toLowerCase()}`, module.name) }}</span>
-          </NuxtLink>
-        </nav>
-      </div>
-
-      <!-- Sidebar Footer User Profile Card -->
-      <div class="p-4 border-t border-slate-100 dark:border-slate-800">
-        <div
-          class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50"
-        >
+        <!-- Sidebar Footer User Profile Card -->
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <div
-            class="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0"
+            class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50"
           >
-            <img
-              v-if="currentUserData?.Image"
-              :src="getImagePath(currentUserData?.Image)"
-              alt="User Profile"
-              class="w-full h-full object-cover"
-            />
-            <span v-else class="font-semibold text-sm text-primary">
-              {{ userInitials }}
-            </span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4
-              class="text-sm font-semibold text-slate-900 dark:text-white truncate leading-snug"
+            <div
+              class="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0"
             >
-              {{ currentUserData?.Name || "User" }}
-            </h4>
-            <p
-              class="text-xs text-slate-500 dark:text-slate-400 capitalize truncate"
-            >
-              {{ currentUserData?.Role || "Guest" }}
-            </p>
+              <img
+                v-if="currentUserData?.Image"
+                :src="getImagePath(currentUserData?.Image)"
+                alt="User Profile"
+                class="w-full h-full object-cover"
+              />
+              <span v-else class="font-semibold text-sm text-primary">
+                {{ userInitials }}
+              </span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4
+                class="text-sm font-semibold text-slate-900 dark:text-white truncate leading-snug"
+              >
+                {{ currentUserData?.Name || "User" }}
+              </h4>
+              <p
+                class="text-xs text-slate-500 dark:text-slate-400 capitalize truncate"
+              >
+                {{ currentUserData?.Role || "Guest" }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -95,10 +116,22 @@
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Topbar Header -->
       <header
-        class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shadow-xs sticky top-0 z-30"
+        class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 sm:px-8 flex items-center justify-between shadow-xs sticky top-0 z-30"
       >
-        <!-- Page Context / Title -->
-        <div class="flex items-center gap-2">
+        <!-- Page Context / Title & Toggle Button -->
+        <div class="flex items-center gap-3">
+          <!-- Toggle Sidebar Button -->
+          <UButton
+            color="neutral"
+            variant="ghost"
+            :icon="isSidebarOpen ? 'i-lucide-panel-left-close' : 'i-lucide-panel-left-open'"
+            size="sm"
+            class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+            :title="isSidebarOpen ? 'Hide sidebar' : 'Show sidebar'"
+            :class="isSidebarOpen ? 'hidden' : 'block'"
+            :aria-label="isSidebarOpen ? 'Hide sidebar' : 'Show sidebar'"
+            @click="toggleSidebar"
+          />
           <h1
             class="text-lg font-bold text-slate-900 dark:text-white capitalize"
           >
@@ -189,9 +222,24 @@ import { moduleData } from "~/model_dto/module_page";
 const route = useRoute();
 const router = useRouter();
 const { locale, setLocale } = useI18n();
-const modulePage = computed(() => moduleData);
+// Filter modules by user role (e.g. hide logger, size_data, and cloudflear_storage if not developer)
+const modulePage = computed(() => {
+  const currentRole = (currentUserData.value?.Role || "").toLowerCase();
+  return moduleData.filter((module) => {
+    if (module.roles && module.roles.length > 0) {
+      return module.roles.some((r) => String(r).toLowerCase() === currentRole);
+    }
+    return true;
+  });
+});
 const { activeLayoutId, setLayout, LAYOUT_OPTIONS } = useLayoutContainer(1);
 const token = useAuthToken();
+
+// Sidebar visibility state
+const isSidebarOpen = useState<boolean>("isSidebarOpen", () => true);
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+};
 
 onMounted(async () => {
   if (token.value) {
@@ -212,10 +260,14 @@ const getModuleIcon = (value: string) => {
       return "i-lucide-credit-card";
     case "report":
       return "i-lucide-file-bar-chart";
+    case "user_register":
+      return "i-lucide-user-plus";
     case "logger":
       return "i-lucide-database";
     case "size_data":
       return "i-lucide-box";
+    case "cloudflear_storage":
+      return "i-lucide-cloud";
     default:
       return "i-lucide-folder";
   }

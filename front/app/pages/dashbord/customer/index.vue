@@ -904,7 +904,7 @@ async function onSubmitLoanInfo() {
       stateCreateLoanInfor.loanInfoUserId = currentUserData.value.Id;
     }
     await createLoanInformationService(stateCreateLoanInfor);
-    await getLoanInformationService();
+    await getLoanInformationService(token.value as string);
     formLoanInfoIsOpen.value = false;
   } catch (error) {
     console.error("Error creating loan information:", error);

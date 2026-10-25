@@ -393,9 +393,9 @@
         </button>
       </div>
 
-      <!-- Repayment Schedule Table -->
+      <!-- Repayment Schedule Table (Visible on Tablets & Desktops) -->
       <div
-        class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
+        class="hidden md:block overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
       >
         <div class="overflow-x-auto">
           <table class="w-full min-w-max table-auto text-left border-collapse">
@@ -549,6 +549,31 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Repayment Schedule Responsive Cards (Visible on Small / Mobile Screens) -->
+      <div class="block md:hidden space-y-3.5">
+        <CardResponsivePaymentList
+          v-for="(payment, index) in filteredPaymentData"
+          :key="payment.payId || index"
+          :payment="payment"
+          :items="getItemsPayment(payment)"
+          @status-update="handleStatusUpdate"
+        />
+
+        <!-- Mobile Empty State -->
+        <div
+          v-if="filteredPaymentData.length === 0"
+          class="p-8 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center text-neutral-400 space-y-2"
+        >
+          <span class="i-lucide-calendar-x w-10 h-10 mx-auto text-neutral-300 dark:text-neutral-700 block" />
+          <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+            No payment schedules found
+          </p>
+          <p class="text-xs text-neutral-400">
+            Try adjusting your search query or status filter.
+          </p>
         </div>
       </div>
     </div>

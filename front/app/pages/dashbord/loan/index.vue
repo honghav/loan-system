@@ -73,177 +73,223 @@
     </div>
 
     <!-- Main Content Section: Loan Configurations Tab -->
-    <div
-      v-if="openLoanTable"
-      class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
-    >
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-max table-auto text-left border-collapse">
-          <thead>
-            <tr
-              class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
-            >
-              <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.loan_type') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.total_periods') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.purpose') }}</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
-            <tr
-              v-for="loanType in filteredLoanTypeData"
-              :key="loanType.loanTypeId"
-              class="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors duration-150 text-sm text-neutral-700 dark:text-neutral-300"
-            >
-              <td class="px-6 py-4 text-center">
-                <UDropdownMenu :items="getItems(loanType)">
-                  <UButton
-                    icon="i-lucide-ellipsis-vertical"
-                    color="neutral"
-                    variant="ghost"
-                    size="sm"
-                    class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  />
-                </UDropdownMenu>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
-                >
-                  <span class="i-lucide-calendar-range w-3.5 h-3.5" />
-                  {{ loanType.loanTypeFrequency }}
-                </span>
-              </td>
-              <td
-                class="px-6 py-4 font-mono font-medium text-neutral-900 dark:text-white"
+    <div v-if="openLoanTable" class="space-y-4">
+      <!-- Desktop Table View (Hidden on mobile) -->
+      <div
+        class="hidden md:block overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
+      >
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-max table-auto text-left border-collapse">
+            <thead>
+              <tr
+                class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
               >
-                <div class="flex items-center gap-1.5">
-                  <span class="i-lucide-clock text-neutral-400 w-4 h-4" />
-                  Day {{ loanType.loanTypeFrequencyDay }} of cycle
-                </div>
-              </td>
-              <td
-                class="px-6 py-4 text-neutral-600 dark:text-neutral-400 max-w-xs truncate"
+                <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.loan_type') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.total_periods') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.purpose') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+              <tr
+                v-for="loanType in filteredLoanTypeData"
+                :key="loanType.loanTypeId"
+                class="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors duration-150 text-sm text-neutral-700 dark:text-neutral-300"
               >
-                {{ loanType.loanTypeDescription || "No description provided" }}
-              </td>
-            </tr>
-            <tr v-if="filteredLoanTypeData.length === 0">
-              <td colspan="4" class="px-6 py-12 text-center">
-                <div
-                  class="flex flex-col items-center justify-center space-y-3"
-                >
+                <td class="px-6 py-4 text-center">
+                  <UDropdownMenu :items="getItems(loanType)">
+                    <UButton
+                      icon="i-lucide-ellipsis-vertical"
+                      color="neutral"
+                      variant="ghost"
+                      size="sm"
+                      class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    />
+                  </UDropdownMenu>
+                </td>
+                <td class="px-6 py-4">
                   <span
-                    class="i-lucide-file-text text-neutral-300 dark:text-neutral-700 w-12 h-12"
-                  />
-                  <p
-                    class="text-base font-medium text-neutral-500 dark:text-neutral-400"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
                   >
-                    No configurations found
-                  </p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                    <span class="i-lucide-calendar-range w-3.5 h-3.5" />
+                    {{ loanType.loanTypeFrequency }}
+                  </span>
+                </td>
+                <td
+                  class="px-6 py-4 font-mono font-medium text-neutral-900 dark:text-white"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <span class="i-lucide-clock text-neutral-400 w-4 h-4" />
+                    Day {{ loanType.loanTypeFrequencyDay }} of cycle
+                  </div>
+                </td>
+                <td
+                  class="px-6 py-4 text-neutral-600 dark:text-neutral-400 max-w-xs truncate"
+                >
+                  {{ loanType.loanTypeDescription || "No description provided" }}
+                </td>
+              </tr>
+              <tr v-if="filteredLoanTypeData.length === 0">
+                <td colspan="4" class="px-6 py-12 text-center">
+                  <div
+                    class="flex flex-col items-center justify-center space-y-3"
+                  >
+                    <span
+                      class="i-lucide-file-text text-neutral-300 dark:text-neutral-700 w-12 h-12"
+                    />
+                    <p
+                      class="text-base font-medium text-neutral-500 dark:text-neutral-400"
+                    >
+                      No configurations found
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile Configurations Cards (Visible on mobile/tablet) -->
+      <div class="block md:hidden space-y-3.5">
+        <CardResponsiveLoanTypeList
+          v-for="loanType in filteredLoanTypeData"
+          :key="loanType.loanTypeId"
+          :loan-type="loanType"
+          :items="getItems(loanType)"
+          @edit="openEditLoanTypeModal"
+          @delete="handleDeleteLoanType"
+        />
+
+        <!-- Mobile Empty State -->
+        <div
+          v-if="filteredLoanTypeData.length === 0"
+          class="p-8 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center text-neutral-400 space-y-2"
+        >
+          <UIcon name="i-lucide-file-text" class="w-10 h-10 mx-auto text-neutral-300 dark:text-neutral-700" />
+          <p class="text-sm font-medium">No configurations found</p>
+        </div>
       </div>
     </div>
 
-    <!-- Loan List Tab -->
-    <div
-      v-else
-      class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
-    >
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-max table-auto text-left border-collapse">
-          <thead>
-            <tr
-              class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
-            >
-              <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.loan_number') }}</th>
-              <th class="px-6 py-4">{{ $t('customer.name') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.amount') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.loan_fee') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.penalty_rate') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.loan_type') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.start_date') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.end_date') }}</th>
-              <th class="px-6 py-4">{{ $t('common.status') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.payment_type') }}</th>
-              <th class="px-6 py-4">{{ $t('loan.purpose') }}</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
-            <tr
-              v-for="loan in loanInfomationData"
-              :key="loan.loanInfoId"
-              class="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors duration-150 text-sm text-neutral-700 dark:text-neutral-300"
-            >
-              <td class="px-6 py-4 text-center">
-                <UDropdownMenu :items="getItemsInfo(loan)">
-                  <UButton
-                    icon="i-lucide-ellipsis-vertical"
-                    color="neutral"
-                    variant="ghost"
-                    size="sm"
-                    class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  />
-                </UDropdownMenu>
-              </td>
-              <td
-                class="px-6 py-4 font-semibold text-neutral-900 dark:text-white"
+    <!-- Main Content Section: Loan List Tab -->
+    <div v-else class="space-y-4">
+      <!-- Desktop Loan List Table (Hidden on mobile) -->
+      <div
+        class="hidden md:block overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
+      >
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-max table-auto text-left border-collapse">
+            <thead>
+              <tr
+                class="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/75 dark:bg-neutral-800/40 text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
               >
-                {{ loan.loanInfoNumber || "N/A" }}
-              </td>
-              <td
-                class="px-6 py-4 font-semibold text-neutral-900 dark:text-white"
+                <th class="px-6 py-4 w-20 text-center">{{ $t('common.actions') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.loan_number') }}</th>
+                <th class="px-6 py-4">{{ $t('customer.name') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.amount') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.loan_fee') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.penalty_rate') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.loan_type') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.start_date') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.end_date') }}</th>
+                <th class="px-6 py-4">{{ $t('common.status') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.payment_type') }}</th>
+                <th class="px-6 py-4">{{ $t('loan.purpose') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+              <tr
+                v-for="loan in filteredLoanInfoData"
+                :key="loan.loanInfoId"
+                class="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors duration-150 text-sm text-neutral-700 dark:text-neutral-300"
               >
-                {{ loan.loanInfoLoaner || "N/A" }}
-              </td>
-              <td class="px-6 py-4 font-mono font-semibold text-primary">
-                ${{ loan.loanInfoAmount }}
-              </td>
-              <td class="px-6 py-4 font-mono">{{ loan.loanInfoLoanFee }}%</td>
-              <td class="px-6 py-4 font-mono">
-                {{ loan.loanInfoPenaltyRate }}%
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800"
+                <td class="px-6 py-4 text-center">
+                  <UDropdownMenu :items="getItemsInfo(loan)">
+                    <UButton
+                      icon="i-lucide-ellipsis-vertical"
+                      color="neutral"
+                      variant="ghost"
+                      size="sm"
+                      class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    />
+                  </UDropdownMenu>
+                </td>
+                <td
+                  class="px-6 py-4 font-semibold text-neutral-900 dark:text-white"
                 >
-                  {{ loan.loanInfoTypeName || "N/A" }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-xs">{{ loan.loanInfoStartDate }}</td>
-              <td class="px-6 py-4 text-xs">{{ loan.loanInfoEndDate }}</td>
-              <td class="px-6 py-4">
-                <span
-                  class="px-2.5 py-1 rounded-full text-xs font-semibold"
-                  :class="
-                    loan.loanInfoStatus === 'completed'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
-                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400'
-                  "
+                  {{ loan.loanInfoNumber || "N/A" }}
+                </td>
+                <td
+                  class="px-6 py-4 font-semibold text-neutral-900 dark:text-white"
                 >
-                  {{ $t(`status.${(loan.loanInfoStatus || 'in_payment').toLowerCase()}`) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-xs capitalize">
-                {{ $t(`loan.${loan.loanInfoPaymentType?.toLowerCase()}`) || loan.loanInfoPaymentType }}
-              </td>
-              <td class="px-6 py-4 text-xs max-w-xs truncate">
-                {{ loan.loanInfoPurposeOfLoan }}
-              </td>
-            </tr>
-            <tr v-if="loanInfomationData.length === 0">
-              <td colspan="11" class="px-6 py-12 text-center text-neutral-500">
-                No loan records found. Click "Add Loan Information" to create
-                one.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  {{ loan.loanInfoLoaner || "N/A" }}
+                </td>
+                <td class="px-6 py-4 font-mono font-semibold text-primary">
+                  ${{ loan.loanInfoAmount }}
+                </td>
+                <td class="px-6 py-4 font-mono">{{ loan.loanInfoLoanFee }}%</td>
+                <td class="px-6 py-4 font-mono">
+                  {{ loan.loanInfoPenaltyRate }}%
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800"
+                  >
+                    {{ loan.loanInfoTypeName || "N/A" }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-xs">{{ loan.loanInfoStartDate }}</td>
+                <td class="px-6 py-4 text-xs">{{ loan.loanInfoEndDate }}</td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                    :class="
+                      loan.loanInfoStatus === 'completed'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400'
+                    "
+                  >
+                    {{ $t(`status.${(loan.loanInfoStatus || 'in_payment').toLowerCase()}`) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-xs capitalize">
+                  {{ $t(`loan.${loan.loanInfoPaymentType?.toLowerCase()}`) || loan.loanInfoPaymentType }}
+                </td>
+                <td class="px-6 py-4 text-xs max-w-xs truncate">
+                  {{ loan.loanInfoPurposeOfLoan }}
+                </td>
+              </tr>
+              <tr v-if="filteredLoanInfoData.length === 0">
+                <td colspan="12" class="px-6 py-12 text-center text-neutral-500">
+                  No loan records found. Click "Create Loan" to create
+                  one.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile Loan Cards (Visible on mobile/tablet) -->
+      <div class="block md:hidden space-y-3.5">
+        <CardResponsiveLoanInformationList
+          v-for="loan in filteredLoanInfoData"
+          :key="loan.loanInfoId"
+          :loan="loan"
+          :items="getItemsInfo(loan)"
+          @view-detail="handleViewLoanDetail"
+          @view-payment="handleViewPaymentInfo"
+        />
+
+        <!-- Mobile Empty State -->
+        <div
+          v-if="filteredLoanInfoData.length === 0"
+          class="p-8 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center text-neutral-400 space-y-2"
+        >
+          <UIcon name="i-lucide-receipt" class="w-10 h-10 mx-auto text-neutral-300 dark:text-neutral-700" />
+          <p class="text-sm font-medium">No loan records found</p>
+        </div>
       </div>
     </div>
   </div>
@@ -377,6 +423,38 @@ window.open(`../customer/${loanInfor.loanInfoId}`, '_blank');      },
     },
   ],
 ];
+
+const handleViewLoanDetail = async (loan: GetLoanInformationDTO) => {
+  viewLoandetailIsOpen.value = true;
+  if (loan.loanInfoId) {
+    await getLoanInformationByIdService(loan.loanInfoId);
+  }
+};
+
+const handleViewPaymentInfo = (loan: GetLoanInformationDTO) => {
+  if (!loan?.loanInfoId) return;
+  window.open(`../customer/${loan.loanInfoId}`, "_blank");
+};
+
+const handleDeleteLoanType = async (loanType: GetLoanTypeDTO) => {
+  if (loanType.loanTypeId) {
+    await deleteLoanTypeService(loanType.loanTypeId);
+  }
+};
+
+// Filter loan information locally
+const filteredLoanInfoData = computed(() => {
+  if (!searchQuery.value) return loanInfomationData.value;
+  const q = searchQuery.value.toLowerCase().trim();
+  return loanInfomationData.value.filter(
+    (l) =>
+      l.loanInfoLoaner?.toLowerCase().includes(q) ||
+      l.loanInfoNumber?.toLowerCase().includes(q) ||
+      l.loanInfoTypeName?.toLowerCase().includes(q) ||
+      l.loanInfoPurposeOfLoan?.toLowerCase().includes(q) ||
+      String(l.loanInfoAmount).includes(q),
+  );
+});
 
 // ===========================//
 // Loan Type Action Control   //

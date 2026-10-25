@@ -1,3 +1,5 @@
+import { UserRole } from "./auth/user_enum.dto";
+
 export enum MouldeEnum {
   PAGE = "page",
   SUB_PAGE = "subpage",
@@ -10,6 +12,7 @@ export interface ModulePage {
   route: string;
   type: MouldeEnum;
   under_page?: string;
+  roles?: (UserRole | string)[];
 }
 
 export const moduleData: ModulePage[] = [
@@ -54,12 +57,22 @@ export const moduleData: ModulePage[] = [
     type: MouldeEnum.PAGE,
   },
   {
+    value: "user_register",
+    name: "User register",
+    icon: "",
+    route: "user_register",
+    under_page: "dashbord",
+    type: MouldeEnum.PAGE,
+    roles: [UserRole.DEVELOPER],
+  },
+  {
     value: "logger",
     name: "Logger",
     icon: "",
     route: "logger",
     under_page: "dashbord",
     type: MouldeEnum.PAGE,
+    roles: [UserRole.DEVELOPER],
   },
   {
     value: "size_data",
@@ -68,6 +81,7 @@ export const moduleData: ModulePage[] = [
     route: "size_data",
     under_page: "dashbord",
     type: MouldeEnum.PAGE,
+    roles: [UserRole.DEVELOPER],
   },
   {
     value: "cloudflear_storage",
@@ -76,5 +90,7 @@ export const moduleData: ModulePage[] = [
     route: "cloudflear_storage",
     under_page: "dashbord",
     type: MouldeEnum.PAGE,
+    roles: [UserRole.DEVELOPER],
   },
+
 ];

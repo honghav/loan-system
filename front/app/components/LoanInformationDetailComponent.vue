@@ -191,9 +191,9 @@
             </span>
           </div>
 
-          <!-- Schedule Table -->
+          <!-- Schedule Table (Desktop / Tablet) -->
           <div
-            class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
+            class="hidden md:block overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
           >
             <div class="overflow-x-auto max-h-80 scrollbar-thin">
               <table
@@ -294,6 +294,31 @@
               </table>
             </div>
           </div>
+
+          <!-- Mobile Payment Schedule Cards (Visible on Small / Mobile Screens) -->
+          <div class="block md:hidden space-y-3">
+            <CardResponsivePaymentList
+              v-for="(payment, index) in loanInfomationByIdData?.loanInfoPayment"
+              :key="payment.payId || index"
+              :payment="getEnrichedPayment(payment)"
+              @status-update="handleStatusUpdate"
+            />
+
+            <!-- Mobile Empty State -->
+            <div
+              v-if="
+                !loanInfomationByIdData?.loanInfoPayment ||
+                loanInfomationByIdData.loanInfoPayment.length === 0
+              "
+              class="p-6 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center text-neutral-400 space-y-2"
+            >
+              <UIcon
+                name="i-lucide-calendar-x"
+                class="w-8 h-8 mx-auto text-neutral-300 dark:text-neutral-700 block"
+              />
+              <p class="text-sm font-medium">No payment schedules available</p>
+            </div>
+          </div>
         </div>
 
         <!-- Image Grid -->
@@ -358,12 +383,54 @@ import formatCurrency from '~/constants/helper/formatCurrency';
 import formatDate from '~/constants/helper/formatDate';
 import getLoanStatusBadge from '~/constants/helper/getLoanStatusBadge';
 import getPaymentStatusBadges from '~/constants/helper/getPaymentStatusBadge';
-import { loanInfomationByIdData } from '~/model_dto/loan/loan_list/get_loan_list.dto';
+import getToken from '~/constants/helper/getToken';
+import {
+  loanInfomationByIdData,
+  getLoanInformationByIdService,
+} from '~/model_dto/loan/loan_list/get_loan_list.dto';
+import {
+  updatePaymentStatusService,
+  type GetPaymentTableDTO,
+} from '~/model_dto/payment/get_payment.dto';
+import { PaymentStatus } from '~/model_dto/payment/enum_payment';
+import CardResponsivePaymentList from '~/components/CardResponsive/PaymentList.vue';
+
 const emit = defineEmits(['close']);
 
 const closeModal = () => {
-    emit('close');
+  emit('close');
 };
 
+const getEnrichedPayment = (payment: GetPaymentTableDTO): GetPaymentTableDTO => {
+  return {
+    ...payment,
+    payCustomerName:
+      payment.payCustomerName ||
+      loanInfomationByIdData.value?.loanInfoLoaner ||
+      '',
+    payCustomerImage:
+      payment.payCustomerImage ||
+      loanInfomationByIdData.value?.loanInfoLoanerImage ||
+      '',
+    payLoanNumber:
+      payment.payLoanNumber && payment.payLoanNumber !== 'NA'
+        ? payment.payLoanNumber
+        : loanInfomationByIdData.value?.loanInfoNumber || 'N/A',
+  };
+};
 
+const handleStatusUpdate = async (
+  payment: GetPaymentTableDTO,
+  newStatus: PaymentStatus
+) => {
+  if (payment.payId) {
+    const token = getToken();
+    await updatePaymentStatusService(payment.payId, newStatus, token);
+    if (loanInfomationByIdData.value?.loanInfoId) {
+      await getLoanInformationByIdService(
+        loanInfomationByIdData.value.loanInfoId
+      );
+    }
+  }
+};
 </script>
