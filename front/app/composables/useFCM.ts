@@ -11,8 +11,8 @@ export const useFCM = () => {
 
   const requestPermission = async (): Promise<string | null> => {
     try {
-      // Only run on client
-      if (!import.meta.client) return null;
+      // Only run on client and if firebaseApp is available
+      if (!import.meta.client || !$firebaseApp) return null;
 
       // Browser doesn't support notifications
       if (!("Notification" in window)) {
@@ -71,20 +71,28 @@ export const useFCM = () => {
 export const useFCMListener = () => {
   const { $firebaseApp } = useNuxtApp();
 
-  onMounted(() => {
-    const messaging = getMessaging($firebaseApp);
+  onMounted(async () => {
+    if (!import.meta.client || !$firebaseApp) return;
 
-    onMessage(messaging, (payload) => {
-      console.log("🔥 Foreground notification:", payload);
+    try {
+      if (!(await isSupported())) return;
 
-      const title = payload.notification?.title || "Notification";
-      const body = payload.notification?.body || "";
+      const messaging = getMessaging($firebaseApp);
 
-      new Notification(title, {
-        body,
-        icon: "/icon.png",
+      onMessage(messaging, (payload) => {
+        console.log("🔥 Foreground notification:", payload);
+
+        const title = payload.notification?.title || "Notification";
+        const body = payload.notification?.body || "";
+
+        new Notification(title, {
+          body,
+          icon: "/icon.png",
+        });
       });
-    });
+    } catch (error) {
+      console.warn("FCM listener initialization failed:", error);
+    }
   });
 };
 
