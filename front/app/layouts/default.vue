@@ -4,14 +4,21 @@
   >
     <!-- Sidebar -->
     <aside
-      class="sticky top-0 h-screen bg-white dark:bg-slate-900 flex flex-col justify-between shrink-0 shadow-sm transition-all duration-300 ease-in-out overflow-hidden z-40"
+      class="sticky top-0 h-screen bg-white dark:bg-slate-900 flex flex-col justify-between shrink-0 shadow-sm overflow-hidden z-40 relative group/sidebar"
       :class="[
         isSidebarOpen
-          ? 'w-64 border-r border-slate-200 dark:border-slate-800 opacity-100'
-          : 'w-0 border-r-0 opacity-0 pointer-events-none'
+          ? 'border-r border-slate-200 dark:border-slate-800 opacity-100'
+          : 'border-r-0 opacity-0 pointer-events-none'
       ]"
+      :style="{
+        width: isSidebarOpen ? `${sidebarWidth}px` : '0px',
+        transition: isResizing ? 'none' : 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease'
+      }"
     >
-      <div class="w-64 h-full flex flex-col justify-between shrink-0">
+      <div
+        class="h-full flex flex-col justify-between shrink-0 overflow-hidden"
+        :style="{ width: `${sidebarWidth}px` }"
+      >
         <!-- Sidebar Header & Logo -->
         <div class="flex-1 flex flex-col min-h-0">
           <div
@@ -109,6 +116,29 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Drag Handle to Resize Sidebar Width -->
+      <div
+        v-if="isSidebarOpen"
+        class="absolute top-0 right-0 w-2 h-full cursor-col-resize z-50 transition-colors flex items-center justify-center select-none group/resizer"
+        :class="[
+          isResizing
+            ? 'bg-primary/20 dark:bg-primary/30'
+            : 'hover:bg-primary/10 dark:hover:bg-primary/20'
+        ]"
+        title="Drag to resize sidebar (double-click to reset)"
+        @mousedown.prevent="startResize"
+        @dblclick="resetSidebarWidth"
+      >
+        <div
+          class="w-0.5 h-8 rounded-full transition-all duration-200"
+          :class="[
+            isResizing
+              ? 'bg-primary h-12 shadow-xs'
+              : 'bg-slate-300 dark:bg-slate-700 group-hover/resizer:bg-primary/70 group-hover/resizer:h-10'
+          ]"
+        />
       </div>
     </aside>
 
@@ -217,6 +247,7 @@ import {
   currentUserData,
   getCurrentUserService,
 } from "~/model_dto/auth/get_current_user.dto";
+import { UserRole } from "~/model_dto/auth/user_enum.dto";
 import { moduleData } from "~/model_dto/module_page";
 
 const route = useRoute();
@@ -235,6 +266,52 @@ const modulePage = computed(() => {
 const { activeLayoutId, setLayout, LAYOUT_OPTIONS } = useLayoutContainer(1);
 const token = useAuthToken();
 
+// Resizable sidebar state and logic
+const DEFAULT_SIDEBAR_WIDTH = 256;
+const MIN_SIDEBAR_WIDTH = 200;
+const MAX_SIDEBAR_WIDTH = 480;
+
+const sidebarWidth = useState<number>("sidebarWidth", () => DEFAULT_SIDEBAR_WIDTH);
+const isResizing = ref(false);
+
+const startResize = (e: MouseEvent) => {
+  e.preventDefault();
+  isResizing.value = true;
+  document.body.style.userSelect = "none";
+  document.body.style.cursor = "col-resize";
+
+  const onMouseMove = (moveEvent: MouseEvent) => {
+    if (!isResizing.value) return;
+    const newWidth = Math.min(
+      Math.max(moveEvent.clientX, MIN_SIDEBAR_WIDTH),
+      MAX_SIDEBAR_WIDTH
+    );
+    sidebarWidth.value = newWidth;
+  };
+
+  const onMouseUp = () => {
+    isResizing.value = false;
+    document.body.style.userSelect = "";
+    document.body.style.cursor = "";
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+
+    if (import.meta.client) {
+      localStorage.setItem("sidebar_width", String(sidebarWidth.value));
+    }
+  };
+
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mouseup", onMouseUp);
+};
+
+const resetSidebarWidth = () => {
+  sidebarWidth.value = DEFAULT_SIDEBAR_WIDTH;
+  if (import.meta.client) {
+    localStorage.removeItem("sidebar_width");
+  }
+};
+
 // Sidebar visibility state
 const isSidebarOpen = useState<boolean>("isSidebarOpen", () => true);
 const toggleSidebar = () => {
@@ -242,8 +319,25 @@ const toggleSidebar = () => {
 };
 
 onMounted(async () => {
+  if (import.meta.client) {
+    const saved = localStorage.getItem("sidebar_width");
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= MIN_SIDEBAR_WIDTH && parsed <= MAX_SIDEBAR_WIDTH) {
+        sidebarWidth.value = parsed;
+      }
+    }
+  }
+
   if (token.value) {
     await getCurrentUserService(token.value as string);
+  }
+});
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    document.body.style.userSelect = "";
+    document.body.style.cursor = "";
   }
 });
 

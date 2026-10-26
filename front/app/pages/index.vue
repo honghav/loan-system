@@ -8,11 +8,17 @@
   </article>
 </template>
 <script setup lang="ts">
+import { UserRole } from '~/model_dto/auth/user_enum.dto';
+
 const connectGoogleCalendar = () => {
   const currentUserId = '9e65ff47-280e-4e0d-8d1f-7499dfe5c710'; // Replace with logged-in user ID
   // Points to NestJS backend running on port 8000
   window.location.href = `http://localhost:8000/api/v1/google-calendar/connect?userId=${currentUserId}`;
 };
+definePageMeta({
+  middleware: "auth",
+  roles: [UserRole.DEVELOPER, UserRole.ADMIN],
+});
 // SEO Meta
 useSeoMeta({
   title: "Loan System",
