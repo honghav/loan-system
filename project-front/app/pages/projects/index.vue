@@ -1,31 +1,31 @@
 <template>
   <div class="space-y-6">
     <!-- Projects Directory Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2 text-xs text-[#908fa0] uppercase tracking-wider font-semibold">
           <span class="material-symbols-outlined text-[16px] text-[#8083ff]">folder_open</span>
           <span>Repository Catalog</span>
         </div>
-        <h1 class="text-2xl font-bold text-white tracking-tight">Projects Directory</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Projects Directory</h1>
       </div>
 
       <!-- Filters & Actions -->
-      <div class="flex items-center gap-3">
-        <div class="relative">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-64">
           <span class="material-symbols-outlined absolute left-3 top-2.5 text-[#908fa0] text-[18px]">search</span>
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Search projects..."
-            class="h-9 pl-9 pr-4 bg-[#141b2b] text-white text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#8083ff]"
+            class="w-full h-9 pl-9 pr-4 bg-[#141b2b] text-white text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#8083ff] transition-all"
             @input="debouncedSearch"
           />
         </div>
 
         <select
           v-model="selectedStatus"
-          class="h-9 px-3 bg-[#141b2b] text-white text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#8083ff]"
+          class="h-9 px-3 bg-[#141b2b] text-white text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#8083ff] transition-all w-full sm:w-auto"
           @change="loadProjects"
         >
           <option value="">All Statuses</option>
@@ -44,20 +44,20 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="!projects.length" class="p-12 text-center rounded-2xl bg-[#141b2b] border border-[#232a3a] space-y-3">
+    <div v-else-if="!projects.length" class="p-10 sm:p-12 text-center rounded-2xl bg-[#141b2b] border border-[#232a3a] space-y-3 shadow-xl">
       <span class="material-symbols-outlined text-4xl text-[#908fa0]">folder_off</span>
       <p class="text-xs text-[#c7c4d7]">No projects match your filter or search criteria.</p>
     </div>
 
     <!-- Projects Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
       <div
         v-for="project in projects"
         :key="project.id"
-        class="p-6 rounded-2xl bg-[#141b2b] border border-[#232a3a] hover:border-[#8083ff]/50 transition-all flex flex-col justify-between shadow-xl group space-y-5"
+        class="p-5 sm:p-6 rounded-2xl bg-[#141b2b] border border-[#232a3a] hover:border-[#8083ff]/50 transition-all flex flex-col justify-between shadow-xl group space-y-4 sm:space-y-5"
       >
         <div class="space-y-3">
-          <div class="flex items-start justify-between">
+          <div class="flex items-start justify-between gap-2">
             <span class="px-2.5 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider" :class="getStatusBadgeClass(project.status)">
               {{ project.status.replace('_', ' ') }}
             </span>

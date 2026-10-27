@@ -2,19 +2,34 @@
   <div class="min-h-screen bg-[#0c1322] text-[#dce2f7] font-sans antialiased selection:bg-[#8083ff] selection:text-white">
     <!-- Fixed Top Header -->
     <header class="fixed top-0 left-0 right-0 h-16 z-50 bg-[#0c1322]/90 backdrop-blur-xl border-b border-[#232a3a] shadow-lg">
-      <div class="w-full h-full px-6 flex items-center justify-between gap-4">
-        <!-- Logo & Title -->
-        <NuxtLink to="/" class="flex items-center gap-3 min-w-[220px] group">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#8083ff] to-[#4cd7f6] flex items-center justify-center text-white shadow-[0_0_15px_rgba(128,131,255,0.4)] group-hover:scale-105 transition-transform">
-            <span class="material-symbols-outlined text-[22px]">rocket_launch</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="font-bold text-lg text-white tracking-tight leading-none group-hover:text-[#c0c1ff] transition-colors">PPM</span>
-            <span class="text-[10px] text-[#908fa0] uppercase tracking-widest font-semibold mt-0.5">Personal Project Manager</span>
-          </div>
-        </NuxtLink>
+      <div class="w-full h-full px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-4">
+        <!-- Left: Mobile Menu Toggle & Logo -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Sidebar Toggle Button -->
+          <button
+            type="button"
+            @click="isMobileSidebarOpen = !isMobileSidebarOpen"
+            class="lg:hidden w-9 h-9 rounded-xl bg-[#141b2b] border border-[#232a3a] flex items-center justify-center text-[#c7c4d7] hover:text-white transition-colors active:scale-95 shrink-0"
+            aria-label="Toggle navigation menu"
+          >
+            <span class="material-symbols-outlined text-[20px]">
+              {{ isMobileSidebarOpen ? 'close' : 'menu' }}
+            </span>
+          </button>
 
-        <!-- Search Bar -->
+          <!-- Logo & Title -->
+          <NuxtLink to="/" class="flex items-center gap-2.5 sm:gap-3 group" @click="isMobileSidebarOpen = false">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#8083ff] to-[#4cd7f6] flex items-center justify-center text-white shadow-[0_0_15px_rgba(128,131,255,0.4)] group-hover:scale-105 transition-transform shrink-0">
+              <span class="material-symbols-outlined text-[19px] sm:text-[22px]">rocket_launch</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-bold text-base sm:text-lg text-white tracking-tight leading-none group-hover:text-[#c0c1ff] transition-colors">PPM</span>
+              <span class="text-[9px] sm:text-[10px] text-[#908fa0] uppercase tracking-wider font-semibold mt-0.5 hidden xs:inline sm:inline">Project Manager</span>
+            </div>
+          </NuxtLink>
+        </div>
+
+        <!-- Search Bar (Desktop / Tablet) -->
         <div class="flex-1 max-w-lg hidden md:flex items-center">
           <div class="relative w-full flex items-center">
             <span class="material-symbols-outlined absolute left-3 text-[#908fa0] pointer-events-none text-[18px]">search</span>
@@ -30,7 +45,7 @@
         </div>
 
         <!-- Right Quick Status & Actions -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
           <!-- Backend API Health Badge -->
           <div class="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-[#141b2b] border border-[#232a3a] text-[#4edea3] text-xs font-medium">
             <span class="w-2 h-2 rounded-full bg-[#4edea3] animate-pulse"></span>
@@ -40,32 +55,53 @@
           <!-- New Project Button -->
           <button
             type="button"
-            class="flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[#8083ff] text-white font-medium text-xs hover:bg-[#c0c1ff] hover:text-[#0d0096] transition-all shadow-[0_0_12px_rgba(128,131,255,0.3)] active:scale-95"
+            class="flex items-center gap-1.5 h-9 px-3 sm:px-4 rounded-xl bg-[#8083ff] text-white font-medium text-xs hover:bg-[#c0c1ff] hover:text-[#0d0096] transition-all shadow-[0_0_12px_rgba(128,131,255,0.3)] active:scale-95"
             @click="isCreateProjectModalOpen = true"
           >
             <span class="material-symbols-outlined text-[18px]">add</span>
-            <span>New Project</span>
+            <span class="hidden sm:inline">New Project</span>
+            <span class="sm:hidden">New</span>
           </button>
 
           <!-- User Avatar -->
-          <div class="w-9 h-9 rounded-full bg-[#191f2f] border border-[#232a3a] flex items-center justify-center text-[#c0c1ff]">
-            <span class="material-symbols-outlined text-[20px]">person</span>
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#191f2f] border border-[#232a3a] flex items-center justify-center text-[#c0c1ff] shrink-0">
+            <span class="material-symbols-outlined text-[18px] sm:text-[20px]">person</span>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Fixed Left Sidebar Navigation -->
-    <aside class="fixed left-0 top-16 bottom-0 w-64 bg-[#070e1d]/90 backdrop-blur-xl border-r border-[#232a3a] z-40 flex flex-col justify-between py-4 shadow-xl">
-      <div class="flex flex-col gap-4 px-4">
-        <div class="px-2 pt-1">
+    <!-- Mobile Backdrop Overlay -->
+    <div
+      v-if="isMobileSidebarOpen"
+      class="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm lg:hidden transition-opacity"
+      @click="isMobileSidebarOpen = false"
+    ></div>
+
+    <!-- Left Sidebar Navigation (Desktop Fixed / Mobile Slide-Over) -->
+    <aside
+      class="fixed left-0 top-16 bottom-0 w-64 bg-[#070e1d]/95 backdrop-blur-xl border-r border-[#232a3a] z-40 flex flex-col justify-between py-4 shadow-2xl transition-transform duration-300 ease-in-out"
+      :class="[
+        isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      ]"
+    >
+      <div class="flex flex-col gap-4 px-4 overflow-y-auto flex-1">
+        <div class="flex items-center justify-between px-2 pt-1">
           <span class="text-[10px] font-bold uppercase tracking-widest text-[#908fa0]">Navigation</span>
+          <button
+            type="button"
+            @click="isMobileSidebarOpen = false"
+            class="lg:hidden text-[#908fa0] hover:text-white p-1"
+          >
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
         </div>
         <nav class="flex flex-col gap-1">
           <NuxtLink
             v-for="item in navItems"
             :key="item.path"
             :to="item.path"
+            @click="isMobileSidebarOpen = false"
             class="flex items-center px-3 py-2.5 rounded-xl transition-all text-xs font-medium"
             :class="[
               route.path === item.path
@@ -80,7 +116,7 @@
       </div>
 
       <!-- Telemetry Footer Widget -->
-      <div class="px-4 flex flex-col gap-3">
+      <div class="px-4 flex flex-col gap-3 pt-3 border-t border-[#232a3a]/60">
         <div class="p-3.5 rounded-xl bg-[#141b2b] border border-[#232a3a] flex flex-col gap-2">
           <div class="flex items-center justify-between text-xs text-[#c7c4d7]">
             <span class="flex items-center gap-1">
@@ -100,28 +136,28 @@
       </div>
     </aside>
 
-    <!-- Main Workspace Content -->
-    <div class="pl-64">
+    <!-- Main Workspace Content (Responsive padding: pl-0 on mobile, pl-64 on desktop) -->
+    <div class="pl-0 lg:pl-64 transition-all duration-300">
       <main class="relative pt-16 w-full min-h-screen bg-[#0c1322]">
         <!-- Ambient Backdrop Glow Spots -->
-        <div class="relative w-full">
-          <div class="absolute -top-12 left-1/4 w-96 h-96 bg-[#8083ff]/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
-          <div class="absolute top-48 right-12 w-80 h-80 bg-[#4cd7f6]/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+        <div class="relative w-full overflow-hidden">
+          <div class="absolute -top-12 left-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-[#8083ff]/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+          <div class="absolute top-48 right-12 w-64 sm:w-80 h-64 sm:h-80 bg-[#4cd7f6]/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
         </div>
         
-        <div class="p-6 md:p-8">
+        <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           <slot />
         </div>
       </main>
     </div>
 
     <!-- Quick Project Creation Modal -->
-    <div v-if="isCreateProjectModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div class="w-full max-w-lg bg-[#141b2b] border border-[#232a3a] rounded-2xl p-6 shadow-2xl space-y-5">
+    <div v-if="isCreateProjectModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
+      <div class="w-full max-w-lg bg-[#141b2b] border border-[#232a3a] rounded-2xl p-5 sm:p-6 shadow-2xl space-y-5 my-8">
         <div class="flex items-center justify-between border-b border-[#232a3a] pb-4">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-[#c0c1ff]">add_circle</span>
-            <h3 class="text-lg font-bold text-white">Create New Project</h3>
+            <h3 class="text-base sm:text-lg font-bold text-white">Create New Project</h3>
           </div>
           <button @click="isCreateProjectModalOpen = false" class="text-[#908fa0] hover:text-white transition-colors">
             <span class="material-symbols-outlined">close</span>
@@ -136,7 +172,7 @@
               required
               type="text"
               placeholder="e.g. NextGen Microservices Platform"
-              class="w-full h-10 px-3 bg-[#070e1d] text-white placeholder-[#908fa0] text-xs rounded-lg border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
+              class="w-full h-10 px-3 bg-[#070e1d] text-white placeholder-[#908fa0] text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
             />
           </div>
 
@@ -146,16 +182,16 @@
               v-model="newProject.description"
               rows="3"
               placeholder="Brief summary of project scope & objectives..."
-              class="w-full p-3 bg-[#070e1d] text-white placeholder-[#908fa0] text-xs rounded-lg border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
+              class="w-full p-3 bg-[#070e1d] text-white placeholder-[#908fa0] text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
             ></textarea>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-[#c7c4d7] mb-1">Initial Status</label>
               <select
                 v-model="newProject.status"
-                class="w-full h-10 px-3 bg-[#070e1d] text-white text-xs rounded-lg border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
+                class="w-full h-10 px-3 bg-[#070e1d] text-white text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
               >
                 <option value="PLANNING">Planning</option>
                 <option value="IN_PROGRESS">In Progress</option>
@@ -166,7 +202,7 @@
               <label class="block text-xs font-semibold text-[#c7c4d7] mb-1">Priority</label>
               <select
                 v-model="newProject.priority"
-                class="w-full h-10 px-3 bg-[#070e1d] text-white text-xs rounded-lg border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
+                class="w-full h-10 px-3 bg-[#070e1d] text-white text-xs rounded-xl border border-[#232a3a] focus:outline-none focus:border-[#c0c1ff]"
               >
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
@@ -187,7 +223,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="px-5 py-2 rounded-lg bg-[#8083ff] text-white text-xs font-semibold hover:bg-[#c0c1ff] hover:text-[#0d0096] transition-all disabled:opacity-50"
+              class="px-5 py-2 rounded-xl bg-[#8083ff] text-white text-xs font-semibold hover:bg-[#c0c1ff] hover:text-[#0d0096] transition-all disabled:opacity-50"
             >
               {{ isSubmitting ? 'Creating...' : 'Create Project' }}
             </button>
@@ -199,7 +235,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ProjectStatus, ProjectPriority } from '~/model_dto/project.dto';
 import { useProjectService } from '~/composables/useProjectService';
@@ -207,10 +243,19 @@ import { useProjectService } from '~/composables/useProjectService';
 const route = useRoute();
 const router = useRouter();
 const searchQuery = ref('');
+const isMobileSidebarOpen = ref(false);
 const isCreateProjectModalOpen = ref(false);
 const isSubmitting = ref(false);
 
 const projectService = useProjectService();
+
+// Automatically close mobile sidebar on navigation
+watch(
+  () => route.path,
+  () => {
+    isMobileSidebarOpen.value = false;
+  }
+);
 
 const newProject = ref({
   name: '',
@@ -223,6 +268,7 @@ const navItems = [
   { path: '/', title: 'Dashboard', icon: 'dashboard' },
   { path: '/projects', title: 'Projects', icon: 'folder' },
   { path: '/kanban', title: 'Task Kanban', icon: 'view_kanban' },
+  { path: '/documents', title: 'Documents', icon: 'description' },
   { path: '/activities', title: 'Activity Audit', icon: 'history_toggle_off' },
 ];
 

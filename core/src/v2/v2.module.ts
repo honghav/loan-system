@@ -5,6 +5,7 @@ import { getV2DatabaseConfig } from './config/database.v2.config';
 import { ProjectModule } from './modules/projects/project.module';
 import { FeatureModule } from './modules/features/feature.module';
 import { TaskModule } from './modules/tasks/task.module';
+import { DocumentModule } from './modules/document/document.module';
 import { ActivityModule } from './modules/activities/activity.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 
@@ -20,6 +21,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     ProjectModule,
     FeatureModule,
     TaskModule,
+    DocumentModule,
     ActivityModule,
     DashboardModule,
   ],

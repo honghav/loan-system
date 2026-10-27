@@ -44,6 +44,7 @@ async function bootstrap() {
     .addTag('Projects', 'Project management endpoints')
     .addTag('Features', 'Feature breakdown endpoints')
     .addTag('Tasks', 'Task management & status tracking endpoints')
+    .addTag('Documents', 'Project documentation and technical notes endpoints')
     .addTag('Activities', 'Project activity audit history')
     .addTag('Dashboard', 'Overview statistics & overdue tracking')
     .build();

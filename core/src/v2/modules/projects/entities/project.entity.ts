@@ -11,6 +11,7 @@ import { ProjectStatus } from '../../../common/enums/project-status.enum';
 import { ProjectPriority } from '../../../common/enums/project-priority.enum';
 import { Feature } from '../../features/entities/feature.entity';
 import { Task } from '../../tasks/entities/task.entity';
+import { Document } from '../../document/entities/document.entity';
 
 @Entity('projects')
 export class Project {
@@ -52,6 +53,9 @@ export class Project {
 
   @OneToMany(() => Task, (task) => task.project)
   tasks?: Task[];
+
+  @OneToMany(() => Document, (document) => document.project)
+  documents?: Document[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
