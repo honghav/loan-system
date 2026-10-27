@@ -16,7 +16,6 @@ const siteUrl = config.public.appUrl;
 
 onMounted(async () => {
   const { default: AOS } = (await import("aos")) as any;
-  useFCMListener();
   AOS.init();
   AOS.refresh();
 });

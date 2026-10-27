@@ -8,8 +8,8 @@ export function useV2Api() {
       return config.public.v2ApiUrl.replace(/\/+$/, '');
     }
 
-    let rawUrl = config.public.baseUrl || config.public.apiUrl || 'http://localhost:8000/api/v2';
-    
+    let rawUrl = config.public.baseUrl || config.public.apiUrl || 'https://loan-api.leanghonghav.site/api/v2';
+
     // Normalize slashes
     rawUrl = rawUrl.trim().replace(/\/+$/, '');
 

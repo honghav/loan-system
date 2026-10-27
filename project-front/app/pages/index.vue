@@ -5,7 +5,7 @@
       <div class="flex flex-col gap-1">
         <div class="flex items-center gap-2 text-xs text-[#908fa0] uppercase tracking-wider font-semibold">
           <span class="w-2 h-2 rounded-full bg-[#4edea3]"></span>
-          <span>Telemetry Pipeline • Active Sync</span>
+          <span>Telemetry Pipeline • Active Sync{{ config.app.baseURL }}</span>
         </div>
         <h1 class="text-3xl font-bold text-white tracking-tight">Executive Operations Deck</h1>
         <p class="text-xs text-[#c7c4d7]">Real-time compilation of distributed repositories, priority queues, and sprint velocities.</p>
@@ -281,6 +281,7 @@ useSeoMeta({
   title: 'Executive Operations Deck - PPM',
   description: 'Real-time telemetry and project velocity tracking.',
 });
+  const config = useRuntimeConfig();
 
 const dashboardService = useDashboardService();
 const stats = ref<DashboardOverviewDto | null>(null);
