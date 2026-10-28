@@ -14,8 +14,11 @@ export async function apiFetch(
     headers["Accept-Language"] = acceptLang;
   }
 
-  if (token) {
-    (headers as Record<string, string>).Authorization = `Bearer ${token}`;
+  const tokenKey = config.public.tokenKey;
+  const tokenToUse = token || (tokenKey ? useCookie(String(tokenKey)).value : undefined);
+
+  if (tokenToUse) {
+    (headers as Record<string, string>).Authorization = `Bearer ${tokenToUse}`;
   }
 
   return await $fetch(`${config.public.baseUrl}/${endpoint}`, {

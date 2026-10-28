@@ -130,11 +130,48 @@
         <span class="truncate">{{ displayContect }}</span>
       </div>
     </div>
+
+    <!-- Action Buttons Row -->
+    <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+      <UButton
+        size="xs"
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-key-round"
+        label="Password"
+        class="cursor-pointer"
+        @click="$emit('change-password', props.user)"
+      />
+      <UButton
+        size="xs"
+        color="neutral"
+        variant="outline"
+        icon="i-lucide-activity"
+        label="Status"
+        class="cursor-pointer"
+        @click="$emit('change-status', props.user)"
+      />
+      <UButton
+        size="xs"
+        color="primary"
+        variant="solid"
+        icon="i-lucide-pencil"
+        label="Edit"
+        class="cursor-pointer"
+        @click="$emit('edit', props.user)"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { GetCurrentUserDTO } from "~/model_dto/auth/get_current_user.dto";
+
+const emit = defineEmits<{
+  (e: "edit", user?: GetCurrentUserDTO): void;
+  (e: "change-password", user?: GetCurrentUserDTO): void;
+  (e: "change-status", user?: GetCurrentUserDTO): void;
+}>();
 
 interface Props {
   user?: GetCurrentUserDTO;

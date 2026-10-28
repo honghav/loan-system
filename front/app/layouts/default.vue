@@ -86,11 +86,13 @@
 
         <!-- Sidebar Footer User Profile Card -->
         <div class="p-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
-          <div
-            class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50"
+          <NuxtLink
+            to="/dashbord/profile"
+            class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/50 hover:bg-slate-100/80 dark:hover:bg-slate-800 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-200 cursor-pointer group"
+            title="View & Edit Profile"
           >
             <div
-              class="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0"
+              class="relative w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200"
             >
               <img
                 v-if="currentUserData?.Image"
@@ -104,7 +106,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <h4
-                class="text-sm font-semibold text-slate-900 dark:text-white truncate leading-snug"
+                class="text-sm font-semibold text-slate-900 dark:text-white truncate leading-snug group-hover:text-primary transition-colors duration-200"
               >
                 {{ currentUserData?.Name || "User" }}
               </h4>
@@ -114,7 +116,11 @@
                 {{ currentUserData?.Role || "Guest" }}
               </p>
             </div>
-          </div>
+            <UIcon
+              name="i-lucide-chevron-right"
+              class="w-4 h-4 text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200 shrink-0"
+            />
+          </NuxtLink>
         </div>
       </div>
 
