@@ -4,9 +4,8 @@ import type { FeatureDto } from './feature.dto';
 export enum TaskStatus {
   TODO = 'TODO',
   IN_PROGRESS = 'IN_PROGRESS',
-  IN_REVIEW = 'IN_REVIEW',
-  DONE = 'DONE',
   BLOCKED = 'BLOCKED',
+  DONE = 'DONE',
 }
 
 export enum TaskPriority {

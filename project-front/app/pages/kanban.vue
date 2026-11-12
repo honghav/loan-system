@@ -110,7 +110,7 @@
               >
                 <option value="TODO">→ TODO</option>
                 <option value="IN_PROGRESS">→ WIP</option>
-                <option value="IN_REVIEW">→ REVIEW</option>
+                <option value="BLOCKED">→ REVIEW</option>
                 <option value="DONE">→ DONE</option>
               </select>
             </div>
@@ -235,7 +235,7 @@ const newTask = ref({
 const columns = [
   { status: TaskStatus.TODO, title: 'To-Do Queue', color: 'bg-[#908fa0]' },
   { status: TaskStatus.IN_PROGRESS, title: 'In Progress', color: 'bg-[#8083ff]' },
-  { status: TaskStatus.IN_REVIEW, title: 'In Review', color: 'bg-[#4cd7f6]' },
+  { status: TaskStatus.BLOCKED, title: 'In Review', color: 'bg-[#4cd7f6]' },
   { status: TaskStatus.DONE, title: 'Done / Verified', color: 'bg-[#4edea3]' },
 ];
 
@@ -290,7 +290,7 @@ const getTasksByStatus = (status: TaskStatus) => {
 
 const changeTaskStatus = async (taskId: string, newStatus: TaskStatus) => {
   try {
-    await taskService.updateTaskStatus(taskId, { status: newStatus });
+    await taskService.updateTaskStatus(taskId,  newStatus );
     const target = tasks.value.find((t) => t.id === taskId);
     if (target) {
       target.status = newStatus;
